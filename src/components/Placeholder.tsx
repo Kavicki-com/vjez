@@ -1,6 +1,13 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { cores, espaco, fonte, raio } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  fonte,
+  larguraMaximaConteudo,
+  peso,
+  raio,
+} from '@/theme/tokens';
 
 type Props = {
   titulo: string;
@@ -31,22 +38,22 @@ export function Placeholder({ titulo, descricao, itens }: Props) {
 }
 
 const styles = StyleSheet.create({
-  scroll: { flex: 1, backgroundColor: cores.fundoSuave },
+  scroll: { flex: 1, backgroundColor: cores.fundo },
   conteudo: {
     padding: espaco.md,
     alignItems: 'center',
   },
   cartao: {
     width: '100%',
-    maxWidth: 720,
-    backgroundColor: cores.fundo,
+    maxWidth: larguraMaximaConteudo,
+    backgroundColor: cores.superficie,
     borderRadius: raio.lg,
     borderWidth: 1,
     borderColor: cores.borda,
     padding: espaco.lg,
     gap: espaco.sm,
   },
-  titulo: { fontSize: fonte.titulo, fontWeight: '700', color: cores.texto },
+  titulo: { fontSize: fonte.titulo, fontWeight: peso.forte, color: cores.texto },
   descricao: {
     fontSize: fonte.corpo,
     color: cores.textoSuave,

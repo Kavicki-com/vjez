@@ -1,59 +1,46 @@
-import { Ionicons } from '@expo/vector-icons';
 import { Drawer } from 'expo-router/drawer';
 
-import { cores } from '@/theme/tokens';
+import { NavLateral } from '@/components/NavLateral';
+import { cores, fonte, larguraNavLateral, peso } from '@/theme/tokens';
+import { useLayout } from '@/theme/useLayout';
 
 export default function DrawerLayout() {
+  const { largo } = useLayout();
+
   return (
     <Drawer
+      drawerContent={NavLateral}
       screenOptions={{
         headerShown: false,
-        drawerActiveTintColor: cores.primaria,
-        drawerInactiveTintColor: cores.textoSuave,
-        drawerActiveBackgroundColor: cores.primariaSuave,
+        // Tela larga: lateral sempre visível. Estreita: gaveta por cima.
+        drawerType: largo ? 'permanent' : 'front',
+        drawerStyle: {
+          width: larguraNavLateral,
+          backgroundColor: cores.superficie,
+          borderRightColor: cores.borda,
+          borderRightWidth: largo ? 1 : 0,
+        },
+        overlayColor: 'rgba(30, 30, 30, 0.35)',
+        sceneStyle: { backgroundColor: cores.fundo },
+        headerStyle: { backgroundColor: cores.superficie },
+        headerShadowVisible: false,
+        headerTintColor: cores.texto,
+        headerTitleStyle: { fontSize: fonte.subtitulo, fontWeight: peso.forte },
       }}
     >
-      <Drawer.Screen
-        name="(tabs)"
-        options={{
-          drawerLabel: 'Início',
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="home-outline" color={color} size={size} />
-          ),
-        }}
-      />
+      {/* As abas trazem o próprio cabeçalho; as telas do menu usam o do drawer. */}
+      <Drawer.Screen name="(tabs)" />
       <Drawer.Screen
         name="configuracoes"
-        options={{
-          headerShown: true,
-          title: 'Configurações',
-          drawerLabel: 'Configurações',
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="settings-outline" color={color} size={size} />
-          ),
-        }}
+        options={{ headerShown: true, title: 'Configurações' }}
       />
       <Drawer.Screen
         name="conta"
-        options={{
-          headerShown: true,
-          title: 'Conta',
-          drawerLabel: 'Conta',
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="person-circle-outline" color={color} size={size} />
-          ),
-        }}
+        options={{ headerShown: true, title: 'Conta' }}
       />
       <Drawer.Screen
         name="privacidade"
-        options={{
-          headerShown: true,
-          title: 'Privacidade e termos',
-          drawerLabel: 'Privacidade e termos',
-          drawerIcon: ({ color, size }) => (
-            <Ionicons name="shield-checkmark-outline" color={color} size={size} />
-          ),
-        }}
+        options={{ headerShown: true, title: 'Privacidade e termos' }}
       />
     </Drawer>
   );
