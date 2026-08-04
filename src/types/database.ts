@@ -602,7 +602,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      buscar_lex_items: {
+        Args: { termo: string }
+        Returns: {
+          atualizado_em: string
+          audio_url: string | null
+          categoria: string
+          criado_em: string
+          genero: Database["public"]["Enums"]["genero_gramatical"] | null
+          hr: string
+          id: string
+          nota_pt: string | null
+          pt: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "lex_items"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
       estado_conta: "convidado" | "autenticado"

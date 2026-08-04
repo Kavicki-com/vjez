@@ -1,0 +1,50 @@
+import { FlatList, StyleSheet, Text, View } from 'react-native';
+
+import { Carregando, Erro } from '@/components/Estados';
+import { cores, espaco, fonte, peso, raio } from '@/theme/tokens';
+
+import { useNumeros } from './hooks';
+
+export function ListaNumeros() {
+  const { data, isPending, isError } = useNumeros();
+
+  if (isPending) return <Carregando />;
+  if (isError) return <Erro />;
+
+  return (
+    <FlatList
+      data={data}
+      keyExtractor={(item) => item.id}
+      contentContainerStyle={styles.lista}
+      showsVerticalScrollIndicator={false}
+      renderItem={({ item }) => (
+        <View style={styles.linha}>
+          <Text style={styles.valor}>{item.valor}</Text>
+          <Text style={styles.hr}>{item.hr}</Text>
+        </View>
+      )}
+    />
+  );
+}
+
+const styles = StyleSheet.create({
+  lista: { gap: espaco.sm, paddingVertical: espaco.md },
+  linha: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: espaco.md,
+    paddingVertical: espaco.sm + espaco.xs,
+    paddingHorizontal: espaco.md,
+    backgroundColor: cores.superficie,
+    borderRadius: raio.md,
+    borderWidth: 1,
+    borderColor: cores.borda,
+  },
+  valor: {
+    minWidth: 56,
+    fontSize: fonte.subtitulo,
+    fontWeight: peso.forte,
+    color: cores.secundaria,
+  },
+  hr: { flex: 1, fontSize: fonte.corpo, color: cores.texto },
+});
