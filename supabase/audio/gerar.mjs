@@ -21,10 +21,14 @@ const API_KEY = process.env.GOOGLE_TTS_API_KEY;
 const URL = process.env.SUPABASE_URL;
 const CHAVE = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-// hr-HR-Standard-A é a voz croata feminina do Google. Trocar aqui troca a
-// voz de todo o app.
-const VOZ = process.env.VOZ_HR ?? 'hr-HR-Standard-A';
-const VELOCIDADE = Number(process.env.VELOCIDADE ?? 0.9); // um pouco lento: é material de estudo
+// O croata NÃO tem vozes Standard, WaveNet nem Neural2 no Google — só a
+// família Chirp3-HD, que é a premium. Usar um nome de voz Standard aqui
+// devolve erro da API. São 30 opções; esta é feminina.
+// Lista: https://cloud.google.com/text-to-speech/docs/list-voices-and-types
+const VOZ = process.env.VOZ_HR ?? 'hr-HR-Chirp3-HD-Achernar';
+// Chirp3-HD aceita de 0.25 a 2.0. Um pouco lento porque é material de
+// estudo: iniciante perde sílaba em ritmo de conversa.
+const VELOCIDADE = Number(process.env.VELOCIDADE ?? 0.9);
 
 if (!API_KEY || !URL || !CHAVE) {
   console.error(

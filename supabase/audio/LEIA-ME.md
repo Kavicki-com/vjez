@@ -41,19 +41,37 @@ a curadoria acrescentar conteúdo: ele gera só o que falta.
 
 ### Custo
 
-O Cloud TTS cobra por caractere e tem faixa gratuita mensal. O conteúdo de
-hoje — 30 letras, 30 números, 94 palavras e 27 expressões — dá cerca de
-1.200 caracteres no total. É desprezível, mas vale conferir antes de rodar
-com `--refazer` sobre um conteúdo grande.
+O conteúdo de hoje são **180 itens e 1.094 caracteres** no total:
+
+| alvo | itens | caracteres |
+|---|---|---|
+| letras (palavra de exemplo) | 30 | 131 |
+| números | 30 | 203 |
+| palavras | 93 | 451 |
+| expressões | 27 | 309 |
+
+O Cloud TTS cobra por caractere e a faixa gratuita é contada em milhões.
+Mil caracteres é ruído estatístico dentro de qualquer plano — mesmo na
+família Chirp3-HD, que é a premium. Vale conferir o preço vigente em
+https://cloud.google.com/text-to-speech/pricing antes de rodar `--refazer`
+sobre um conteúdo muito maior, mas para o volume atual não há o que pesar.
 
 ## Escolhas embutidas
 
-**Voz:** `hr-HR-Standard-A`, feminina. Trocar `VOZ_HR` troca a voz do app
-inteiro. Vale ouvir as opções antes de gerar tudo — a voz vira a "professora"
-do app e é cara de trocar depois que o aluno se acostuma.
+**Voz:** `hr-HR-Chirp3-HD-Achernar`, feminina.
+
+O croata **não tem** vozes Standard, WaveNet nem Neural2 no Google — só a
+família **Chirp3-HD**, com 30 vozes. Não há escolha de tier: ou é Chirp3-HD
+ou é outro fornecedor. A lista completa está em
+https://cloud.google.com/text-to-speech/docs/list-voices-and-types
+
+Trocar `VOZ_HR` troca a voz do app inteiro. Vale ouvir algumas antes de
+gerar tudo — a voz vira a "professora" do app e é cara de trocar depois que
+o aluno se acostuma.
 
 **Velocidade 0.9**, um pouco abaixo do natural: é material de estudo, e
-iniciante perde sílaba em velocidade de conversa. `VELOCIDADE` ajusta.
+iniciante perde sílaba em velocidade de conversa. `VELOCIDADE` ajusta, e
+Chirp3-HD aceita de 0.25 a 2.0.
 
 **Alfabeto fala a palavra de exemplo, não a letra.** A letra sozinha ensina
 pouco; o que fixa o som é ouvir `čokolada` para o Č.
