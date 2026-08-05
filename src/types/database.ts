@@ -614,6 +614,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      migrar_progresso: {
+        Args: {
+          licoes?: Json
+          tentativas?: Json
+          modulos?: Json
+          dia_local?: string | null
+        }
+        Returns: undefined
+      }
       registrar_dia_ativo: {
         Args: { dia_local: string }
         Returns: {

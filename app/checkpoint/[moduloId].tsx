@@ -79,7 +79,7 @@ export default function TelaCheckpoint() {
     // e ficaria sem priorização nenhuma.
     const errados = new Set(historico.errados);
     const acertados = new Set(historico.acertados);
-    for (const [id, acertou] of Object.entries(tentativasLocais)) {
+    for (const [id, { acertou }] of Object.entries(tentativasLocais)) {
       if (acertou) {
         errados.delete(id);
         acertados.add(id);
@@ -155,7 +155,7 @@ export default function TelaCheckpoint() {
     if (!resposta) return;
     const resultado = corrigir(exercicio, resposta);
     setVereditos((atual) => ({ ...atual, [exercicio.id]: resultado }));
-    registrarTentativaLocal(exercicio.id, resultado.acertou);
+    registrarTentativaLocal(exercicio.id, resultado.acertou, modulo.id);
     void registrarTentativa({
       exercicio,
       moduloId: modulo.id,

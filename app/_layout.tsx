@@ -14,6 +14,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { ProvedorPreferencias } from '@/features/config/Preferencias';
+import { MigracaoDeProgresso } from '@/features/conta/migracao';
 import { ProvedorProgresso } from '@/features/perfil/ProgressoLocal';
 
 // Segura a splash até a Nunito Sans estar pronta: sem isso a tela pisca
@@ -51,6 +52,8 @@ export default function RootLayout() {
           <ProvedorProgresso>
             <SafeAreaProvider>
               <StatusBar style="dark" />
+              {/* Fica na raiz: o login pode acontecer em qualquer tela. */}
+              <MigracaoDeProgresso />
               <Stack screenOptions={{ headerShown: false }} />
             </SafeAreaProvider>
           </ProvedorProgresso>

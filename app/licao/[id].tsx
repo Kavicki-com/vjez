@@ -29,7 +29,9 @@ import {
 import { useLicao } from '@/features/licao/hooks';
 import { registrarNota, registrarTentativa } from '@/features/licao/progresso';
 import { registrarDiaAtivo } from '@/features/ofensiva/api';
+import { useSessao } from '@/features/conta/hooks';
 import { useProgressoLocal } from '@/features/perfil/ProgressoLocal';
+import { ORDEM_LICAO_PORTAO_LOGIN } from '@/lib/regras';
 import {
   cores,
   espaco,
@@ -47,6 +49,7 @@ export default function TelaLicao() {
   const { concluirLicao, registrarTentativa: registrarTentativaLocal } =
     useProgressoLocal();
   const cliente = useQueryClient();
+  const { autenticado } = useSessao();
 
   const [indice, setIndice] = useState(0);
   const [respostas, setRespostas] = useState<Record<string, Resposta>>({});
@@ -86,6 +89,9 @@ export default function TelaLicao() {
         nota={nota}
         acertos={Object.values(vereditos).filter((v) => v.acertou).length}
         total={exercicios.length}
+        // Guest-first: a Lição 1 é aberta, e o portão aparece no fim dela —
+        // no momento em que o progresso passa a valer alguma coisa.
+        ofereceConta={!autenticado && licao.ordem === ORDEM_LICAO_PORTAO_LOGIN}
         aoSair={() => router.back()}
       />
     );
@@ -116,7 +122,7 @@ export default function TelaLicao() {
     setVereditos((atual) => ({ ...atual, [exercicio.id]: resultado }));
     // O checkpoint prioriza erros: sem isso, convidado faria uma prova sem
     // priorização nenhuma, porque nada dele é gravado no servidor.
-    registrarTentativaLocal(exercicio.id, resultado.acertou);
+    registrarTentativaLocal(exercicio.id, resultado.acertou, licao.moduloId);
     // Não bloqueia a lição se a gravação falhar (ou se for convidado).
     void registrarTentativa({
       exercicio,

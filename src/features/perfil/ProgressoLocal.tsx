@@ -20,13 +20,23 @@ import {
 type Estado = {
   /** licaoId -> nota obtida. */
   notas: Record<string, number>;
-  /** exercicioId -> acertou na última tentativa. Alimenta o checkpoint. */
-  tentativas: Record<string, boolean>;
+  /**
+   * exercicioId -> resultado da última tentativa. Alimenta o checkpoint e,
+   * na migração, vira linha em tentativas_exercicio — que exige o módulo,
+   * por isso ele viaja junto.
+   */
+  tentativas: Record<string, { acertou: boolean; moduloId: string }>;
   /** moduloId -> passou no checkpoint. */
   checkpoints: Record<string, boolean>;
   concluirLicao: (licaoId: string, nota: number) => void;
-  registrarTentativa: (exercicioId: string, acertou: boolean) => void;
+  registrarTentativa: (
+    exercicioId: string,
+    acertou: boolean,
+    moduloId: string,
+  ) => void;
   concluirCheckpoint: (moduloId: string, passou: boolean) => void;
+  /** Há algo do convidado para levar para a conta? */
+  temProgresso: boolean;
   /** Usado na migração de convidado para conta. */
   limpar: () => void;
 };
@@ -35,7 +45,9 @@ const Contexto = createContext<Estado | null>(null);
 
 export function ProvedorProgresso({ children }: { children: ReactNode }) {
   const [notas, setNotas] = useState<Record<string, number>>({});
-  const [tentativas, setTentativas] = useState<Record<string, boolean>>({});
+  const [tentativas, setTentativas] = useState<
+    Record<string, { acertou: boolean; moduloId: string }>
+  >({});
   const [checkpoints, setCheckpoints] = useState<Record<string, boolean>>({});
 
   const concluirLicao = useCallback((licaoId: string, nota: number) => {
@@ -48,10 +60,13 @@ export function ProvedorProgresso({ children }: { children: ReactNode }) {
   }, []);
 
   const registrarTentativa = useCallback(
-    (exercicioId: string, acertou: boolean) => {
+    (exercicioId: string, acertou: boolean, moduloId: string) => {
       // Guarda só o último resultado: acertar depois de errar tira o
       // exercício da fila de prioridade do checkpoint.
-      setTentativas((atual) => ({ ...atual, [exercicioId]: acertou }));
+      setTentativas((atual) => ({
+        ...atual,
+        [exercicioId]: { acertou, moduloId },
+      }));
     },
     [],
   );
@@ -69,11 +84,17 @@ export function ProvedorProgresso({ children }: { children: ReactNode }) {
     setCheckpoints({});
   }, []);
 
+  const temProgresso =
+    Object.keys(notas).length > 0 ||
+    Object.keys(tentativas).length > 0 ||
+    Object.keys(checkpoints).length > 0;
+
   const valor = useMemo(
     () => ({
       notas,
       tentativas,
       checkpoints,
+      temProgresso,
       concluirLicao,
       registrarTentativa,
       concluirCheckpoint,
@@ -83,6 +104,7 @@ export function ProvedorProgresso({ children }: { children: ReactNode }) {
       notas,
       tentativas,
       checkpoints,
+      temProgresso,
       concluirLicao,
       registrarTentativa,
       concluirCheckpoint,

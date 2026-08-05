@@ -1,9 +1,11 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Botao } from '@/components/Botao';
 import { Confete } from '@/components/Confete';
 import { Sahovnica } from '@/components/Sahovnica';
+import { entrarComGoogle } from '@/features/conta/api';
 import {
   CHECKPOINT_NOTA_MINIMA,
   NOTA_MAXIMA_LICAO,
@@ -25,6 +27,8 @@ type Props = {
   nota: number;
   acertos: number;
   total: number;
+  /** Mostra o portão de login: convidado que acabou de fazer a Lição 1. */
+  ofereceConta?: boolean;
   aoSair: () => void;
 };
 
@@ -33,7 +37,16 @@ type Props = {
  * O confete só cai quando a lição foi bem — comemorar um resultado ruim
  * soa deboche.
  */
-export function TelaFim({ titulo, nota, acertos, total, aoSair }: Props) {
+export function TelaFim({
+  titulo,
+  nota,
+  acertos,
+  total,
+  ofereceConta,
+  aoSair,
+}: Props) {
+  const [entrando, setEntrando] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
   const fracao = nota / NOTA_MAXIMA_LICAO;
   const foiBem = fracao >= CHECKPOINT_NOTA_MINIMA;
   const xp = Math.round(nota * XP_POR_PONTO);
@@ -107,7 +120,40 @@ export function TelaFim({ titulo, nota, acertos, total, aoSair }: Props) {
             </Text>
           </View>
 
-          <Botao rotulo="Voltar para a trilha" aoTocar={aoSair} />
+          {ofereceConta ? (
+            <View style={styles.portao}>
+              <Sahovnica altura={6} noTopo />
+              <View style={styles.portaoCorpo}>
+                <Text style={styles.portaoTitulo}>Guarde essa ofensiva</Text>
+                <Text style={styles.portaoTexto}>
+                  Seus {xp} XP e o que você acabou de fazer ficam salvos na
+                  conta, em qualquer aparelho.
+                </Text>
+                <Botao
+                  rotulo={entrando ? 'Abrindo...' : 'Entrar com Google'}
+                  desabilitado={entrando}
+                  aoTocar={() => {
+                    setErro(null);
+                    setEntrando(true);
+                    entrarComGoogle().catch((e) => {
+                      setErro(
+                        e instanceof Error ? e.message : 'Não deu para entrar.',
+                      );
+                      setEntrando(false);
+                    });
+                  }}
+                />
+                {erro && <Text style={styles.portaoErro}>{erro}</Text>}
+                <Botao
+                  rotulo="Continuar sem conta"
+                  variante="secundaria"
+                  aoTocar={aoSair}
+                />
+              </View>
+            </View>
+          ) : (
+            <Botao rotulo="Voltar para a trilha" aoTocar={aoSair} />
+          )}
         </View>
       </ScrollView>
     </View>
@@ -206,6 +252,34 @@ const styles = StyleSheet.create({
   },
   barraCheia: { height: '100%', backgroundColor: cores.primaria },
   barraCheiaNeutra: { backgroundColor: cores.contorno },
+  portao: {
+    width: '100%',
+    borderRadius: raio.lg,
+    borderWidth: 1,
+    borderColor: cores.primaria,
+    backgroundColor: cores.superficie,
+    overflow: 'hidden',
+  },
+  portaoCorpo: { padding: espaco.md, gap: espaco.sm },
+  portaoTitulo: {
+    fontSize: fonte.subtitulo,
+    lineHeight: linha.subtitulo,
+    fontFamily: familia.forte,
+    color: cores.texto,
+  },
+  portaoTexto: {
+    fontSize: fonte.pequena,
+    lineHeight: linha.pequena,
+    fontFamily: familia.normal,
+    color: cores.textoSuave,
+    marginBottom: espaco.xs,
+  },
+  portaoErro: {
+    fontSize: fonte.pequena,
+    lineHeight: linha.pequena,
+    fontFamily: familia.normal,
+    color: cores.erro,
+  },
   barraLegenda: {
     fontSize: fonte.pequena,
     lineHeight: linha.pequena,
