@@ -52,18 +52,3 @@ export async function buscarPalavras(termo: string): Promise<LexItem[]> {
   if (error) throw error;
   return data.map(paraLexItem);
 }
-
-/** Agrupa por categoria preservando a ordem alfabética dentro de cada uma. */
-export function agruparPorCategoria(
-  itens: LexItem[],
-): { categoria: string; itens: LexItem[] }[] {
-  const mapa = new Map<string, LexItem[]>();
-  for (const item of itens) {
-    const grupo = mapa.get(item.categoria);
-    if (grupo) grupo.push(item);
-    else mapa.set(item.categoria, [item]);
-  }
-  return [...mapa.entries()]
-    .map(([categoria, itens]) => ({ categoria, itens }))
-    .sort((a, b) => a.categoria.localeCompare(b.categoria, 'pt-BR'));
-}

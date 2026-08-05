@@ -16,6 +16,7 @@ import { Botao } from '@/components/Botao';
 import { Carregando, Erro } from '@/components/Estados';
 import { Sahovnica } from '@/components/Sahovnica';
 import { Feedback } from '@/features/licao/Feedback';
+import { TelaFim } from '@/features/licao/TelaFim';
 import { CampoDoExercicio } from '@/features/licao/exercicios';
 import {
   calcularNota,
@@ -26,7 +27,6 @@ import {
 import { useLicao } from '@/features/licao/hooks';
 import { registrarNota, registrarTentativa } from '@/features/licao/progresso';
 import { useProgressoLocal } from '@/features/perfil/ProgressoLocal';
-import { NOTA_MAXIMA_LICAO } from '@/lib/regras';
 import {
   cores,
   espaco,
@@ -79,6 +79,7 @@ export default function TelaLicao() {
         nota={nota}
         acertos={Object.values(vereditos).filter((v) => v.acertou).length}
         total={exercicios.length}
+        aoSair={() => router.back()}
       />
     );
   }
@@ -198,40 +199,6 @@ export default function TelaLicao() {
   );
 }
 
-function TelaFim({
-  titulo,
-  nota,
-  acertos,
-  total,
-}: {
-  titulo: string;
-  nota: number;
-  acertos: number;
-  total: number;
-}) {
-  return (
-    <View style={styles.fim}>
-      <View style={styles.coluna}>
-        <Text style={styles.fimTitulo}>Lição concluída</Text>
-        <Text style={styles.fimLicao}>{titulo}</Text>
-
-        <View style={styles.notaCaixa}>
-          <Text style={styles.notaValor}>
-            {nota.toFixed(1).replace('.', ',')}
-          </Text>
-          <Text style={styles.notaMax}>de {NOTA_MAXIMA_LICAO}</Text>
-        </View>
-
-        <Text style={styles.fimDetalhe}>
-          {acertos} de {total} exercícios certos
-        </Text>
-
-        <Botao rotulo="Voltar para a trilha" aoTocar={() => router.back()} />
-      </View>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   tela: { flex: 1, backgroundColor: cores.fundo },
   cabecalho: {
@@ -290,32 +257,4 @@ const styles = StyleSheet.create({
     borderTopColor: cores.erro,
   },
 
-  fim: {
-    flex: 1,
-    backgroundColor: cores.fundo,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: espaco.md,
-  },
-  fimTitulo: {
-    fontSize: fonte.gigante, lineHeight: linha.gigante,
-    fontFamily: familia.extraForte,
-    color: cores.texto,
-  },
-  fimLicao: { fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal, color: cores.textoSuave },
-  notaCaixa: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: espaco.sm,
-    padding: espaco.lg,
-    borderRadius: raio.lg,
-    backgroundColor: cores.primariaSuave,
-  },
-  notaValor: {
-    fontSize: 56,
-    fontFamily: familia.forte,
-    color: cores.primaria,
-  },
-  notaMax: { fontSize: fonte.subtitulo, lineHeight: linha.subtitulo, fontFamily: familia.normal, color: cores.primaria },
-  fimDetalhe: { fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal, color: cores.textoSuave },
 });

@@ -3,10 +3,15 @@ import { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Carregando } from '@/components/Estados';
+import { Sahovnica } from '@/components/Sahovnica';
 import { PortaoDeLogin } from '@/features/conta/PortaoDeLogin';
 import { useSessao } from '@/features/conta/hooks';
 import { useTrilha } from '@/features/licao/hooks';
 import { useProgressoLocal } from '@/features/perfil/ProgressoLocal';
+import {
+  calcularConquistas,
+  type Conquista,
+} from '@/features/perfil/conquistas';
 import { usePerfil, useProgressoLicoes } from '@/features/perfil/hooks';
 import { montarTrilha } from '@/features/trilha/estado';
 import {
@@ -17,6 +22,7 @@ import {
   larguraMaximaConteudo,
   linha,
   raio,
+  tracking,
 } from '@/theme/tokens';
 import type { Nivel, ProgressoLicao } from '@/types/schema';
 
@@ -35,18 +41,32 @@ export default function Perfil() {
 
   const trilha = useMemo(() => {
     if (!modulos) return [];
-    const local: ProgressoLicao[] = Object.entries(notas).map(([licaoId, nota]) => ({
-      usuarioId: perfil?.id ?? 'convidado',
-      licaoId,
-      nota,
-      concluida: true,
-      data: '',
-    }));
+    const local: ProgressoLicao[] = Object.entries(notas).map(
+      ([licaoId, nota]) => ({
+        usuarioId: perfil?.id ?? 'convidado',
+        licaoId,
+        nota,
+        concluida: true,
+        data: '',
+      }),
+    );
     return montarTrilha(modulos, [...(progressoServidor ?? []), ...local]);
   }, [modulos, progressoServidor, notas, perfil?.id]);
 
-  const licoesFeitas = Object.keys(notas).length + (progressoServidor?.length ?? 0);
+  const licoesFeitas = trilha.reduce((n, m) => n + m.concluidas, 0);
   const modulosConcluidos = trilha.filter((m) => m.estado === 'concluido').length;
+  const diasDeOfensiva = perfil?.ofensiva.diasSeguidos ?? 0;
+
+  const conquistas = useMemo(
+    () =>
+      calcularConquistas({
+        licoesConcluidas: licoesFeitas,
+        modulosConcluidos,
+        diasDeOfensiva,
+        trilha,
+      }),
+    [licoesFeitas, modulosConcluidos, diasDeOfensiva, trilha],
+  );
 
   if (carregando) return <Carregando />;
 
@@ -67,12 +87,18 @@ export default function Perfil() {
     >
       <View style={styles.coluna}>
         <View style={styles.identidade}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarLetra}>
-              {(perfil?.nome ?? 'V').charAt(0).toUpperCase()}
-            </Text>
-          </View>
-          <View style={styles.identidadeTexto}>
+          <Sahovnica noTopo />
+          <View style={styles.identidadeCorpo}>
+            <View style={styles.avatarCaixa}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarLetra}>
+                  {(perfil?.nome ?? 'V').charAt(0).toUpperCase()}
+                </Text>
+              </View>
+              <View style={styles.selo}>
+                <Text style={styles.seloTexto}>{modulosConcluidos}</Text>
+              </View>
+            </View>
             <Text style={styles.nome}>{perfil?.nome ?? 'Aprendiz'}</Text>
             <Text style={styles.nivel}>
               Nível {ROTULO_NIVEL[perfil?.nivel ?? 'basico']}
@@ -80,28 +106,32 @@ export default function Perfil() {
           </View>
         </View>
 
-        <View style={styles.grade}>
+        <View style={styles.bento}>
           <Estatistica
             icone="flame"
-            cor={cores.destaque}
-            valor={String(perfil?.ofensiva.diasSeguidos ?? 0)}
-            rotulo="dias seguidos"
+            cor={cores.primaria}
+            fundo={cores.primariaSuave}
+            valor={String(diasDeOfensiva)}
+            rotulo="dias de ofensiva"
           />
           <Estatistica
             icone="flash"
             cor={cores.secundaria}
+            fundo={cores.secundariaSuave}
             valor={String(perfil?.xp ?? 0)}
-            rotulo="XP"
+            rotulo="XP total"
           />
           <Estatistica
             icone="checkmark-done"
             cor={cores.acerto}
+            fundo={cores.acertoSuave}
             valor={String(licoesFeitas)}
             rotulo="lições feitas"
           />
           <Estatistica
-            icone="trophy"
-            cor={cores.primaria}
+            icone="map"
+            cor={cores.terciaria}
+            fundo={cores.sobreTerciariaContainer}
             valor={String(modulosConcluidos)}
             rotulo="módulos"
           />
@@ -132,10 +162,10 @@ export default function Perfil() {
         </View>
 
         <Text style={styles.secao}>Conquistas</Text>
-        <View style={styles.vazio}>
-          <Text style={styles.vazioTexto}>
-            As conquistas chegam junto com os checkpoints de módulo.
-          </Text>
+        <View style={styles.lista}>
+          {conquistas.map((c) => (
+            <CartaoConquista key={c.id} conquista={c} />
+          ))}
         </View>
       </View>
     </ScrollView>
@@ -145,19 +175,71 @@ export default function Perfil() {
 function Estatistica({
   icone,
   cor,
+  fundo,
   valor,
   rotulo,
 }: {
   icone: keyof typeof Ionicons.glyphMap;
   cor: string;
+  fundo: string;
   valor: string;
   rotulo: string;
 }) {
   return (
-    <View style={styles.estatistica}>
-      <Ionicons name={icone} size={22} color={cor} />
+    <View style={[styles.estatistica, { borderTopColor: cor }]}>
+      <View style={[styles.estatisticaIcone, { backgroundColor: fundo }]}>
+        <Ionicons name={icone} size={22} color={cor} />
+      </View>
       <Text style={styles.estatisticaValor}>{valor}</Text>
       <Text style={styles.estatisticaRotulo}>{rotulo}</Text>
+    </View>
+  );
+}
+
+function CartaoConquista({ conquista }: { conquista: Conquista }) {
+  const fracao = Math.min(conquista.atual / conquista.meta, 1);
+  const cor = conquista.concluida ? cores.terciaria : cores.contorno;
+
+  return (
+    <View
+      style={[styles.conquista, !conquista.concluida && styles.conquistaPendente]}
+    >
+      <View
+        style={[
+          styles.conquistaIcone,
+          {
+            backgroundColor: conquista.concluida
+              ? cores.terciariaContainer
+              : cores.superficieVariante,
+          },
+        ]}
+      >
+        <Ionicons
+          name={conquista.icone}
+          size={26}
+          color={conquista.concluida ? cores.superficie : cores.contorno}
+        />
+      </View>
+
+      <View style={styles.conquistaTexto}>
+        <View style={styles.linhaTopo}>
+          <Text style={styles.conquistaTitulo}>{conquista.titulo}</Text>
+          <Text style={[styles.conquistaContagem, { color: cor }]}>
+            {conquista.concluida
+              ? 'conquistado'
+              : `${conquista.atual}/${conquista.meta}`}
+          </Text>
+        </View>
+        <Text style={styles.conquistaDescricao}>{conquista.descricao}</Text>
+        <View style={styles.barra}>
+          <View
+            style={[
+              styles.barraCheia,
+              { width: `${fracao * 100}%`, backgroundColor: cor },
+            ]}
+          />
+        </View>
+      </View>
     </View>
   );
 }
@@ -168,8 +250,142 @@ const styles = StyleSheet.create({
   coluna: { width: '100%', maxWidth: larguraMaximaConteudo, gap: espaco.md },
 
   identidade: {
-    flexDirection: 'row',
+    borderRadius: raio.lg,
+    borderWidth: 1,
+    borderColor: cores.borda,
+    backgroundColor: cores.superficie,
+    overflow: 'hidden',
+  },
+  identidadeCorpo: { alignItems: 'center', gap: espaco.xs, padding: espaco.lg },
+  avatarCaixa: { marginBottom: espaco.sm },
+  avatar: {
+    width: 96,
+    height: 96,
+    borderRadius: raio.pill,
+    backgroundColor: cores.primaria,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarLetra: {
+    fontSize: fonte.gigante,
+    lineHeight: linha.gigante,
+    fontFamily: familia.extraForte,
+    color: cores.superficie,
+  },
+  selo: {
+    position: 'absolute',
+    right: -4,
+    bottom: -4,
+    minWidth: 36,
+    height: 36,
+    paddingHorizontal: espaco.xs,
+    borderRadius: raio.pill,
+    backgroundColor: cores.secundaria,
+    borderWidth: 3,
+    borderColor: cores.superficie,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  seloTexto: {
+    fontSize: fonte.rotulo,
+    lineHeight: linha.rotulo,
+    fontFamily: familia.forte,
+    color: cores.superficie,
+  },
+  nome: {
+    fontSize: fonte.titulo,
+    lineHeight: linha.titulo,
+    letterSpacing: tracking.titulo,
+    fontFamily: familia.forte,
+    color: cores.texto,
+  },
+  nivel: {
+    fontSize: fonte.subtitulo,
+    lineHeight: linha.subtitulo,
+    fontFamily: familia.normal,
+    color: cores.textoSuave,
+  },
+
+  bento: { flexDirection: 'row', flexWrap: 'wrap', gap: espaco.md },
+  estatistica: {
+    flexGrow: 1,
+    flexBasis: '44%',
+    alignItems: 'center',
+    gap: espaco.xs,
+    padding: espaco.md,
+    borderRadius: raio.lg,
+    borderWidth: 1,
+    borderTopWidth: 4,
+    borderColor: cores.borda,
+    backgroundColor: cores.superficie,
+  },
+  estatisticaIcone: {
+    width: 44,
+    height: 44,
+    borderRadius: raio.pill,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: espaco.xs,
+  },
+  estatisticaValor: {
+    fontSize: fonte.titulo,
+    lineHeight: linha.titulo,
+    fontFamily: familia.extraForte,
+    color: cores.texto,
+  },
+  estatisticaRotulo: {
+    fontSize: fonte.pequena,
+    lineHeight: linha.pequena,
+    fontFamily: familia.medio,
+    color: cores.textoSuave,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+    textAlign: 'center',
+  },
+
+  secao: {
+    fontSize: fonte.pequena,
+    lineHeight: linha.pequena,
+    fontFamily: familia.forte,
+    color: cores.textoSuave,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+    marginTop: espaco.md,
+  },
+  lista: { gap: espaco.sm },
+
+  linhaModulo: {
+    gap: espaco.xs,
+    padding: espaco.md,
+    borderRadius: raio.lg,
+    borderWidth: 1,
+    borderColor: cores.borda,
+    backgroundColor: cores.superficie,
+  },
+  linhaTopo: { flexDirection: 'row', alignItems: 'center', gap: espaco.sm },
+  moduloTema: {
+    flex: 1,
+    fontSize: fonte.corpo,
+    lineHeight: linha.corpo,
+    fontFamily: familia.normal,
+    color: cores.texto,
+  },
+  moduloContagem: {
+    fontSize: fonte.pequena,
+    lineHeight: linha.pequena,
+    fontFamily: familia.medio,
+    color: cores.textoSuave,
+  },
+  barra: {
+    height: 8,
+    borderRadius: raio.pill,
+    backgroundColor: cores.superficieVariante,
+    overflow: 'hidden',
+  },
+  barraCheia: { height: '100%', backgroundColor: cores.primaria },
+
+  conquista: {
+    flexDirection: 'row',
     gap: espaco.md,
     padding: espaco.md,
     borderRadius: raio.lg,
@@ -177,76 +393,31 @@ const styles = StyleSheet.create({
     borderColor: cores.borda,
     backgroundColor: cores.superficie,
   },
-  avatar: {
-    width: 60,
-    height: 60,
+  conquistaPendente: { opacity: 0.75 },
+  conquistaIcone: {
+    width: 56,
+    height: 56,
     borderRadius: raio.pill,
-    backgroundColor: cores.primaria,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarLetra: {
-    fontSize: fonte.titulo, lineHeight: linha.titulo,
-    fontFamily: familia.forte,
-    color: cores.superficie,
-  },
-  identidadeTexto: { flex: 1, gap: 2 },
-  nome: { fontSize: fonte.titulo, lineHeight: linha.titulo, fontFamily: familia.forte, color: cores.texto },
-  nivel: { fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal, color: cores.textoSuave },
-
-  grade: { flexDirection: 'row', flexWrap: 'wrap', gap: espaco.sm },
-  estatistica: {
-    flexGrow: 1,
-    flexBasis: '45%',
-    alignItems: 'center',
-    gap: 2,
-    padding: espaco.md,
-    borderRadius: raio.md,
-    borderWidth: 1,
-    borderColor: cores.borda,
-    backgroundColor: cores.superficie,
-  },
-  estatisticaValor: {
-    fontSize: fonte.titulo, lineHeight: linha.titulo,
+  conquistaTexto: { flex: 1, gap: espaco.xs },
+  conquistaTitulo: {
+    flex: 1,
+    fontSize: fonte.rotulo,
+    lineHeight: linha.rotulo,
     fontFamily: familia.forte,
     color: cores.texto,
   },
-  estatisticaRotulo: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },
-
-  secao: {
-    fontSize: fonte.pequena, lineHeight: linha.pequena,
-    fontFamily: familia.forte,
+  conquistaContagem: {
+    fontSize: fonte.pequena,
+    lineHeight: linha.pequena,
+    fontFamily: familia.medio,
+  },
+  conquistaDescricao: {
+    fontSize: fonte.pequena,
+    lineHeight: linha.pequena,
+    fontFamily: familia.normal,
     color: cores.textoSuave,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
-    marginTop: espaco.sm,
   },
-  lista: { gap: espaco.sm },
-  linhaModulo: {
-    gap: espaco.xs,
-    padding: espaco.md,
-    borderRadius: raio.md,
-    borderWidth: 1,
-    borderColor: cores.borda,
-    backgroundColor: cores.superficie,
-  },
-  linhaTopo: { flexDirection: 'row', alignItems: 'center', gap: espaco.sm },
-  moduloTema: { flex: 1, fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal, color: cores.texto },
-  moduloContagem: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },
-  barra: {
-    height: 8,
-    borderRadius: raio.pill,
-    backgroundColor: cores.fundoSuave,
-    overflow: 'hidden',
-  },
-  barraCheia: { height: '100%', backgroundColor: cores.primaria },
-
-  vazio: {
-    padding: espaco.md,
-    borderRadius: raio.md,
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    borderColor: cores.borda,
-  },
-  vazioTexto: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 });
