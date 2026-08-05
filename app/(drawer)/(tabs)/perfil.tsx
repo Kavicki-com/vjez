@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Avatar } from '@/components/Avatar';
 import { Carregando } from '@/components/Estados';
+import { Medalha } from '@/components/Medalha';
 import { Sahovnica } from '@/components/Sahovnica';
 import { PortaoDeLogin } from '@/features/conta/PortaoDeLogin';
 import { useSessao } from '@/features/conta/hooks';
@@ -14,6 +15,7 @@ import {
 } from '@/features/perfil/conquistas';
 import { usePerfil } from '@/features/perfil/hooks';
 import { useTrilhaMontada } from '@/features/trilha/useTrilhaMontada';
+import { useLayout } from '@/theme/useLayout';
 import {
   cores,
   espaco,
@@ -21,6 +23,7 @@ import {
   fonte,
   larguraMaximaConteudo,
   linha,
+  ouro,
   raio,
   tracking,
 } from '@/theme/tokens';
@@ -35,7 +38,8 @@ const ROTULO_NIVEL: Record<Nivel, string> = {
 export default function Perfil() {
   const { carregando, autenticado, sessao } = useSessao();
   const { data: perfil } = usePerfil();
-  const { trilha } = useTrilhaMontada();
+  const { trilha, notasDoServidor, notasLocais } = useTrilhaMontada();
+  const { compacto } = useLayout();
 
   const licoesFeitas = trilha.reduce((n, m) => n + m.concluidas, 0);
   const modulosConcluidos = trilha.filter((m) => m.estado === 'concluido').length;
@@ -43,15 +47,23 @@ export default function Perfil() {
   // O provedor é a fonte mais fresca: trocar a foto no Google reflete aqui.
   const nome = nomeDaSessao(sessao) ?? perfil?.nome;
 
+  const melhorNota = useMemo(() => {
+    const todas = [
+      ...Object.values(notasLocais),
+      ...notasDoServidor.map((p) => p.nota),
+    ];
+    return todas.length ? Math.max(...todas) : 0;
+  }, [notasLocais, notasDoServidor]);
+
   const conquistas = useMemo(
     () =>
       calcularConquistas({
         licoesConcluidas: licoesFeitas,
-        modulosConcluidos,
         diasDeOfensiva,
         trilha,
+        melhorNota,
       }),
-    [licoesFeitas, modulosConcluidos, diasDeOfensiva, trilha],
+    [licoesFeitas, diasDeOfensiva, trilha, melhorNota],
   );
 
   if (carregando) return <Carregando />;
@@ -144,9 +156,14 @@ export default function Perfil() {
         </View>
 
         <Text style={styles.secao}>Conquistas</Text>
-        <View style={styles.lista}>
+        <View style={styles.grade}>
           {conquistas.map((c) => (
-            <CartaoConquista key={c.id} conquista={c} />
+            <CartaoConquista
+              key={c.id}
+              conquista={c}
+              // 2 por linha no celular, 4 em tela larga.
+              largura={compacto ? '47%' : '23%'}
+            />
           ))}
         </View>
       </View>
@@ -178,50 +195,47 @@ function Estatistica({
   );
 }
 
-function CartaoConquista({ conquista }: { conquista: Conquista }) {
+function CartaoConquista({
+  conquista,
+  largura,
+}: {
+  conquista: Conquista;
+  largura: `${number}%`;
+}) {
   const fracao = Math.min(conquista.atual / conquista.meta, 1);
-  const cor = conquista.concluida ? cores.terciaria : cores.contorno;
 
   return (
     <View
-      style={[styles.conquista, !conquista.concluida && styles.conquistaPendente]}
+      style={[
+        styles.conquista,
+        { flexBasis: largura },
+        conquista.concluida && styles.conquistaGanha,
+      ]}
     >
-      <View
-        style={[
-          styles.conquistaIcone,
-          {
-            backgroundColor: conquista.concluida
-              ? cores.terciariaContainer
-              : cores.superficieVariante,
-          },
-        ]}
-      >
-        <Ionicons
-          name={conquista.icone}
-          size={26}
-          color={conquista.concluida ? cores.superficie : cores.contorno}
-        />
-      </View>
+      <Medalha icone={conquista.icone} conquistada={conquista.concluida} />
 
-      <View style={styles.conquistaTexto}>
-        <View style={styles.linhaTopo}>
-          <Text style={styles.conquistaTitulo}>{conquista.titulo}</Text>
-          <Text style={[styles.conquistaContagem, { color: cor }]}>
-            {conquista.concluida
-              ? 'conquistado'
-              : `${conquista.atual}/${conquista.meta}`}
+      <Text
+        style={[
+          styles.conquistaTitulo,
+          conquista.concluida && styles.conquistaTituloGanha,
+        ]}
+        numberOfLines={2}
+      >
+        {conquista.titulo}
+      </Text>
+
+      {conquista.concluida ? (
+        <Text style={styles.conquistaGanhaTexto}>conquistado</Text>
+      ) : (
+        <>
+          <View style={styles.barraFina}>
+            <View style={[styles.barraFinaCheia, { width: `${fracao * 100}%` }]} />
+          </View>
+          <Text style={styles.conquistaContagem}>
+            {conquista.atual}/{conquista.meta}
           </Text>
-        </View>
-        <Text style={styles.conquistaDescricao}>{conquista.descricao}</Text>
-        <View style={styles.barra}>
-          <View
-            style={[
-              styles.barraCheia,
-              { width: `${fracao * 100}%`, backgroundColor: cor },
-            ]}
-          />
-        </View>
-      </View>
+        </>
+      )}
     </View>
   );
 }
@@ -352,40 +366,49 @@ const styles = StyleSheet.create({
   },
   barraCheia: { height: '100%', backgroundColor: cores.primaria },
 
+  grade: { flexDirection: 'row', flexWrap: 'wrap', gap: espaco.sm },
   conquista: {
-    flexDirection: 'row',
-    gap: espaco.md,
-    padding: espaco.md,
+    flexGrow: 0,
+    alignItems: 'center',
+    gap: espaco.xs,
+    paddingVertical: espaco.md,
+    paddingHorizontal: espaco.sm,
     borderRadius: raio.lg,
     borderWidth: 1,
     borderColor: cores.borda,
     backgroundColor: cores.superficie,
   },
-  conquistaPendente: { opacity: 0.75 },
-  conquistaIcone: {
-    width: 56,
-    height: 56,
-    borderRadius: raio.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  conquistaTexto: { flex: 1, gap: espaco.xs },
+  conquistaGanha: { borderColor: ouro.medio, backgroundColor: '#fffdf3' },
   conquistaTitulo: {
-    flex: 1,
-    fontSize: fonte.rotulo,
-    lineHeight: linha.rotulo,
-    fontFamily: familia.forte,
-    color: cores.texto,
-  },
-  conquistaContagem: {
     fontSize: fonte.pequena,
+    lineHeight: linha.pequena,
+    fontFamily: familia.forte,
+    color: cores.textoSuave,
+    textAlign: 'center',
+    marginTop: espaco.xs,
+  },
+  conquistaTituloGanha: { color: cores.texto },
+  conquistaGanhaTexto: {
+    fontSize: fonte.pequena - 1,
     lineHeight: linha.pequena,
     fontFamily: familia.medio,
+    color: ouro.escuro,
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
   },
-  conquistaDescricao: {
-    fontSize: fonte.pequena,
+  barraFina: {
+    width: '80%',
+    height: 4,
+    borderRadius: raio.pill,
+    backgroundColor: cores.superficieVariante,
+    overflow: 'hidden',
+    marginTop: espaco.xs,
+  },
+  barraFinaCheia: { height: '100%', backgroundColor: cores.contorno },
+  conquistaContagem: {
+    fontSize: fonte.pequena - 1,
     lineHeight: linha.pequena,
-    fontFamily: familia.normal,
+    fontFamily: familia.medio,
     color: cores.textoSuave,
   },
 });

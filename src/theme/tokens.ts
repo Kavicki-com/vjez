@@ -66,6 +66,18 @@ export const cores = {
 } as const;
 
 /**
+ * Dourado da medalha de conquista. Três paradas porque medalha sem
+ * gradiente vira só um círculo amarelo — o que dá o brilho é a variação.
+ */
+export const ouro = {
+  brilho: '#FDF3B8',
+  claro: '#F2D06B',
+  medio: '#DDA92E',
+  escuro: '#A9761B',
+  borda: '#8A5E12',
+} as const;
+
+/**
  * Tons de baixo dos elementos com relevo.
  * O botão e o nó da trilha têm uma borda inferior sólida mais escura que
  * some quando pressionados — é o que dá o "afunda ao tocar" sem sombra.
