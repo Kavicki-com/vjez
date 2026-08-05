@@ -2,10 +2,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
+import { Avatar } from '@/components/Avatar';
 import { Carregando } from '@/components/Estados';
 import { Sahovnica } from '@/components/Sahovnica';
 import { PortaoDeLogin } from '@/features/conta/PortaoDeLogin';
 import { useSessao } from '@/features/conta/hooks';
+import { fotoDaSessao, nomeDaSessao } from '@/features/conta/identidade';
 import { useTrilha } from '@/features/licao/hooks';
 import { useProgressoLocal } from '@/features/perfil/ProgressoLocal';
 import {
@@ -33,7 +35,7 @@ const ROTULO_NIVEL: Record<Nivel, string> = {
 };
 
 export default function Perfil() {
-  const { carregando, autenticado } = useSessao();
+  const { carregando, autenticado, sessao } = useSessao();
   const { data: perfil } = usePerfil();
   const { data: modulos } = useTrilha();
   const { data: progressoServidor } = useProgressoLicoes();
@@ -56,6 +58,8 @@ export default function Perfil() {
   const licoesFeitas = trilha.reduce((n, m) => n + m.concluidas, 0);
   const modulosConcluidos = trilha.filter((m) => m.estado === 'concluido').length;
   const diasDeOfensiva = perfil?.ofensiva.diasSeguidos ?? 0;
+  // O provedor é a fonte mais fresca: trocar a foto no Google reflete aqui.
+  const nome = nomeDaSessao(sessao) ?? perfil?.nome;
 
   const conquistas = useMemo(
     () =>
@@ -90,16 +94,12 @@ export default function Perfil() {
           <Sahovnica noTopo />
           <View style={styles.identidadeCorpo}>
             <View style={styles.avatarCaixa}>
-              <View style={styles.avatar}>
-                <Text style={styles.avatarLetra}>
-                  {(perfil?.nome ?? 'V').charAt(0).toUpperCase()}
-                </Text>
-              </View>
+              <Avatar fotoUrl={fotoDaSessao(sessao)} nome={nome} />
               <View style={styles.selo}>
                 <Text style={styles.seloTexto}>{modulosConcluidos}</Text>
               </View>
             </View>
-            <Text style={styles.nome}>{perfil?.nome ?? 'Aprendiz'}</Text>
+            <Text style={styles.nome}>{nome ?? 'Aprendiz'}</Text>
             <Text style={styles.nivel}>
               Nível {ROTULO_NIVEL[perfil?.nivel ?? 'basico']}
             </Text>
@@ -258,20 +258,6 @@ const styles = StyleSheet.create({
   },
   identidadeCorpo: { alignItems: 'center', gap: espaco.xs, padding: espaco.lg },
   avatarCaixa: { marginBottom: espaco.sm },
-  avatar: {
-    width: 96,
-    height: 96,
-    borderRadius: raio.pill,
-    backgroundColor: cores.primaria,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarLetra: {
-    fontSize: fonte.gigante,
-    lineHeight: linha.gigante,
-    fontFamily: familia.extraForte,
-    color: cores.superficie,
-  },
   selo: {
     position: 'absolute',
     right: -4,

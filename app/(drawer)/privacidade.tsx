@@ -33,6 +33,10 @@ export default function Privacidade() {
         <Bloco titulo="O que guardamos">
           <Item>Seu nome e e-mail, vindos do Google ou da Apple ao entrar.</Item>
           <Item>
+            Sua foto de perfil <Negrito>não é guardada</Negrito>: ela é lida
+            direto da sua conta Google a cada sessão e só aparece na tela.
+          </Item>
+          <Item>
             Seu progresso: lições concluídas, notas, acertos e erros por
             exercício.
           </Item>
