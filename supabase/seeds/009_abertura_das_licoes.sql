@@ -68,3 +68,13 @@ from (values
 ) as d(mod_ordem, licao_ordem, icone, intro)
 where l.ordem = d.licao_ordem
   and l.modulo_id = (select id from public.modulos where ordem = d.mod_ordem);
+
+-- Depois da carga das ilustrações no Storage, o campo passa a guardar a URL
+-- pública em vez do nome do glifo. A tela aceita os dois formatos.
+update public.licoes l
+set ilustracao = format(
+  'https://cltclnrgtlififwvpfra.supabase.co/storage/v1/object/public/ilustracoes/%s-%s.png',
+  m.ordem, l.ordem
+)
+from public.modulos m
+where m.id = l.modulo_id;

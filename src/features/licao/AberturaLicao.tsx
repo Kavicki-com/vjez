@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Botao } from '@/components/Botao';
+import { Imagem } from '@/components/Imagem';
 import { Sahovnica } from '@/components/Sahovnica';
 import { etiquetaDoCaso } from '@/lib/padez';
 import {
@@ -40,7 +42,11 @@ export function AberturaLicao({
   quantidadeDeExercicios,
   aoComecar,
 }: Props) {
-  const icone = (ilustracao ?? 'book') as keyof typeof Ionicons.glyphMap;
+  // O campo aceita URL de ilustração ou nome de glifo: a curadoria troca de
+  // um para o outro sem mexer no código.
+  const eUrl = Boolean(ilustracao?.startsWith('http'));
+  const [ilustracaoFalhou, setIlustracaoFalhou] = useState(false);
+  const icone = (eUrl ? 'book' : (ilustracao ?? 'book')) as keyof typeof Ionicons.glyphMap;
 
   return (
     <View style={styles.tela}>
@@ -51,9 +57,19 @@ export function AberturaLicao({
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.coluna}>
-          <View style={styles.ilustracao}>
-            <Ionicons name={icone} size={72} color={cores.primaria} />
-          </View>
+          {eUrl && ilustracao && !ilustracaoFalhou ? (
+            <Imagem
+              url={ilustracao}
+              altura={200}
+              ajuste="contain"
+              rotuloAcessivel={`Ilustração da lição ${titulo}`}
+              aoFalhar={() => setIlustracaoFalhou(true)}
+            />
+          ) : (
+            <View style={styles.ilustracao}>
+              <Ionicons name={icone} size={72} color={cores.primaria} />
+            </View>
+          )}
 
           {padez && (
             <View style={styles.selo}>
