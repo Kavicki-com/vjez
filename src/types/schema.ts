@@ -84,6 +84,12 @@ export interface ExEscolherForma extends ExercicioBase {
   tipo: 'escolher_forma';
   opcoes: string[];
   resposta: string;
+  /**
+   * As opções estão em croata e podem ser faladas ao toque.
+   * Fica a cargo da curadoria: metade das opções do app é português, e em
+   * perguntas sobre o som ouvir seria entregar a resposta.
+   */
+  falarOpcoes?: boolean;
 }
 
 /** Auto-corrigível. */

@@ -99,6 +99,7 @@ export function paraExercicio(linha: Tables<'exercicios'>): Exercicio {
         tipo: 'escolher_forma',
         opcoes: dados.opcoes,
         resposta: dados.resposta,
+        falarOpcoes: Boolean(dados.falar_opcoes),
       };
     case 'montar_frase':
       return {

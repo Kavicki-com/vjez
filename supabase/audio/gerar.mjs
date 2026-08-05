@@ -7,7 +7,7 @@
  *   GOOGLE_TTS_API_KEY=...  \
  *   SUPABASE_URL=...        \
  *   SUPABASE_SERVICE_ROLE_KEY=... \
- *   node supabase/audio/gerar.mjs [--so=letras,numeros,palavras,frases] [--refazer]
+ *   node supabase/audio/gerar.mjs [--so=letras,numeros,palavras,frases,opcoes] [--refazer]
  *
  * Roda com service_role de propósito: é trabalho em lote, fora do app, e
  * precisa escrever em conteúdo curado. Nunca embarque essa chave no cliente.
@@ -54,6 +54,69 @@ const ALVOS = [
   { nome: 'palavras', tabela: 'lex_items', colunas: 'id, hr, audio_url', texto: (r) => r.hr },
   { nome: 'frases', tabela: 'frases', colunas: 'id, hr, audio_url', texto: (r) => r.hr },
 ];
+
+/**
+ * Opções de exercício são formas flexionadas — "kavu", "školi", "ženom" —
+ * que não existem como verbete, então vão para audio_hr, indexado por texto.
+ *
+ * Só entram as de exercícios marcados com `falar_opcoes` na curadoria.
+ * Metade das opções do app é português ("para onde?", "Nominativ") e
+ * algumas perguntas são sobre o som — nelas, ouvir É a resposta.
+ */
+async function processarOpcoes() {
+  const resposta = await fetch(
+    `${URL}/rest/v1/exercicios?select=dados&tipo=eq.escolher_forma`,
+    { headers: cabecalhos },
+  );
+  const linhas = await resposta.json();
+
+  const textos = new Set();
+  for (const { dados } of linhas) {
+    if (!dados?.falar_opcoes) continue;
+    for (const opcao of dados.opcoes ?? []) textos.add(opcao);
+  }
+
+  const jaTem = new Set(
+    await fetch(`${URL}/rest/v1/audio_hr?select=texto`, { headers: cabecalhos })
+      .then((r) => r.json())
+      .then((linhas) => linhas.map((l) => l.texto)),
+  );
+
+  let feitos = 0;
+  let pulados = 0;
+
+  for (const texto of textos) {
+    if (jaTem.has(texto) && !refazer) {
+      pulados++;
+      continue;
+    }
+    const mp3 = await sintetizar(texto);
+    // Nome do arquivo a partir do texto, sem acento e sem espaço, para o
+    // objeto no Storage ser inspecionável em vez de um uuid opaco.
+    const arquivo = texto
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+      .toLowerCase();
+    const url = await subir(`opcoes/${arquivo}.mp3`, mp3);
+
+    const upsert = await fetch(`${URL}/rest/v1/audio_hr?on_conflict=texto`, {
+      method: 'POST',
+      headers: {
+        ...cabecalhos,
+        'Content-Type': 'application/json',
+        Prefer: 'resolution=merge-duplicates',
+      },
+      body: JSON.stringify({ texto, audio_url: url }),
+    });
+    if (!upsert.ok) throw new Error(`audio_hr ${upsert.status}: ${await upsert.text()}`);
+
+    feitos++;
+    process.stdout.write(`\r  opcoes: ${feitos} gerados`);
+  }
+  console.log(`\r  opcoes: ${feitos} gerados, ${pulados} já tinham áudio.        `);
+}
 
 const cabecalhos = { apikey: CHAVE, Authorization: `Bearer ${CHAVE}` };
 
@@ -129,4 +192,5 @@ for (const alvo of ALVOS) {
   if (filtro && !filtro.includes(alvo.nome)) continue;
   await processar(alvo);
 }
+if (!filtro || filtro.includes('opcoes')) await processarOpcoes();
 console.log('\nPronto. O app passa a mostrar o botão de ouvir sozinho.');

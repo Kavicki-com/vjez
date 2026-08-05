@@ -22,6 +22,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      audio_hr: {
+        Row: {
+          atualizado_em: string
+          audio_url: string
+          criado_em: string
+          id: string
+          texto: string
+        }
+        Insert: {
+          atualizado_em?: string
+          audio_url: string
+          criado_em?: string
+          id?: string
+          texto: string
+        }
+        Update: {
+          atualizado_em?: string
+          audio_url?: string
+          criado_em?: string
+          id?: string
+          texto?: string
+        }
+        Relationships: []
+      }
       atividades: {
         Row: {
           atualizado_em: string
