@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Botao } from '@/components/Botao';
 import { Carregando, Erro } from '@/components/Estados';
 import { Sahovnica } from '@/components/Sahovnica';
+import { AberturaLicao } from '@/features/licao/AberturaLicao';
 import { Feedback } from '@/features/licao/Feedback';
 import { TelaFim } from '@/features/licao/TelaFim';
 import { CampoDoExercicio } from '@/features/licao/exercicios';
@@ -47,6 +48,8 @@ export default function TelaLicao() {
   const [respostas, setRespostas] = useState<Record<string, Resposta>>({});
   const [vereditos, setVereditos] = useState<Record<string, Veredito>>({});
   const [terminou, setTerminou] = useState(false);
+  // A abertura é o passo zero: some assim que o aluno começa.
+  const [naAbertura, setNaAbertura] = useState(true);
 
   const exercicios = licao?.exercicios ?? [];
   const exercicio = exercicios[indice];
@@ -85,6 +88,20 @@ export default function TelaLicao() {
   }
 
   if (!exercicio) return <Erro mensagem="Esta lição ainda não tem exercícios." />;
+
+  // Sem intro cadastrada a abertura não aparece: quem decide é o conteúdo.
+  if (naAbertura && licao.intro_pt) {
+    return (
+      <AberturaLicao
+        titulo={licao.titulo_pt}
+        intro={licao.intro_pt}
+        ilustracao={licao.ilustracao}
+        padez={licao.padez}
+        quantidadeDeExercicios={exercicios.length}
+        aoComecar={() => setNaAbertura(false)}
+      />
+    );
+  }
 
   const podeVerificar = resposta !== null && !veredito;
   const ultimo = indice === exercicios.length - 1;

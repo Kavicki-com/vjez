@@ -5,7 +5,12 @@
 import { paraExercicio } from '@/lib/mapeadores';
 import { supabase } from '@/lib/supabase';
 import { ORDEM_ATIVIDADES } from '@/lib/regras';
-import type { Atividade, Exercicio, TipoAtividade } from '@/types/schema';
+import type {
+  Atividade,
+  Exercicio,
+  Padez,
+  TipoAtividade,
+} from '@/types/schema';
 
 export type LicaoResumo = {
   id: string;
@@ -20,6 +25,8 @@ export type ModuloResumo = {
   nivel: string;
   /** Nome do glifo Ionicons escolhido pela curadoria. */
   icone: string | null;
+  /** Caso que o módulo ensina. Nulo nos módulos temáticos. */
+  padez: Padez | null;
   licoes: LicaoResumo[];
 };
 
@@ -27,7 +34,7 @@ export type ModuloResumo = {
 export async function buscarTrilha(): Promise<ModuloResumo[]> {
   const { data, error } = await supabase
     .from('modulos')
-    .select('id, tema_pt, ordem, nivel, icone, licoes(id, titulo_pt, ordem)')
+    .select('id, tema_pt, ordem, nivel, icone, padez, licoes(id, titulo_pt, ordem)')
     .order('ordem')
     .order('ordem', { referencedTable: 'licoes' });
   if (error) throw error;
@@ -38,6 +45,7 @@ export async function buscarTrilha(): Promise<ModuloResumo[]> {
     ordem: m.ordem,
     nivel: m.nivel,
     icone: m.icone,
+    padez: m.padez,
     licoes: m.licoes ?? [],
   }));
 }
@@ -47,6 +55,11 @@ export type LicaoCompleta = {
   titulo_pt: string;
   ordem: number;
   moduloId: string;
+  /** Abertura da lição: explicação e ilustração vindas da curadoria. */
+  intro_pt: string | null;
+  ilustracao: string | null;
+  /** Caso do módulo, para o selo da abertura. */
+  padez: Padez | null;
   atividades: Atividade[];
   /** Todos os exercícios, na ordem em que aparecem. */
   exercicios: Exercicio[];
@@ -61,7 +74,7 @@ export async function buscarLicao(licaoId: string): Promise<LicaoCompleta> {
   const { data, error } = await supabase
     .from('licoes')
     .select(
-      'id, titulo_pt, ordem, modulo_id, atividades(id, tipo, titulo_pt, ordem, exercicios(*))',
+      'id, titulo_pt, ordem, intro_pt, ilustracao, modulo_id, modulos(padez), atividades(id, tipo, titulo_pt, ordem, exercicios(*))',
     )
     .eq('id', licaoId)
     .single();
@@ -88,6 +101,9 @@ export async function buscarLicao(licaoId: string): Promise<LicaoCompleta> {
     titulo_pt: data.titulo_pt,
     ordem: data.ordem,
     moduloId: data.modulo_id,
+    intro_pt: data.intro_pt,
+    ilustracao: data.ilustracao,
+    padez: data.modulos?.padez ?? null,
     atividades,
     exercicios: atividades.flatMap((a) => a.exercicios),
   };

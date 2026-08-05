@@ -252,6 +252,8 @@ export type Database = {
           atualizado_em: string
           criado_em: string
           id: string
+          ilustracao: string | null
+          intro_pt: string | null
           modulo_id: string
           ordem: number
           titulo_pt: string
@@ -260,6 +262,8 @@ export type Database = {
           atualizado_em?: string
           criado_em?: string
           id?: string
+          ilustracao?: string | null
+          intro_pt?: string | null
           modulo_id: string
           ordem: number
           titulo_pt: string
@@ -268,6 +272,8 @@ export type Database = {
           atualizado_em?: string
           criado_em?: string
           id?: string
+          ilustracao?: string | null
+          intro_pt?: string | null
           modulo_id?: string
           ordem?: number
           titulo_pt?: string
@@ -292,6 +298,7 @@ export type Database = {
           id: string
           nivel: Database["public"]["Enums"]["nivel"]
           ordem: number
+          padez: Database["public"]["Enums"]["padez"] | null
           tema_pt: string
         }
         Insert: {
@@ -303,6 +310,7 @@ export type Database = {
           id?: string
           nivel: Database["public"]["Enums"]["nivel"]
           ordem: number
+          padez?: Database["public"]["Enums"]["padez"] | null
           tema_pt: string
         }
         Update: {
@@ -314,6 +322,7 @@ export type Database = {
           id?: string
           nivel?: Database["public"]["Enums"]["nivel"]
           ordem?: number
+          padez?: Database["public"]["Enums"]["padez"] | null
           tema_pt?: string
         }
         Relationships: [

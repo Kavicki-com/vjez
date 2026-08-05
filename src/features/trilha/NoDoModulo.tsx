@@ -45,8 +45,8 @@ export function NoDoModulo({ modulo, desvio, aoTocar }: Props) {
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`${modulo.tema_pt}, ${concluidas} de ${total} lições`}
-          accessibilityState={{ disabled: bloqueado || semConteudo }}
-          disabled={bloqueado || semConteudo}
+          // Abre sempre: ver o que vem pela frente não é o mesmo que
+          // poder fazer. Quem tranca a lição é a tela da unidade.
           onPress={aoTocar}
           style={({ pressed }) => [
             styles.circulo,

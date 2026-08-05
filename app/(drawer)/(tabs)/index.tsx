@@ -58,11 +58,9 @@ export default function Inicio() {
               key={modulo.id}
               modulo={modulo}
               desvio={desvioDoNo(i)}
-              aoTocar={() => {
-                if (modulo.proximaLicaoId) {
-                  router.push(`/licao/${modulo.proximaLicaoId}`);
-                }
-              }}
+              // O nó abre a unidade, não a lição: é lá que se vê progresso,
+              // nota e a opção de refazer.
+              aoTocar={() => router.push(`/modulo/${modulo.id}`)}
             />
           ))}
         </View>
