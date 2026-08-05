@@ -1,7 +1,12 @@
 import { Drawer } from 'expo-router/drawer';
 
 import { NavLateral } from '@/components/NavLateral';
-import { cores, fonte, larguraNavLateral, peso } from '@/theme/tokens';
+import {
+  cores,
+  familia,
+  fonte,
+  larguraNavLateral,
+} from '@/theme/tokens';
 import { useLayout } from '@/theme/useLayout';
 
 export default function DrawerLayout() {
@@ -25,7 +30,7 @@ export default function DrawerLayout() {
         headerStyle: { backgroundColor: cores.superficie },
         headerShadowVisible: false,
         headerTintColor: cores.texto,
-        headerTitleStyle: { fontSize: fonte.subtitulo, fontWeight: peso.forte },
+        headerTitleStyle: { fontSize: fonte.subtitulo, fontFamily: familia.forte },
       }}
     >
       {/* As abas trazem o próprio cabeçalho; as telas do menu usam o do drawer. */}

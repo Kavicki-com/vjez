@@ -1,6 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native';
 
-import { cores, espaco, fonte, peso, raio } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  familia,
+  fonte,
+  raio,
+} from '@/theme/tokens';
 import type { Exercicio } from '@/types/schema';
 
 import { EscolherForma } from './EscolherForma';
@@ -74,11 +80,11 @@ const styles = StyleSheet.create({
     backgroundColor: cores.fundoSuave,
     gap: espaco.xs,
   },
-  fraseHr: { fontSize: fonte.subtitulo, color: cores.texto },
+  fraseHr: { fontSize: fonte.subtitulo, fontFamily: familia.normal, color: cores.texto },
   origemPt: {
     fontSize: fonte.titulo,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.texto,
   },
-  base: { fontSize: fonte.pequena, color: cores.textoSuave },
+  base: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 });

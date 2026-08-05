@@ -1,7 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { cores, espaco, fonte, peso, raio } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  familia,
+  fonte,
+  raio,
+} from '@/theme/tokens';
 
 type Props = {
   nome?: string;
@@ -42,10 +48,10 @@ const styles = StyleSheet.create({
   texto: { flex: 1, gap: 2 },
   saudacao: {
     fontSize: fonte.titulo,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.texto,
   },
-  pergunta: { fontSize: fonte.corpo, color: cores.textoSuave },
+  pergunta: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.textoSuave },
   ofensiva: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -57,7 +63,7 @@ const styles = StyleSheet.create({
   },
   ofensivaNumero: {
     fontSize: fonte.subtitulo,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.texto,
   },
 });

@@ -1,21 +1,42 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
 
-import { cores, espaco, fonte, peso, raio } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  familia,
+  fonte,
+  raio,
+  relevo,
+  sombraSolida,
+} from '@/theme/tokens';
 
 type Props = {
   rotulo: string;
   aoTocar: () => void;
   desabilitado?: boolean;
-  variante?: 'primaria' | 'secundaria';
+  variante?: 'primaria' | 'secundaria' | 'acerto' | 'erro';
 };
 
+const TONS = {
+  primaria: { fundo: cores.primaria, baixo: sombraSolida.primaria, texto: cores.superficie },
+  acerto: { fundo: cores.acerto, baixo: sombraSolida.acerto, texto: cores.superficie },
+  erro: { fundo: cores.erro, baixo: sombraSolida.erro, texto: cores.superficie },
+  secundaria: { fundo: cores.superficie, baixo: sombraSolida.neutra, texto: cores.texto },
+} as const;
+
+/**
+ * Botão com relevo sólido: a borda inferior escura some ao pressionar e o
+ * botão desce, dando a sensação de afundar. A margem compensa a borda
+ * perdida para o bloco não pular de altura.
+ */
 export function Botao({
   rotulo,
   aoTocar,
   desabilitado,
   variante = 'primaria',
 }: Props) {
-  const secundaria = variante === 'secundaria';
+  const tom = TONS[variante];
+
   return (
     <Pressable
       accessibilityRole="button"
@@ -24,7 +45,13 @@ export function Botao({
       onPress={aoTocar}
       style={({ pressed }) => [
         styles.base,
-        secundaria ? styles.secundaria : styles.primaria,
+        {
+          backgroundColor: tom.fundo,
+          borderBottomColor: tom.baixo,
+          borderColor: variante === 'secundaria' ? cores.borda : tom.fundo,
+          borderBottomWidth: relevo,
+        },
+        variante === 'secundaria' && styles.secundaria,
         pressed && !desabilitado && styles.pressionado,
         desabilitado && styles.desabilitado,
       ]}
@@ -32,8 +59,7 @@ export function Botao({
       <Text
         style={[
           styles.rotulo,
-          secundaria ? styles.rotuloSecundario : styles.rotuloPrimario,
-          desabilitado && styles.rotuloDesabilitado,
+          { color: desabilitado ? cores.textoSuave : tom.texto },
         ]}
       >
         {rotulo}
@@ -51,15 +77,20 @@ const styles = StyleSheet.create({
     borderRadius: raio.md,
     borderWidth: 1,
   },
-  primaria: { backgroundColor: cores.primaria, borderColor: cores.primaria },
-  secundaria: { backgroundColor: cores.superficie, borderColor: cores.borda },
-  pressionado: { opacity: 0.85 },
+  secundaria: { borderWidth: 1 },
+  pressionado: {
+    transform: [{ translateY: relevo }],
+    borderBottomWidth: 0,
+    marginBottom: relevo,
+  },
   desabilitado: {
     backgroundColor: cores.fundoSuave,
     borderColor: cores.borda,
+    borderBottomColor: cores.borda,
   },
-  rotulo: { fontSize: fonte.corpo, fontWeight: peso.forte },
-  rotuloPrimario: { color: cores.superficie },
-  rotuloSecundario: { color: cores.texto },
-  rotuloDesabilitado: { color: cores.textoSuave },
+  rotulo: {
+    fontSize: fonte.corpo,
+    fontFamily: familia.forte,
+    letterSpacing: 0.3,
+  },
 });

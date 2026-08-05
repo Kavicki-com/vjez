@@ -1,6 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { cores, espaco, fonte, peso, raio } from '@/theme/tokens';
+import { cores, espaco, familia, fonte } from '@/theme/tokens';
 import type { Exercicio, Padez } from '@/types/schema';
 
 import type { Veredito } from './correcao';
@@ -23,16 +24,25 @@ type Props = {
 
 /**
  * Feedback do CLAUDE.md: erro mostra a forma certa e o porquê do caso.
- * Errar tira ponto, mas nunca bloqueia — daí não existir estado de "trave aqui".
+ * Sai sem caixa própria — quem tinge o bloco é o rodapé da lição, para o
+ * acerto e o erro ocuparem a mesma faixa e não empurrarem o conteúdo.
  */
 export function Feedback({ exercicio, veredito }: Props) {
   const certo = veredito.acertou;
+  const cor = certo ? cores.acerto : cores.erro;
 
   return (
-    <View style={[styles.caixa, certo ? styles.caixaCerta : styles.caixaErrada]}>
-      <Text style={[styles.titulo, certo ? styles.tituloCerto : styles.tituloErrado]}>
-        {certo ? 'Isso!' : 'Ainda não'}
-      </Text>
+    <View style={styles.bloco}>
+      <View style={styles.linhaTitulo}>
+        <Ionicons
+          name={certo ? 'checkmark-circle' : 'close-circle'}
+          size={24}
+          color={cor}
+        />
+        <Text style={[styles.titulo, { color: cor }]}>
+          {certo ? 'Isso!' : 'Ainda não'}
+        </Text>
+      </View>
 
       {!certo && veredito.esperado && (
         <Text style={styles.esperado}>
@@ -54,21 +64,18 @@ export function Feedback({ exercicio, veredito }: Props) {
 }
 
 const styles = StyleSheet.create({
-  caixa: {
-    padding: espaco.md,
-    borderRadius: raio.md,
-    borderWidth: 1,
-    gap: espaco.xs,
+  bloco: { gap: espaco.xs },
+  linhaTitulo: { flexDirection: 'row', alignItems: 'center', gap: espaco.sm },
+  titulo: { fontSize: fonte.subtitulo, fontFamily: familia.forte },
+  esperado: {
+    fontSize: fonte.corpo,
+    fontFamily: familia.normal,
+    color: cores.texto,
   },
-  caixaCerta: {
-    backgroundColor: cores.acertoSuave,
-    borderColor: cores.acerto,
+  formaCerta: { fontFamily: familia.forte },
+  motivo: {
+    fontSize: fonte.pequena,
+    fontFamily: familia.normal,
+    color: cores.textoSuave,
   },
-  caixaErrada: { backgroundColor: cores.erroSuave, borderColor: cores.erro },
-  titulo: { fontSize: fonte.subtitulo, fontWeight: peso.forte },
-  tituloCerto: { color: cores.acerto },
-  tituloErrado: { color: cores.erro },
-  esperado: { fontSize: fonte.corpo, color: cores.texto },
-  formaCerta: { fontWeight: peso.forte },
-  motivo: { fontSize: fonte.pequena, color: cores.textoSuave },
 });

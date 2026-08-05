@@ -1,7 +1,13 @@
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { MAX_CARACTERES_PRODUCAO_LIVRE } from '@/lib/regras';
-import { cores, espaco, fonte, raio } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  familia,
+  fonte,
+  raio,
+} from '@/theme/tokens';
 import type { ExProducaoLivre } from '@/types/schema';
 
 import type { PropsExercicio } from './tipos';
@@ -51,14 +57,14 @@ const styles = StyleSheet.create({
   campo: {
     minHeight: 160,
     padding: espaco.md,
-    fontSize: fonte.corpo,
+    fontSize: fonte.corpo, fontFamily: familia.normal,
     color: cores.texto,
     borderRadius: raio.md,
     borderWidth: 2,
     borderColor: cores.borda,
     backgroundColor: cores.superficie,
   },
-  contador: { fontSize: fonte.pequena, color: cores.textoSuave, textAlign: 'right' },
+  contador: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave, textAlign: 'right' },
   contadorAlerta: { color: cores.erro },
-  nota: { fontSize: fonte.pequena, color: cores.textoSuave },
+  nota: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 });

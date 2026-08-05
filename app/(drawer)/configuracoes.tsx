@@ -6,9 +6,9 @@ import { usePreferencias } from '@/features/config/Preferencias';
 import {
   cores,
   espaco,
+  familia,
   fonte,
   larguraMaximaConteudo,
-  peso,
   raio,
 } from '@/theme/tokens';
 
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   coluna: { width: '100%', maxWidth: larguraMaximaConteudo, gap: espaco.sm },
   secao: {
     fontSize: fonte.pequena,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.textoSuave,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
@@ -142,11 +142,11 @@ const styles = StyleSheet.create({
     padding: espaco.md,
   },
   linhaTexto: { flex: 1, gap: 2 },
-  linhaTitulo: { fontSize: fonte.corpo, color: cores.texto },
-  linhaDetalhe: { fontSize: fonte.pequena, color: cores.textoSuave },
+  linhaTitulo: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.texto },
+  linhaDetalhe: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
   divisor: { height: 1, backgroundColor: cores.borda, marginLeft: espaco.xxl },
   nota: {
-    fontSize: fonte.pequena,
+    fontSize: fonte.pequena, fontFamily: familia.normal,
     color: cores.textoSuave,
     marginTop: espaco.sm,
   },

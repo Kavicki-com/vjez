@@ -29,9 +29,9 @@ import { NOTA_MAXIMA_LICAO } from '@/lib/regras';
 import {
   cores,
   espaco,
+  familia,
   fonte,
   larguraMaximaConteudo,
-  peso,
   raio,
 } from '@/theme/tokens';
 
@@ -162,17 +162,32 @@ export default function TelaLicao() {
           {!veredito && exercicio.dica_pt && (
             <Text style={styles.dica}>{exercicio.dica_pt}</Text>
           )}
-
-          {veredito && <Feedback exercicio={exercicio} veredito={veredito} />}
         </View>
       </ScrollView>
 
-      <View style={[styles.rodape, { paddingBottom: insets.bottom + espaco.md }]}>
+      {/* Rodapé se tinge com o resultado, como no Duolingo: o feedback
+          aparece na mesma faixa do botão, sem empurrar o exercício. */}
+      <View
+        style={[
+          styles.rodape,
+          veredito?.acertou === true && styles.rodapeCerto,
+          veredito?.acertou === false && styles.rodapeErrado,
+          { paddingBottom: insets.bottom + espaco.md },
+        ]}
+      >
         <View style={styles.coluna}>
+          {veredito && <Feedback exercicio={exercicio} veredito={veredito} />}
           <Botao
             rotulo={veredito ? (ultimo ? 'Ver resultado' : 'Continuar') : 'Verificar'}
             aoTocar={veredito ? continuar : verificar}
             desabilitado={!veredito && !podeVerificar}
+            variante={
+              veredito?.acertou === true
+                ? 'acerto'
+                : veredito?.acertou === false
+                  ? 'erro'
+                  : 'primaria'
+            }
           />
         </View>
       </View>
@@ -232,24 +247,24 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   barraCheia: { height: '100%', backgroundColor: cores.primaria },
-  contagem: { fontSize: fonte.pequena, color: cores.textoSuave },
+  contagem: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 
   corpo: { flex: 1 },
   corpoConteudo: { padding: espaco.md, alignItems: 'center' },
   coluna: { width: '100%', maxWidth: larguraMaximaConteudo, gap: espaco.md },
   atividade: {
     fontSize: fonte.pequena,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.textoSuave,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
   },
   enunciado: {
     fontSize: fonte.titulo,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.texto,
   },
-  dica: { fontSize: fonte.pequena, color: cores.textoSuave },
+  dica: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 
   rodape: {
     paddingHorizontal: espaco.md,
@@ -258,6 +273,14 @@ const styles = StyleSheet.create({
     borderTopColor: cores.borda,
     backgroundColor: cores.superficie,
     alignItems: 'center',
+  },
+  rodapeCerto: {
+    backgroundColor: cores.acertoSuave,
+    borderTopColor: cores.acerto,
+  },
+  rodapeErrado: {
+    backgroundColor: cores.erroSuave,
+    borderTopColor: cores.erro,
   },
 
   fim: {
@@ -269,10 +292,10 @@ const styles = StyleSheet.create({
   },
   fimTitulo: {
     fontSize: fonte.gigante,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.texto,
   },
-  fimLicao: { fontSize: fonte.corpo, color: cores.textoSuave },
+  fimLicao: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.textoSuave },
   notaCaixa: {
     flexDirection: 'row',
     alignItems: 'baseline',
@@ -283,9 +306,9 @@ const styles = StyleSheet.create({
   },
   notaValor: {
     fontSize: 56,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.primaria,
   },
-  notaMax: { fontSize: fonte.subtitulo, color: cores.primaria },
-  fimDetalhe: { fontSize: fonte.corpo, color: cores.textoSuave },
+  notaMax: { fontSize: fonte.subtitulo, fontFamily: familia.normal, color: cores.primaria },
+  fimDetalhe: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.textoSuave },
 });

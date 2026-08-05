@@ -1,7 +1,13 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 import { Carregando, Erro } from '@/components/Estados';
-import { cores, espaco, fonte, peso, raio } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  familia,
+  fonte,
+  raio,
+} from '@/theme/tokens';
 
 import { useExpressoes } from './hooks';
 
@@ -42,9 +48,9 @@ const styles = StyleSheet.create({
   },
   hr: {
     fontSize: fonte.subtitulo,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.primaria,
   },
-  pt: { fontSize: fonte.corpo, color: cores.texto },
-  contexto: { fontSize: fonte.pequena, color: cores.textoSuave },
+  pt: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.texto },
+  contexto: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 });

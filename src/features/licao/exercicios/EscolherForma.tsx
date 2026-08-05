@@ -1,6 +1,12 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { cores, espaco, fonte, peso, raio } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  familia,
+  fonte,
+  raio,
+} from '@/theme/tokens';
 import type { ExEscolherForma } from '@/types/schema';
 
 import type { PropsExercicio } from './tipos';
@@ -74,8 +80,8 @@ const styles = StyleSheet.create({
   certa: { borderColor: cores.acerto, backgroundColor: cores.acertoSuave },
   errada: { borderColor: cores.erro, backgroundColor: cores.erroSuave },
   pressionada: { opacity: 0.85 },
-  texto: { fontSize: fonte.subtitulo, color: cores.texto },
-  textoSelecionado: { color: cores.primaria, fontWeight: peso.forte },
-  textoCerta: { color: cores.acerto, fontWeight: peso.forte },
-  textoErrada: { color: cores.erro, fontWeight: peso.forte },
+  texto: { fontSize: fonte.subtitulo, fontFamily: familia.normal, color: cores.texto },
+  textoSelecionado: { color: cores.primaria, fontFamily: familia.forte },
+  textoCerta: { color: cores.acerto, fontFamily: familia.forte },
+  textoErrada: { color: cores.erro, fontFamily: familia.forte },
 });

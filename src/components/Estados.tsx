@@ -1,6 +1,11 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
-import { cores, espaco, fonte } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  familia,
+  fonte,
+} from '@/theme/tokens';
 
 export function Carregando() {
   return (
@@ -37,9 +42,9 @@ const styles = StyleSheet.create({
     padding: espaco.xl,
     gap: espaco.xs,
   },
-  titulo: { fontSize: fonte.subtitulo, fontWeight: '700', color: cores.texto },
+  titulo: { fontSize: fonte.subtitulo, fontFamily: familia.forte, color: cores.texto },
   texto: {
-    fontSize: fonte.corpo,
+    fontSize: fonte.corpo, fontFamily: familia.normal,
     color: cores.textoSuave,
     textAlign: 'center',
   },

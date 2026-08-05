@@ -12,9 +12,9 @@ import { montarTrilha } from '@/features/trilha/estado';
 import {
   cores,
   espaco,
+  familia,
   fonte,
   larguraMaximaConteudo,
-  peso,
   raio,
 } from '@/theme/tokens';
 import type { Nivel, ProgressoLicao } from '@/types/schema';
@@ -186,12 +186,12 @@ const styles = StyleSheet.create({
   },
   avatarLetra: {
     fontSize: fonte.titulo,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.superficie,
   },
   identidadeTexto: { flex: 1, gap: 2 },
-  nome: { fontSize: fonte.titulo, fontWeight: peso.forte, color: cores.texto },
-  nivel: { fontSize: fonte.corpo, color: cores.textoSuave },
+  nome: { fontSize: fonte.titulo, fontFamily: familia.forte, color: cores.texto },
+  nivel: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.textoSuave },
 
   grade: { flexDirection: 'row', flexWrap: 'wrap', gap: espaco.sm },
   estatistica: {
@@ -207,14 +207,14 @@ const styles = StyleSheet.create({
   },
   estatisticaValor: {
     fontSize: fonte.titulo,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.texto,
   },
-  estatisticaRotulo: { fontSize: fonte.pequena, color: cores.textoSuave },
+  estatisticaRotulo: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 
   secao: {
     fontSize: fonte.pequena,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.textoSuave,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
@@ -230,8 +230,8 @@ const styles = StyleSheet.create({
     backgroundColor: cores.superficie,
   },
   linhaTopo: { flexDirection: 'row', alignItems: 'center', gap: espaco.sm },
-  moduloTema: { flex: 1, fontSize: fonte.corpo, color: cores.texto },
-  moduloContagem: { fontSize: fonte.pequena, color: cores.textoSuave },
+  moduloTema: { flex: 1, fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.texto },
+  moduloContagem: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
   barra: {
     height: 8,
     borderRadius: raio.pill,
@@ -247,5 +247,5 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
     borderColor: cores.borda,
   },
-  vazioTexto: { fontSize: fonte.pequena, color: cores.textoSuave },
+  vazioTexto: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 });

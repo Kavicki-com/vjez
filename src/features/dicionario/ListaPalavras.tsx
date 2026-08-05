@@ -3,7 +3,13 @@ import { SectionList, StyleSheet, Text, View } from 'react-native';
 
 import { CampoBusca } from '@/components/CampoBusca';
 import { Carregando, Erro, Vazio } from '@/components/Estados';
-import { cores, espaco, fonte, peso, raio } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  familia,
+  fonte,
+  raio,
+} from '@/theme/tokens';
 import type { LexItem } from '@/types/schema';
 
 import { agruparPorCategoria } from './api';
@@ -79,7 +85,7 @@ const styles = StyleSheet.create({
   lista: { paddingVertical: espaco.md, gap: espaco.sm },
   categoria: {
     fontSize: fonte.pequena,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.textoSuave,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
@@ -102,13 +108,13 @@ const styles = StyleSheet.create({
   },
   hr: {
     fontSize: fonte.subtitulo,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.primaria,
   },
-  genero: { fontSize: fonte.pequena, color: cores.textoSuave },
-  pt: { fontSize: fonte.corpo, color: cores.texto },
+  genero: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
+  pt: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.texto },
   nota: {
-    fontSize: fonte.pequena,
+    fontSize: fonte.pequena, fontFamily: familia.normal,
     color: cores.textoSuave,
     marginTop: espaco.xs,
   },

@@ -1,7 +1,13 @@
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { cores, espaco, fonte, peso, raio } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  familia,
+  fonte,
+  raio,
+} from '@/theme/tokens';
 import type { ExLigarPares } from '@/types/schema';
 
 import type { PropsExercicio } from './tipos';
@@ -137,8 +143,8 @@ const styles = StyleSheet.create({
   fichaLigada: { backgroundColor: cores.fundoSuave },
   fichaCerta: { borderColor: cores.acerto, backgroundColor: cores.acertoSuave },
   fichaErrada: { borderColor: cores.erro, backgroundColor: cores.erroSuave },
-  hr: { fontSize: fonte.subtitulo, fontWeight: peso.forte, color: cores.primaria },
-  pt: { fontSize: fonte.pequena + 1, color: cores.texto },
-  ligacao: { fontSize: fonte.pequena, color: cores.textoSuave },
+  hr: { fontSize: fonte.subtitulo, fontFamily: familia.forte, color: cores.primaria },
+  pt: { fontSize: fonte.pequena + 1, fontFamily: familia.normal, color: cores.texto },
+  ligacao: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
   textoErrado: { color: cores.erro },
 });

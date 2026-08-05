@@ -5,7 +5,12 @@ import { Tabs } from 'expo-router';
 import { DrawerToggleButton } from 'expo-router/drawer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { cores, espaco, fonte, peso } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  familia,
+  fonte,
+} from '@/theme/tokens';
 import { useLayout } from '@/theme/useLayout';
 
 /**
@@ -28,7 +33,7 @@ export default function TabsLayout() {
         headerStyle: { backgroundColor: cores.superficie },
         headerShadowVisible: false,
         headerTintColor: cores.texto,
-        headerTitleStyle: { fontSize: fonte.subtitulo, fontWeight: peso.forte },
+        headerTitleStyle: { fontSize: fonte.subtitulo, fontFamily: familia.forte },
         // A lateral já dá acesso a tudo; o botão de menu só existe quando ela é gaveta.
         headerLeft: largo
           ? undefined
@@ -53,7 +58,7 @@ export default function TabsLayout() {
         tabBarLabelStyle: {
           fontSize: fonte.pequena,
           lineHeight: fonte.pequena + 4,
-          fontWeight: peso.medio,
+          fontFamily: familia.medio,
         },
         sceneStyle: { backgroundColor: cores.fundo },
       }}

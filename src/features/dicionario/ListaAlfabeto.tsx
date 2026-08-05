@@ -1,7 +1,13 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 import { Carregando, Erro } from '@/components/Estados';
-import { cores, espaco, fonte, peso, raio } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  familia,
+  fonte,
+  raio,
+} from '@/theme/tokens';
 
 import { useLetras } from './hooks';
 
@@ -56,13 +62,13 @@ const styles = StyleSheet.create({
   },
   letra: {
     fontSize: fonte.subtitulo,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.primaria,
   },
   texto: { flex: 1, gap: 2 },
-  som: { fontSize: fonte.corpo, color: cores.texto },
+  som: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.texto },
   exemplo: {
-    fontSize: fonte.pequena,
+    fontSize: fonte.pequena, fontFamily: familia.normal,
     color: cores.textoSuave,
     fontStyle: 'italic',
   },

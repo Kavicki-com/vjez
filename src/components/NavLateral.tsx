@@ -8,7 +8,13 @@ import {
 } from 'expo-router/drawer';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { cores, espaco, fonte, peso, raio } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  familia,
+  fonte,
+  raio,
+} from '@/theme/tokens';
 
 type Destino = {
   href: Href;
@@ -103,7 +109,7 @@ const styles = StyleSheet.create({
   },
   marcaTexto: {
     fontSize: fonte.titulo,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.primaria,
     letterSpacing: -0.5,
   },
@@ -121,7 +127,7 @@ const styles = StyleSheet.create({
   rotulo: {
     fontSize: fonte.corpo,
     color: cores.textoSuave,
-    fontWeight: peso.medio,
+    fontFamily: familia.medio,
     flexShrink: 1,
   },
   rotuloAtivo: { color: cores.primaria },

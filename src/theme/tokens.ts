@@ -36,6 +36,22 @@ export const cores = {
   destaque: '#E8A33D',
 } as const;
 
+/**
+ * Tons de baixo dos elementos com relevo.
+ * O botão e o nó da trilha têm uma borda inferior sólida mais escura que
+ * some quando pressionados — é o que dá o "afunda ao tocar" sem sombra.
+ */
+export const sombraSolida = {
+  primaria: '#7A0013',
+  secundaria: '#0E3479',
+  acerto: '#0B5C2D',
+  erro: '#9C0D1D',
+  neutra: '#D5D0CE',
+} as const;
+
+/** Espessura da borda inferior que dá o relevo. */
+export const relevo = 4;
+
 export const espaco = {
   xs: 4,
   sm: 8,
@@ -60,10 +76,16 @@ export const fonte = {
   gigante: 32,
 } as const;
 
-export const peso = {
-  normal: '400',
-  medio: '600',
-  forte: '700',
+/**
+ * Peso da fonte vem por FAMÍLIA, não por `fontWeight`.
+ * Cada peso da Nunito é um arquivo separado: no nativo, `fontWeight: '700'`
+ * sobre a família Regular não engrossa nada — só a família certa engrossa.
+ * Use sempre `fontFamily: familia.X`.
+ */
+export const familia = {
+  normal: 'Nunito_400Regular',
+  medio: 'Nunito_600SemiBold',
+  forte: 'Nunito_800ExtraBold',
 } as const;
 
 /**

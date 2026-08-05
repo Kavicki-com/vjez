@@ -3,9 +3,9 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import {
   cores,
   espaco,
+  familia,
   fonte,
   larguraMaximaConteudo,
-  peso,
   raio,
 } from '@/theme/tokens';
 
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: cores.primaria,
   },
-  avisoTexto: { fontSize: fonte.pequena, color: cores.primaria },
+  avisoTexto: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.primaria },
   bloco: {
     padding: espaco.md,
     borderRadius: raio.md,
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   blocoTitulo: {
     fontSize: fonte.subtitulo,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.texto,
   },
   blocoCorpo: { gap: espaco.sm },
@@ -145,6 +145,6 @@ const styles = StyleSheet.create({
     backgroundColor: cores.primaria,
     marginTop: 7,
   },
-  itemTexto: { flex: 1, fontSize: fonte.corpo, color: cores.texto, lineHeight: 22 },
-  negrito: { fontWeight: peso.forte },
+  itemTexto: { flex: 1, fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.texto, lineHeight: 22 },
+  negrito: { fontFamily: familia.forte },
 });

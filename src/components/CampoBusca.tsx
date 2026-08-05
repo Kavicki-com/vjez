@@ -1,7 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
-import { cores, espaco, fonte, raio } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  familia,
+  fonte,
+  raio,
+} from '@/theme/tokens';
 
 type Props = {
   valor: string;
@@ -53,7 +59,7 @@ const styles = StyleSheet.create({
   // navegação por teclado na web.
   entrada: {
     flex: 1,
-    fontSize: fonte.corpo,
+    fontSize: fonte.corpo, fontFamily: familia.normal,
     color: cores.texto,
   },
 });

@@ -3,7 +3,13 @@ import { useState } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 
 import { Botao } from '@/components/Botao';
-import { cores, espaco, fonte, peso, raio } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  familia,
+  fonte,
+  raio,
+} from '@/theme/tokens';
 
 import { entrarComGoogle } from './api';
 
@@ -88,20 +94,20 @@ const styles = StyleSheet.create({
   icone: { marginBottom: espaco.xs },
   titulo: {
     fontSize: fonte.titulo,
-    fontWeight: peso.forte,
+    fontFamily: familia.forte,
     color: cores.texto,
     textAlign: 'center',
   },
   explicacao: {
-    fontSize: fonte.corpo,
+    fontSize: fonte.corpo, fontFamily: familia.normal,
     color: cores.textoSuave,
     textAlign: 'center',
   },
   botoes: { width: '100%', gap: espaco.sm, marginTop: espaco.md },
-  nota: { fontSize: fonte.pequena, color: cores.textoSuave, textAlign: 'center' },
-  erro: { fontSize: fonte.pequena, color: cores.erro, textAlign: 'center' },
+  nota: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave, textAlign: 'center' },
+  erro: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.erro, textAlign: 'center' },
   rodape: {
-    fontSize: fonte.pequena,
+    fontSize: fonte.pequena, fontFamily: familia.normal,
     color: cores.textoSuave,
     textAlign: 'center',
     marginTop: espaco.sm,

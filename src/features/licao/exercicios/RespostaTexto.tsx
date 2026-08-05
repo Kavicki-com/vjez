@@ -1,6 +1,12 @@
 import { StyleSheet, TextInput, View } from 'react-native';
 
-import { cores, espaco, fonte, peso, raio } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  familia,
+  fonte,
+  raio,
+} from '@/theme/tokens';
 
 type Props = {
   valor: string;
@@ -46,7 +52,7 @@ const styles = StyleSheet.create({
     minHeight: 56,
     paddingHorizontal: espaco.md,
     fontSize: fonte.subtitulo,
-    fontWeight: peso.medio,
+    fontFamily: familia.medio,
     color: cores.texto,
     borderRadius: raio.md,
     borderWidth: 2,

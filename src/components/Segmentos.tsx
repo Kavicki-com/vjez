@@ -1,6 +1,12 @@
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 
-import { cores, espaco, fonte, peso, raio } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  familia,
+  fonte,
+  raio,
+} from '@/theme/tokens';
 
 type Props<T extends string> = {
   opcoes: readonly { valor: T; rotulo: string }[];
@@ -61,7 +67,7 @@ const styles = StyleSheet.create({
   pilulaPressionada: { backgroundColor: cores.fundoSuave },
   rotulo: {
     fontSize: fonte.pequena + 1,
-    fontWeight: peso.medio,
+    fontFamily: familia.medio,
     color: cores.textoSuave,
   },
   rotuloAtivo: { color: cores.superficie },
