@@ -1,13 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from 'react-native';
 
-import {
-  cores,
-  espaco,
-  familia,
-  fonte,
-  linha,
-} from '@/theme/tokens';
+import { BotaoAudio } from '@/features/audio/BotaoAudio';
+import { useAudioDeTexto } from '@/features/audio/useAudioDeTexto';
+import { cores, espaco, familia, fonte, linha } from '@/theme/tokens';
 import type { Exercicio, Padez } from '@/types/schema';
 
 import type { Veredito } from './correcao';
@@ -36,6 +32,13 @@ type Props = {
 export function Feedback({ exercicio, veredito }: Props) {
   const certo = veredito.acertou;
   const cor = certo ? cores.acerto : cores.erro;
+  const { data: audios } = useAudioDeTexto();
+
+  // O áudio da forma certa só aparece AQUI, depois de responder. Antes,
+  // ouvir a resposta em croata seria o gabarito em voz alta.
+  const audioDaForma = veredito.esperado
+    ? audios?.get(veredito.esperado)
+    : undefined;
 
   return (
     <View style={styles.bloco}>
@@ -50,10 +53,16 @@ export function Feedback({ exercicio, veredito }: Props) {
         </Text>
       </View>
 
-      {!certo && veredito.esperado && (
-        <Text style={styles.esperado}>
-          Forma certa: <Text style={styles.formaCerta}>{veredito.esperado}</Text>
-        </Text>
+      {veredito.esperado && (certo ? audioDaForma : true) && (
+        <View style={styles.linhaForma}>
+          <Text style={styles.esperado}>
+            {certo ? 'Como se fala: ' : 'Forma certa: '}
+            <Text style={styles.formaCerta}>{veredito.esperado}</Text>
+          </Text>
+          {audioDaForma && (
+            <BotaoAudio url={audioDaForma} rotulo={veredito.esperado} />
+          )}
+        </View>
       )}
 
       {exercicio.padez && (
@@ -73,14 +82,23 @@ const styles = StyleSheet.create({
   bloco: { gap: espaco.xs },
   linhaTitulo: { flexDirection: 'row', alignItems: 'center', gap: espaco.sm },
   titulo: { fontSize: fonte.subtitulo, lineHeight: linha.subtitulo, fontFamily: familia.forte },
+  linhaForma: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: espaco.sm,
+    paddingVertical: espaco.xs,
+  },
   esperado: {
-    fontSize: fonte.corpo, lineHeight: linha.corpo,
+    flex: 1,
+    fontSize: fonte.corpo,
+    lineHeight: linha.corpo,
     fontFamily: familia.normal,
     color: cores.texto,
   },
   formaCerta: { fontFamily: familia.forte },
   motivo: {
-    fontSize: fonte.pequena, lineHeight: linha.pequena,
+    fontSize: fonte.pequena,
+    lineHeight: linha.pequena,
     fontFamily: familia.normal,
     color: cores.textoSuave,
   },

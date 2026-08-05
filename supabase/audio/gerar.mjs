@@ -65,16 +65,28 @@ const ALVOS = [
  */
 async function processarOpcoes() {
   const resposta = await fetch(
-    `${URL}/rest/v1/exercicios?select=dados&tipo=eq.escolher_forma`,
+    `${URL}/rest/v1/exercicios?select=tipo,dados`,
     { headers: cabecalhos },
   );
   const linhas = await resposta.json();
 
   const textos = new Set();
-  for (const { dados } of linhas) {
-    if (!dados?.falar_opcoes) continue;
-    for (const opcao of dados.opcoes ?? []) textos.add(opcao);
+  for (const { tipo, dados } of linhas) {
+    if (!dados) continue;
+
+    // Opções croatas, só onde a curadoria marcou.
+    if (tipo === 'escolher_forma' && dados.falar_opcoes) {
+      for (const opcao of dados.opcoes ?? []) textos.add(opcao);
+    }
+
+    // A RESPOSTA certa de cada template. O app só toca isso no feedback,
+    // depois de o aluno responder — antes, seria o gabarito em voz alta.
+    if (tipo === 'traducao') textos.add(dados.respostas_aceitas?.[0]);
+    if (tipo === 'preencher_lacuna') textos.add(dados.resposta);
+    if (tipo === 'montar_frase') textos.add(dados.alvo_hr);
   }
+  textos.delete(undefined);
+  textos.delete(null);
 
   const jaTem = new Set(
     await fetch(`${URL}/rest/v1/audio_hr?select=texto`, { headers: cabecalhos })
