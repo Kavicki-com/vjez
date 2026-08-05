@@ -24,6 +24,7 @@ import {
 } from '@/features/licao/correcao';
 import { useLicao } from '@/features/licao/hooks';
 import { registrarNota, registrarTentativa } from '@/features/licao/progresso';
+import { useProgressoLocal } from '@/features/perfil/ProgressoLocal';
 import { NOTA_MAXIMA_LICAO } from '@/lib/regras';
 import {
   cores,
@@ -38,6 +39,7 @@ export default function TelaLicao() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { data: licao, isPending, isError } = useLicao(id);
+  const { concluirLicao } = useProgressoLocal();
 
   const [indice, setIndice] = useState(0);
   const [respostas, setRespostas] = useState<Record<string, Resposta>>({});
@@ -100,6 +102,9 @@ export default function TelaLicao() {
   const continuar = () => {
     if (ultimo) {
       setTerminou(true);
+      // O estado local destrava a trilha na hora; o Supabase só grava se
+      // houver conta (convidado migra no portão de login).
+      concluirLicao(licao.id, nota);
       void registrarNota({ licaoId: licao.id, nota });
       return;
     }

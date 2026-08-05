@@ -18,6 +18,8 @@ export type ModuloResumo = {
   tema_pt: string;
   ordem: number;
   nivel: string;
+  /** Nome do glifo Ionicons escolhido pela curadoria. */
+  icone: string | null;
   licoes: LicaoResumo[];
 };
 
@@ -25,7 +27,7 @@ export type ModuloResumo = {
 export async function buscarTrilha(): Promise<ModuloResumo[]> {
   const { data, error } = await supabase
     .from('modulos')
-    .select('id, tema_pt, ordem, nivel, licoes(id, titulo_pt, ordem)')
+    .select('id, tema_pt, ordem, nivel, icone, licoes(id, titulo_pt, ordem)')
     .order('ordem')
     .order('ordem', { referencedTable: 'licoes' });
   if (error) throw error;
@@ -35,6 +37,7 @@ export async function buscarTrilha(): Promise<ModuloResumo[]> {
     tema_pt: m.tema_pt,
     ordem: m.ordem,
     nivel: m.nivel,
+    icone: m.icone,
     licoes: m.licoes ?? [],
   }));
 }

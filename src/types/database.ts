@@ -288,6 +288,7 @@ export type Database = {
           bloqueado_por: string | null
           criado_em: string
           fase: Database["public"]["Enums"]["fase"]
+          icone: string | null
           id: string
           nivel: Database["public"]["Enums"]["nivel"]
           ordem: number
@@ -298,6 +299,7 @@ export type Database = {
           bloqueado_por?: string | null
           criado_em?: string
           fase: Database["public"]["Enums"]["fase"]
+          icone?: string | null
           id?: string
           nivel: Database["public"]["Enums"]["nivel"]
           ordem: number
@@ -308,6 +310,7 @@ export type Database = {
           bloqueado_por?: string | null
           criado_em?: string
           fase?: Database["public"]["Enums"]["fase"]
+          icone?: string | null
           id?: string
           nivel?: Database["public"]["Enums"]["nivel"]
           ordem?: number

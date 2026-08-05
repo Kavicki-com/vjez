@@ -1,125 +1,83 @@
-import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useMemo } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { Carregando, Erro } from '@/components/Estados';
 import { useTrilha } from '@/features/licao/hooks';
-import {
-  cores,
-  espaco,
-  fonte,
-  larguraMaximaConteudo,
-  peso,
-  raio,
-} from '@/theme/tokens';
+import { useProgressoLocal } from '@/features/perfil/ProgressoLocal';
+import { usePerfil, useProgressoLicoes } from '@/features/perfil/hooks';
+import { CabecalhoTrilha } from '@/features/trilha/CabecalhoTrilha';
+import { NoDoModulo } from '@/features/trilha/NoDoModulo';
+import { montarTrilha } from '@/features/trilha/estado';
+import { cores, espaco, larguraMaximaConteudo } from '@/theme/tokens';
+import type { ProgressoLicao } from '@/types/schema';
+
+/** Serpenteado do caminho: desloca cada nó por uma onda suave. */
+function desvioDoNo(indice: number): number {
+  return Math.round(Math.sin(indice * 0.9) * 46);
+}
 
 export default function Inicio() {
-  const { data, isPending, isError } = useTrilha();
+  const { data: modulos, isPending, isError } = useTrilha();
+  const { data: perfil } = usePerfil();
+  const { data: progressoServidor } = useProgressoLicoes();
+  const { notas } = useProgressoLocal();
+
+  const trilha = useMemo(() => {
+    if (!modulos) return [];
+    // O progresso da sessão entra junto com o do servidor, então a trilha
+    // reage assim que a lição termina — sem esperar refetch.
+    const local: ProgressoLicao[] = Object.entries(notas).map(([licaoId, nota]) => ({
+      usuarioId: perfil?.id ?? 'convidado',
+      licaoId,
+      nota,
+      concluida: true,
+      data: '',
+    }));
+    return montarTrilha(modulos, [...(progressoServidor ?? []), ...local]);
+  }, [modulos, progressoServidor, notas, perfil?.id]);
 
   if (isPending) return <Carregando />;
   if (isError) return <Erro />;
 
   return (
-    <View style={styles.tela}>
-      <FlatList
-        data={data}
-        keyExtractor={(m) => m.id}
-        style={styles.lista}
-        contentContainerStyle={styles.conteudo}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item: modulo }) => (
-          <View style={styles.coluna}>
-            <View style={styles.cabecalhoModulo}>
-              <View style={styles.selo}>
-                <Text style={styles.seloTexto}>{modulo.ordem}</Text>
-              </View>
-              <Text style={styles.tema}>{modulo.tema_pt}</Text>
-            </View>
+    <ScrollView
+      style={styles.tela}
+      contentContainerStyle={styles.conteudo}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={styles.coluna}>
+        <CabecalhoTrilha
+          nome={perfil?.nome?.split(' ')[0]}
+          diasDeOfensiva={perfil?.ofensiva.diasSeguidos ?? 0}
+        />
 
-            {modulo.licoes.length === 0 ? (
-              <View style={styles.emBreve}>
-                <Text style={styles.emBreveTexto}>Lições em preparação</Text>
-              </View>
-            ) : (
-              modulo.licoes.map((licao) => (
-                <Pressable
-                  key={licao.id}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Abrir lição ${licao.titulo_pt}`}
-                  onPress={() => router.push(`/licao/${licao.id}`)}
-                  style={({ pressed }) => [
-                    styles.licao,
-                    pressed && styles.licaoPressionada,
-                  ]}
-                >
-                  <View style={styles.licaoTexto}>
-                    <Text style={styles.licaoOrdem}>Lição {licao.ordem}</Text>
-                    <Text style={styles.licaoTitulo}>{licao.titulo_pt}</Text>
-                  </View>
-                  <Ionicons
-                    name="chevron-forward"
-                    size={20}
-                    color={cores.primaria}
-                  />
-                </Pressable>
-              ))
-            )}
-          </View>
-        )}
-      />
-    </View>
+        <View style={styles.caminho}>
+          {trilha.map((modulo, i) => (
+            <NoDoModulo
+              key={modulo.id}
+              modulo={modulo}
+              desvio={desvioDoNo(i)}
+              aoTocar={() => {
+                if (modulo.proximaLicaoId) {
+                  router.push(`/licao/${modulo.proximaLicaoId}`);
+                }
+              }}
+            />
+          ))}
+        </View>
+      </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   tela: { flex: 1, backgroundColor: cores.fundo },
-  lista: { flex: 1 },
-  conteudo: { padding: espaco.md, alignItems: 'center', gap: espaco.lg },
-  coluna: { width: '100%', maxWidth: larguraMaximaConteudo, gap: espaco.sm },
-  cabecalhoModulo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: espaco.sm,
+  conteudo: { padding: espaco.md, alignItems: 'center' },
+  coluna: {
+    width: '100%',
+    maxWidth: larguraMaximaConteudo,
+    gap: espaco.xl,
   },
-  selo: {
-    width: 28,
-    height: 28,
-    borderRadius: raio.pill,
-    backgroundColor: cores.primaria,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  seloTexto: {
-    fontSize: fonte.pequena,
-    fontWeight: peso.forte,
-    color: cores.superficie,
-  },
-  tema: {
-    flex: 1,
-    fontSize: fonte.subtitulo,
-    fontWeight: peso.forte,
-    color: cores.texto,
-  },
-  licao: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: espaco.md,
-    padding: espaco.md,
-    borderRadius: raio.md,
-    borderWidth: 1,
-    borderColor: cores.borda,
-    backgroundColor: cores.superficie,
-  },
-  licaoPressionada: { backgroundColor: cores.primariaSuave },
-  licaoTexto: { flex: 1, gap: 2 },
-  licaoOrdem: { fontSize: fonte.pequena, color: cores.textoSuave },
-  licaoTitulo: { fontSize: fonte.corpo, color: cores.texto, fontWeight: peso.medio },
-  emBreve: {
-    padding: espaco.md,
-    borderRadius: raio.md,
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    borderColor: cores.borda,
-  },
-  emBreveTexto: { fontSize: fonte.pequena, color: cores.textoSuave },
+  caminho: { alignItems: 'center', gap: espaco.xl, paddingBottom: espaco.xxl },
 });
