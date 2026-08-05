@@ -14,6 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Botao } from '@/components/Botao';
 import { Carregando, Erro } from '@/components/Estados';
+import { Sahovnica } from '@/components/Sahovnica';
 import { Feedback } from '@/features/licao/Feedback';
 import { CampoDoExercicio } from '@/features/licao/exercicios';
 import {
@@ -32,6 +33,7 @@ import {
   familia,
   fonte,
   larguraMaximaConteudo,
+  linha,
   raio,
 } from '@/theme/tokens';
 
@@ -116,7 +118,8 @@ export default function TelaLicao() {
       style={styles.tela}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <View style={[styles.cabecalho, { paddingTop: insets.top + espaco.sm }]}>
+      <Sahovnica altura={6} />
+      <View style={[styles.cabecalho, { paddingTop: espaco.sm }]}>
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Sair da lição"
@@ -238,6 +241,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: espaco.md,
     paddingBottom: espaco.sm,
     backgroundColor: cores.superficie,
+    // Borda tracejada dos mockups, no lugar da linha cheia.
+    borderBottomWidth: 2,
+    borderBottomColor: cores.borda,
+    borderStyle: 'dashed',
   },
   barra: {
     flex: 1,
@@ -247,24 +254,24 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   barraCheia: { height: '100%', backgroundColor: cores.primaria },
-  contagem: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
+  contagem: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 
   corpo: { flex: 1 },
   corpoConteudo: { padding: espaco.md, alignItems: 'center' },
   coluna: { width: '100%', maxWidth: larguraMaximaConteudo, gap: espaco.md },
   atividade: {
-    fontSize: fonte.pequena,
+    fontSize: fonte.pequena, lineHeight: linha.pequena,
     fontFamily: familia.forte,
     color: cores.textoSuave,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
   },
   enunciado: {
-    fontSize: fonte.titulo,
+    fontSize: fonte.titulo, lineHeight: linha.titulo,
     fontFamily: familia.forte,
     color: cores.texto,
   },
-  dica: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
+  dica: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 
   rodape: {
     paddingHorizontal: espaco.md,
@@ -291,11 +298,11 @@ const styles = StyleSheet.create({
     padding: espaco.md,
   },
   fimTitulo: {
-    fontSize: fonte.gigante,
-    fontFamily: familia.forte,
+    fontSize: fonte.gigante, lineHeight: linha.gigante,
+    fontFamily: familia.extraForte,
     color: cores.texto,
   },
-  fimLicao: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.textoSuave },
+  fimLicao: { fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal, color: cores.textoSuave },
   notaCaixa: {
     flexDirection: 'row',
     alignItems: 'baseline',
@@ -309,6 +316,6 @@ const styles = StyleSheet.create({
     fontFamily: familia.forte,
     color: cores.primaria,
   },
-  notaMax: { fontSize: fonte.subtitulo, fontFamily: familia.normal, color: cores.primaria },
-  fimDetalhe: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.textoSuave },
+  notaMax: { fontSize: fonte.subtitulo, lineHeight: linha.subtitulo, fontFamily: familia.normal, color: cores.primaria },
+  fimDetalhe: { fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal, color: cores.textoSuave },
 });

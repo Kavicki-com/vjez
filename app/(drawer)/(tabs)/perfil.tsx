@@ -15,6 +15,7 @@ import {
   familia,
   fonte,
   larguraMaximaConteudo,
+  linha,
   raio,
 } from '@/theme/tokens';
 import type { Nivel, ProgressoLicao } from '@/types/schema';
@@ -185,13 +186,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarLetra: {
-    fontSize: fonte.titulo,
+    fontSize: fonte.titulo, lineHeight: linha.titulo,
     fontFamily: familia.forte,
     color: cores.superficie,
   },
   identidadeTexto: { flex: 1, gap: 2 },
-  nome: { fontSize: fonte.titulo, fontFamily: familia.forte, color: cores.texto },
-  nivel: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.textoSuave },
+  nome: { fontSize: fonte.titulo, lineHeight: linha.titulo, fontFamily: familia.forte, color: cores.texto },
+  nivel: { fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal, color: cores.textoSuave },
 
   grade: { flexDirection: 'row', flexWrap: 'wrap', gap: espaco.sm },
   estatistica: {
@@ -206,14 +207,14 @@ const styles = StyleSheet.create({
     backgroundColor: cores.superficie,
   },
   estatisticaValor: {
-    fontSize: fonte.titulo,
+    fontSize: fonte.titulo, lineHeight: linha.titulo,
     fontFamily: familia.forte,
     color: cores.texto,
   },
-  estatisticaRotulo: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
+  estatisticaRotulo: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 
   secao: {
-    fontSize: fonte.pequena,
+    fontSize: fonte.pequena, lineHeight: linha.pequena,
     fontFamily: familia.forte,
     color: cores.textoSuave,
     textTransform: 'uppercase',
@@ -230,8 +231,8 @@ const styles = StyleSheet.create({
     backgroundColor: cores.superficie,
   },
   linhaTopo: { flexDirection: 'row', alignItems: 'center', gap: espaco.sm },
-  moduloTema: { flex: 1, fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.texto },
-  moduloContagem: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
+  moduloTema: { flex: 1, fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal, color: cores.texto },
+  moduloContagem: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },
   barra: {
     height: 8,
     borderRadius: raio.pill,
@@ -247,5 +248,5 @@ const styles = StyleSheet.create({
     borderStyle: 'dashed',
     borderColor: cores.borda,
   },
-  vazioTexto: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
+  vazioTexto: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 });

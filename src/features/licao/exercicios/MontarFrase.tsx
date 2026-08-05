@@ -6,6 +6,7 @@ import {
   espaco,
   familia,
   fonte,
+  linha,
   raio,
 } from '@/theme/tokens';
 import type { ExMontarFrase } from '@/types/schema';
@@ -105,7 +106,7 @@ const styles = StyleSheet.create({
     backgroundColor: cores.primariaSuave,
   },
   pressionada: { opacity: 0.85 },
-  texto: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.texto },
-  textoMontado: { fontSize: fonte.corpo, color: cores.primaria, fontFamily: familia.medio },
-  vazio: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
+  texto: { fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal, color: cores.texto },
+  textoMontado: { fontSize: fonte.corpo, lineHeight: linha.corpo, color: cores.primaria, fontFamily: familia.medio },
+  vazio: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 });

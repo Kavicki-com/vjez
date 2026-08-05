@@ -5,6 +5,7 @@ import {
   espaco,
   familia,
   fonte,
+  linha,
   raio,
 } from '@/theme/tokens';
 
@@ -51,7 +52,7 @@ const styles = StyleSheet.create({
   campo: {
     minHeight: 56,
     paddingHorizontal: espaco.md,
-    fontSize: fonte.subtitulo,
+    fontSize: fonte.subtitulo, lineHeight: linha.subtitulo,
     fontFamily: familia.medio,
     color: cores.texto,
     borderRadius: raio.md,

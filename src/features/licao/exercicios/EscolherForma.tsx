@@ -5,6 +5,7 @@ import {
   espaco,
   familia,
   fonte,
+  linha,
   raio,
 } from '@/theme/tokens';
 import type { ExEscolherForma } from '@/types/schema';
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
   certa: { borderColor: cores.acerto, backgroundColor: cores.acertoSuave },
   errada: { borderColor: cores.erro, backgroundColor: cores.erroSuave },
   pressionada: { opacity: 0.85 },
-  texto: { fontSize: fonte.subtitulo, fontFamily: familia.normal, color: cores.texto },
+  texto: { fontSize: fonte.subtitulo, lineHeight: linha.subtitulo, fontFamily: familia.normal, color: cores.texto },
   textoSelecionado: { color: cores.primaria, fontFamily: familia.forte },
   textoCerta: { color: cores.acerto, fontFamily: familia.forte },
   textoErrada: { color: cores.erro, fontFamily: familia.forte },

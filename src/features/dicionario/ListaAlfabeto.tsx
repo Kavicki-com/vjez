@@ -6,6 +6,7 @@ import {
   espaco,
   familia,
   fonte,
+  linha,
   raio,
 } from '@/theme/tokens';
 
@@ -61,14 +62,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   letra: {
-    fontSize: fonte.subtitulo,
+    fontSize: fonte.subtitulo, lineHeight: linha.subtitulo,
     fontFamily: familia.forte,
     color: cores.primaria,
   },
   texto: { flex: 1, gap: 2 },
-  som: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.texto },
+  som: { fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal, color: cores.texto },
   exemplo: {
-    fontSize: fonte.pequena, fontFamily: familia.normal,
+    fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal,
     color: cores.textoSuave,
     fontStyle: 'italic',
   },

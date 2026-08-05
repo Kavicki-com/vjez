@@ -10,6 +10,7 @@ import {
   espaco,
   familia,
   fonte,
+  linha,
 } from '@/theme/tokens';
 import { useLayout } from '@/theme/useLayout';
 
@@ -30,10 +31,15 @@ export default function TabsLayout() {
       tabBar={largo ? () => null : undefined}
       screenOptions={{
         headerShown: true,
-        headerStyle: { backgroundColor: cores.superficie },
+        headerStyle: {
+          backgroundColor: cores.superficie,
+          borderBottomWidth: 2,
+          borderBottomColor: cores.borda,
+          borderStyle: 'dashed',
+        },
         headerShadowVisible: false,
         headerTintColor: cores.texto,
-        headerTitleStyle: { fontSize: fonte.subtitulo, fontFamily: familia.forte },
+        headerTitleStyle: { fontSize: fonte.subtitulo, lineHeight: linha.subtitulo, fontFamily: familia.forte },
         // A lateral já dá acesso a tudo; o botão de menu só existe quando ela é gaveta.
         headerLeft: largo
           ? undefined
@@ -47,7 +53,10 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: cores.textoSuave,
         tabBarStyle: {
           backgroundColor: cores.superficie,
+          // Tracejado do mockup no lugar da linha cheia.
+          borderTopWidth: 2,
           borderTopColor: cores.borda,
+          borderStyle: 'dashed',
           height: ALTURA_BARRA + insets.bottom,
           paddingTop: espaco.sm,
           paddingBottom: insets.bottom + espaco.sm,

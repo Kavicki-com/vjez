@@ -6,6 +6,7 @@ import {
   espaco,
   familia,
   fonte,
+  linha,
   raio,
 } from '@/theme/tokens';
 
@@ -47,10 +48,10 @@ const styles = StyleSheet.create({
     gap: espaco.xs,
   },
   hr: {
-    fontSize: fonte.subtitulo,
+    fontSize: fonte.subtitulo, lineHeight: linha.subtitulo,
     fontFamily: familia.forte,
     color: cores.primaria,
   },
-  pt: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.texto },
-  contexto: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
+  pt: { fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal, color: cores.texto },
+  contexto: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 });

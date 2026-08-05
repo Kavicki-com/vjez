@@ -9,6 +9,7 @@ import {
   familia,
   fonte,
   larguraMaximaConteudo,
+  linha,
   raio,
 } from '@/theme/tokens';
 
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
   conteudo: { padding: espaco.md, alignItems: 'center' },
   coluna: { width: '100%', maxWidth: larguraMaximaConteudo, gap: espaco.sm },
   secao: {
-    fontSize: fonte.pequena,
+    fontSize: fonte.pequena, lineHeight: linha.pequena,
     fontFamily: familia.forte,
     color: cores.textoSuave,
     textTransform: 'uppercase',
@@ -142,11 +143,11 @@ const styles = StyleSheet.create({
     padding: espaco.md,
   },
   linhaTexto: { flex: 1, gap: 2 },
-  linhaTitulo: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.texto },
-  linhaDetalhe: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
+  linhaTitulo: { fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal, color: cores.texto },
+  linhaDetalhe: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },
   divisor: { height: 1, backgroundColor: cores.borda, marginLeft: espaco.xxl },
   nota: {
-    fontSize: fonte.pequena, fontFamily: familia.normal,
+    fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal,
     color: cores.textoSuave,
     marginTop: espaco.sm,
   },

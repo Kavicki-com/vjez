@@ -6,6 +6,7 @@ import {
   familia,
   fonte,
   larguraMaximaConteudo,
+  linha,
   raio,
 } from '@/theme/tokens';
 
@@ -53,9 +54,9 @@ const styles = StyleSheet.create({
     padding: espaco.lg,
     gap: espaco.sm,
   },
-  titulo: { fontSize: fonte.titulo, fontFamily: familia.forte, color: cores.texto },
+  titulo: { fontSize: fonte.titulo, lineHeight: linha.titulo, fontFamily: familia.forte, color: cores.texto },
   descricao: {
-    fontSize: fonte.corpo, fontFamily: familia.normal,
+    fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal,
     color: cores.textoSuave,
     marginBottom: espaco.sm,
   },
@@ -66,5 +67,5 @@ const styles = StyleSheet.create({
     borderRadius: raio.pill,
     backgroundColor: cores.primaria,
   },
-  item: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.texto, flexShrink: 1 },
+  item: { fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal, color: cores.texto, flexShrink: 1 },
 });

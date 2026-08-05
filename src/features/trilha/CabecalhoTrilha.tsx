@@ -1,12 +1,15 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { Sahovnica } from '@/components/Sahovnica';
 import {
   cores,
   espaco,
   familia,
   fonte,
+  linha,
   raio,
+  tracking,
 } from '@/theme/tokens';
 
 type Props = {
@@ -17,18 +20,23 @@ type Props = {
 /**
  * Saudação da trilha. "Bok" é conteúdo-alvo (fica em HR, regra 1);
  * o resto da interface é PT-BR.
+ * A faixa quadriculada no topo é o motivo da bandeira, como nos mockups.
  */
 export function CabecalhoTrilha({ nome, diasDeOfensiva }: Props) {
   return (
     <View style={styles.cartao}>
-      <View style={styles.texto}>
-        <Text style={styles.saudacao}>Bok{nome ? `, ${nome}` : ''}!</Text>
-        <Text style={styles.pergunta}>Pronto para aprender?</Text>
-      </View>
+      <Sahovnica noTopo />
 
-      <View style={styles.ofensiva}>
-        <Ionicons name="flame" size={20} color={cores.destaque} />
-        <Text style={styles.ofensivaNumero}>{diasDeOfensiva}</Text>
+      <View style={styles.corpo}>
+        <View style={styles.texto}>
+          <Text style={styles.saudacao}>Bok{nome ? `, ${nome}` : ''}!</Text>
+          <Text style={styles.pergunta}>Pronto para aprender?</Text>
+        </View>
+
+        <View style={styles.ofensiva}>
+          <Ionicons name="flame" size={20} color={cores.destaque} />
+          <Text style={styles.ofensivaNumero}>{diasDeOfensiva}</Text>
+        </View>
       </View>
     </View>
   );
@@ -36,22 +44,32 @@ export function CabecalhoTrilha({ nome, diasDeOfensiva }: Props) {
 
 const styles = StyleSheet.create({
   cartao: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: espaco.md,
-    padding: espaco.md,
     borderRadius: raio.lg,
     backgroundColor: cores.superficie,
     borderWidth: 1,
     borderColor: cores.borda,
+    overflow: 'hidden',
   },
-  texto: { flex: 1, gap: 2 },
+  corpo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: espaco.md,
+    padding: espaco.lg,
+  },
+  texto: { flex: 1, gap: espaco.xs },
   saudacao: {
     fontSize: fonte.titulo,
+    lineHeight: linha.titulo,
+    letterSpacing: tracking.titulo,
     fontFamily: familia.forte,
     color: cores.texto,
   },
-  pergunta: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.textoSuave },
+  pergunta: {
+    fontSize: fonte.corpo,
+    lineHeight: linha.corpo,
+    fontFamily: familia.normal,
+    color: cores.textoSuave,
+  },
   ofensiva: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -59,10 +77,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: espaco.sm + espaco.xs,
     paddingVertical: espaco.sm,
     borderRadius: raio.pill,
-    backgroundColor: cores.fundoSuave,
+    backgroundColor: cores.superficieMedia,
   },
   ofensivaNumero: {
     fontSize: fonte.subtitulo,
+    lineHeight: linha.subtitulo,
     fontFamily: familia.forte,
     color: cores.texto,
   },

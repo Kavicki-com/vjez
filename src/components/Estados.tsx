@@ -5,6 +5,7 @@ import {
   espaco,
   familia,
   fonte,
+  linha,
 } from '@/theme/tokens';
 
 export function Carregando() {
@@ -42,9 +43,9 @@ const styles = StyleSheet.create({
     padding: espaco.xl,
     gap: espaco.xs,
   },
-  titulo: { fontSize: fonte.subtitulo, fontFamily: familia.forte, color: cores.texto },
+  titulo: { fontSize: fonte.subtitulo, lineHeight: linha.subtitulo, fontFamily: familia.forte, color: cores.texto },
   texto: {
-    fontSize: fonte.corpo, fontFamily: familia.normal,
+    fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal,
     color: cores.textoSuave,
     textAlign: 'center',
   },

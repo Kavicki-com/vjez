@@ -1,7 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { cores, espaco, familia, fonte } from '@/theme/tokens';
+import {
+  cores,
+  espaco,
+  familia,
+  fonte,
+  linha,
+} from '@/theme/tokens';
 import type { Exercicio, Padez } from '@/types/schema';
 
 import type { Veredito } from './correcao';
@@ -66,15 +72,15 @@ export function Feedback({ exercicio, veredito }: Props) {
 const styles = StyleSheet.create({
   bloco: { gap: espaco.xs },
   linhaTitulo: { flexDirection: 'row', alignItems: 'center', gap: espaco.sm },
-  titulo: { fontSize: fonte.subtitulo, fontFamily: familia.forte },
+  titulo: { fontSize: fonte.subtitulo, lineHeight: linha.subtitulo, fontFamily: familia.forte },
   esperado: {
-    fontSize: fonte.corpo,
+    fontSize: fonte.corpo, lineHeight: linha.corpo,
     fontFamily: familia.normal,
     color: cores.texto,
   },
   formaCerta: { fontFamily: familia.forte },
   motivo: {
-    fontSize: fonte.pequena,
+    fontSize: fonte.pequena, lineHeight: linha.pequena,
     fontFamily: familia.normal,
     color: cores.textoSuave,
   },

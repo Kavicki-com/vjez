@@ -8,6 +8,7 @@ import {
   espaco,
   familia,
   fonte,
+  linha,
   raio,
 } from '@/theme/tokens';
 import type { LexItem } from '@/types/schema';
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
   busca: { paddingTop: espaco.md },
   lista: { paddingVertical: espaco.md, gap: espaco.sm },
   categoria: {
-    fontSize: fonte.pequena,
+    fontSize: fonte.pequena, lineHeight: linha.pequena,
     fontFamily: familia.forte,
     color: cores.textoSuave,
     textTransform: 'uppercase',
@@ -107,14 +108,14 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   hr: {
-    fontSize: fonte.subtitulo,
+    fontSize: fonte.subtitulo, lineHeight: linha.subtitulo,
     fontFamily: familia.forte,
     color: cores.primaria,
   },
-  genero: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
-  pt: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.texto },
+  genero: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },
+  pt: { fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal, color: cores.texto },
   nota: {
-    fontSize: fonte.pequena, fontFamily: familia.normal,
+    fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal,
     color: cores.textoSuave,
     marginTop: espaco.xs,
   },

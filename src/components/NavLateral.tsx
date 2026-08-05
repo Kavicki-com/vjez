@@ -13,6 +13,7 @@ import {
   espaco,
   familia,
   fonte,
+  linha,
   raio,
 } from '@/theme/tokens';
 
@@ -108,7 +109,7 @@ const styles = StyleSheet.create({
     paddingBottom: espaco.lg,
   },
   marcaTexto: {
-    fontSize: fonte.titulo,
+    fontSize: fonte.titulo, lineHeight: linha.titulo,
     fontFamily: familia.forte,
     color: cores.primaria,
     letterSpacing: -0.5,
@@ -125,7 +126,7 @@ const styles = StyleSheet.create({
   itemAtivo: { backgroundColor: cores.primariaSuave },
   itemPressionado: { backgroundColor: cores.fundoSuave },
   rotulo: {
-    fontSize: fonte.corpo,
+    fontSize: fonte.corpo, lineHeight: linha.corpo,
     color: cores.textoSuave,
     fontFamily: familia.medio,
     flexShrink: 1,

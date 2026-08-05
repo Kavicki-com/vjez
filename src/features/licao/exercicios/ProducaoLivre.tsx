@@ -6,6 +6,7 @@ import {
   espaco,
   familia,
   fonte,
+  linha,
   raio,
 } from '@/theme/tokens';
 import type { ExProducaoLivre } from '@/types/schema';
@@ -57,14 +58,14 @@ const styles = StyleSheet.create({
   campo: {
     minHeight: 160,
     padding: espaco.md,
-    fontSize: fonte.corpo, fontFamily: familia.normal,
+    fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal,
     color: cores.texto,
     borderRadius: raio.md,
     borderWidth: 2,
     borderColor: cores.borda,
     backgroundColor: cores.superficie,
   },
-  contador: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave, textAlign: 'right' },
+  contador: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave, textAlign: 'right' },
   contadorAlerta: { color: cores.erro },
-  nota: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
+  nota: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 });

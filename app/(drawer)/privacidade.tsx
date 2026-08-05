@@ -6,6 +6,7 @@ import {
   familia,
   fonte,
   larguraMaximaConteudo,
+  linha,
   raio,
 } from '@/theme/tokens';
 
@@ -122,7 +123,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: cores.primaria,
   },
-  avisoTexto: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.primaria },
+  avisoTexto: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.primaria },
   bloco: {
     padding: espaco.md,
     borderRadius: raio.md,
@@ -132,7 +133,7 @@ const styles = StyleSheet.create({
     gap: espaco.sm,
   },
   blocoTitulo: {
-    fontSize: fonte.subtitulo,
+    fontSize: fonte.subtitulo, lineHeight: linha.subtitulo,
     fontFamily: familia.forte,
     color: cores.texto,
   },

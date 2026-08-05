@@ -6,6 +6,7 @@ import {
   espaco,
   familia,
   fonte,
+  linha,
   raio,
   relevo,
   sombraSolida,
@@ -106,7 +107,7 @@ const styles = StyleSheet.create({
     backgroundColor: cores.secundaria,
   },
   seloTexto: {
-    fontSize: fonte.pequena - 1,
+    fontSize: fonte.pequena, lineHeight: linha.pequena - 1,
     fontFamily: familia.forte,
     color: cores.superficie,
   },
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
     borderColor: cores.secundariaSuave,
   },
   tema: {
-    fontSize: fonte.subtitulo,
+    fontSize: fonte.subtitulo, lineHeight: linha.subtitulo,
     fontFamily: familia.forte,
     color: cores.texto,
     textAlign: 'center',
@@ -163,6 +164,6 @@ const styles = StyleSheet.create({
   },
   contadorConcluido: { backgroundColor: cores.primaria },
   contadorAtual: { backgroundColor: cores.secundaria },
-  contadorTexto: { fontSize: fonte.pequena - 1, fontFamily: familia.normal, color: cores.textoSuave },
+  contadorTexto: { fontSize: fonte.pequena, lineHeight: linha.pequena - 1, fontFamily: familia.normal, color: cores.textoSuave },
   contadorTextoForte: { color: cores.superficie, fontFamily: familia.medio },
 });

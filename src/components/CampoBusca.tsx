@@ -6,6 +6,7 @@ import {
   espaco,
   familia,
   fonte,
+  linha,
   raio,
 } from '@/theme/tokens';
 
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
   // navegação por teclado na web.
   entrada: {
     flex: 1,
-    fontSize: fonte.corpo, fontFamily: familia.normal,
+    fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal,
     color: cores.texto,
   },
 });

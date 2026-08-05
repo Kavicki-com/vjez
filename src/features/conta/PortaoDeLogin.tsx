@@ -8,6 +8,7 @@ import {
   espaco,
   familia,
   fonte,
+  linha,
   raio,
 } from '@/theme/tokens';
 
@@ -93,21 +94,21 @@ const styles = StyleSheet.create({
   },
   icone: { marginBottom: espaco.xs },
   titulo: {
-    fontSize: fonte.titulo,
+    fontSize: fonte.titulo, lineHeight: linha.titulo,
     fontFamily: familia.forte,
     color: cores.texto,
     textAlign: 'center',
   },
   explicacao: {
-    fontSize: fonte.corpo, fontFamily: familia.normal,
+    fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal,
     color: cores.textoSuave,
     textAlign: 'center',
   },
   botoes: { width: '100%', gap: espaco.sm, marginTop: espaco.md },
-  nota: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave, textAlign: 'center' },
-  erro: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.erro, textAlign: 'center' },
+  nota: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave, textAlign: 'center' },
+  erro: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.erro, textAlign: 'center' },
   rodape: {
-    fontSize: fonte.pequena, fontFamily: familia.normal,
+    fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal,
     color: cores.textoSuave,
     textAlign: 'center',
     marginTop: espaco.sm,

@@ -5,6 +5,7 @@ import {
   espaco,
   familia,
   fonte,
+  linha,
   raio,
 } from '@/theme/tokens';
 import type { Exercicio } from '@/types/schema';
@@ -80,11 +81,11 @@ const styles = StyleSheet.create({
     backgroundColor: cores.fundoSuave,
     gap: espaco.xs,
   },
-  fraseHr: { fontSize: fonte.subtitulo, fontFamily: familia.normal, color: cores.texto },
+  fraseHr: { fontSize: fonte.subtitulo, lineHeight: linha.subtitulo, fontFamily: familia.normal, color: cores.texto },
   origemPt: {
-    fontSize: fonte.titulo,
+    fontSize: fonte.titulo, lineHeight: linha.titulo,
     fontFamily: familia.forte,
     color: cores.texto,
   },
-  base: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
+  base: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 });

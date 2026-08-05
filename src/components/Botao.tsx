@@ -5,6 +5,7 @@ import {
   espaco,
   familia,
   fonte,
+  linha,
   raio,
   relevo,
   sombraSolida,
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
     borderBottomColor: cores.borda,
   },
   rotulo: {
-    fontSize: fonte.corpo,
+    fontSize: fonte.corpo, lineHeight: linha.corpo,
     fontFamily: familia.forte,
     letterSpacing: 0.3,
   },

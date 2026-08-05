@@ -5,6 +5,7 @@ import {
   espaco,
   familia,
   fonte,
+  linha,
   raio,
 } from '@/theme/tokens';
 
@@ -66,7 +67,7 @@ const styles = StyleSheet.create({
   pilulaAtiva: { backgroundColor: cores.primaria, borderColor: cores.primaria },
   pilulaPressionada: { backgroundColor: cores.fundoSuave },
   rotulo: {
-    fontSize: fonte.pequena + 1,
+    fontSize: fonte.pequena, lineHeight: linha.pequena + 1,
     fontFamily: familia.medio,
     color: cores.textoSuave,
   },

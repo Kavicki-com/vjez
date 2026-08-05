@@ -14,6 +14,7 @@ import {
   familia,
   fonte,
   larguraMaximaConteudo,
+  linha,
   raio,
 } from '@/theme/tokens';
 
@@ -119,11 +120,11 @@ const styles = StyleSheet.create({
     padding: espaco.md,
   },
   linhaTexto: { flex: 1, gap: 2 },
-  linhaTitulo: { fontSize: fonte.corpo, fontFamily: familia.normal, color: cores.texto },
-  linhaDetalhe: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.textoSuave },
+  linhaTitulo: { fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal, color: cores.texto },
+  linhaDetalhe: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },
   divisor: { height: 1, backgroundColor: cores.borda, marginLeft: espaco.xxl },
   secao: {
-    fontSize: fonte.pequena,
+    fontSize: fonte.pequena, lineHeight: linha.pequena,
     fontFamily: familia.forte,
     color: cores.textoSuave,
     textTransform: 'uppercase',
@@ -139,12 +140,12 @@ const styles = StyleSheet.create({
     backgroundColor: cores.erroSuave,
   },
   riscoTitulo: {
-    fontSize: fonte.corpo,
+    fontSize: fonte.corpo, lineHeight: linha.corpo,
     fontFamily: familia.forte,
     color: cores.erro,
   },
-  riscoTexto: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.texto },
+  riscoTexto: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.texto },
   destaque: { fontFamily: familia.forte },
   confirmacao: { gap: espaco.sm },
-  erro: { fontSize: fonte.pequena, fontFamily: familia.normal, color: cores.erro },
+  erro: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.erro },
 });
