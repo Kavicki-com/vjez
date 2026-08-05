@@ -5,6 +5,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { CampoBusca } from '@/components/CampoBusca';
 import { Carregando, Erro, Vazio } from '@/components/Estados';
 import { Sahovnica } from '@/components/Sahovnica';
+import { BotaoAudio } from '@/features/audio/BotaoAudio';
 import {
   cores,
   espaco,
@@ -142,13 +143,7 @@ function CartaoDestaque({ item }: { item: LexItem }) {
         {/* O botão de áudio só existe quando há MP3 — ele aparece sozinho
             quando a curadoria subir o arquivo (item 12 do escopo). */}
         {item.audioUrl && (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`Ouvir ${item.hr}`}
-            style={styles.botaoAudio}
-          >
-            <Ionicons name="volume-high" size={22} color={cores.secundaria} />
-          </Pressable>
+          <BotaoAudio url={item.audioUrl} rotulo={item.hr} tamanho="grande" />
         )}
       </View>
     </View>
@@ -174,15 +169,7 @@ function LinhaPalavra({ item }: { item: LexItem }) {
         <Text style={styles.pt}>{item.pt}</Text>
         {item.nota_pt && <Text style={styles.nota}>{item.nota_pt}</Text>}
       </View>
-      {item.audioUrl && (
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={`Ouvir ${item.hr}`}
-          style={styles.botaoAudioPequeno}
-        >
-          <Ionicons name="play-circle" size={26} color={cores.contorno} />
-        </Pressable>
-      )}
+      {item.audioUrl && <BotaoAudio url={item.audioUrl} rotulo={item.hr} />}
     </View>
   );
 }

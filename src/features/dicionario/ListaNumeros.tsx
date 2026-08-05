@@ -1,6 +1,7 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 import { Carregando, Erro } from '@/components/Estados';
+import { BotaoAudio } from '@/features/audio/BotaoAudio';
 import {
   cores,
   espaco,
@@ -28,6 +29,7 @@ export function ListaNumeros() {
         <View style={styles.linha}>
           <Text style={styles.valor}>{item.valor}</Text>
           <Text style={styles.hr}>{item.hr}</Text>
+          {item.audioUrl && <BotaoAudio url={item.audioUrl} rotulo={item.hr} />}
         </View>
       )}
     />

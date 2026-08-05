@@ -1,6 +1,7 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 import { Carregando, Erro } from '@/components/Estados';
+import { BotaoAudio } from '@/features/audio/BotaoAudio';
 import {
   cores,
   espaco,
@@ -26,7 +27,12 @@ export function ListaExpressoes() {
       showsVerticalScrollIndicator={false}
       renderItem={({ item }) => (
         <View style={styles.cartao}>
-          <Text style={styles.hr}>{item.hr}</Text>
+          <View style={styles.linhaHr}>
+            <Text style={styles.hr}>{item.hr}</Text>
+            {item.audioUrl && (
+              <BotaoAudio url={item.audioUrl} rotulo={item.hr} />
+            )}
+          </View>
           <Text style={styles.pt}>{item.pt}</Text>
           {item.contexto && (
             <Text style={styles.contexto}>{item.contexto}</Text>
@@ -47,7 +53,14 @@ const styles = StyleSheet.create({
     borderColor: cores.borda,
     gap: espaco.xs,
   },
+  linhaHr: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: espaco.sm,
+  },
   hr: {
+    flex: 1,
     fontSize: fonte.subtitulo, lineHeight: linha.subtitulo,
     fontFamily: familia.forte,
     color: cores.primaria,

@@ -127,7 +127,8 @@ export function TelaFim({
                 <Text style={styles.portaoTitulo}>Guarde essa ofensiva</Text>
                 <Text style={styles.portaoTexto}>
                   Seus {xp} XP e o que você acabou de fazer ficam salvos na
-                  conta, em qualquer aparelho.
+                  conta, em qualquer aparelho. A partir daqui a trilha
+                  continua com você logado.
                 </Text>
                 <Botao
                   rotulo={entrando ? 'Abrindo...' : 'Entrar com Google'}
@@ -144,11 +145,6 @@ export function TelaFim({
                   }}
                 />
                 {erro && <Text style={styles.portaoErro}>{erro}</Text>}
-                <Botao
-                  rotulo="Continuar sem conta"
-                  variante="secundaria"
-                  aoTocar={aoSair}
-                />
               </View>
             </View>
           ) : (

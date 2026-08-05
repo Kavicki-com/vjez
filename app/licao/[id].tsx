@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Botao } from '@/components/Botao';
 import { Carregando, Erro } from '@/components/Estados';
 import { Sahovnica } from '@/components/Sahovnica';
+import { BotaoAudio } from '@/features/audio/BotaoAudio';
 import { AberturaLicao } from '@/features/licao/AberturaLicao';
 import { Feedback } from '@/features/licao/Feedback';
 import { TelaFim } from '@/features/licao/TelaFim';
@@ -190,7 +191,17 @@ export default function TelaLicao() {
           {atividadeAtual && (
             <Text style={styles.atividade}>{atividadeAtual.titulo_pt}</Text>
           )}
-          <Text style={styles.enunciado}>{exercicio.enunciado_pt}</Text>
+          <View style={styles.linhaEnunciado}>
+            <Text style={styles.enunciado}>{exercicio.enunciado_pt}</Text>
+            {exercicio.audioUrl && (
+              <BotaoAudio
+                url={exercicio.audioUrl}
+                rotulo="o enunciado"
+                tamanho="grande"
+                automatico
+              />
+            )}
+          </View>
 
           <CampoDoExercicio
             exercicio={exercicio}
@@ -272,7 +283,13 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.6,
   },
+  linhaEnunciado: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: espaco.md,
+  },
   enunciado: {
+    flex: 1,
     fontSize: fonte.titulo, lineHeight: linha.titulo,
     fontFamily: familia.forte,
     color: cores.texto,

@@ -1,6 +1,7 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 import { Carregando, Erro } from '@/components/Estados';
+import { BotaoAudio } from '@/features/audio/BotaoAudio';
 import {
   cores,
   espaco,
@@ -35,6 +36,9 @@ export function ListaAlfabeto() {
               <Text style={styles.exemplo}>{item.exemplo_hr}</Text>
             )}
           </View>
+          {item.audioUrl && (
+            <BotaoAudio url={item.audioUrl} rotulo={item.letra} />
+          )}
         </View>
       )}
     />
