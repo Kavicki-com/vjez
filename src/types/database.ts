@@ -180,6 +180,7 @@ export type Database = {
           criado_em: string
           hr: string
           id: string
+          pronuncia_pt: string | null
           pt: string
         }
         Insert: {
@@ -189,6 +190,7 @@ export type Database = {
           criado_em?: string
           hr: string
           id?: string
+          pronuncia_pt?: string | null
           pt: string
         }
         Update: {
@@ -198,6 +200,7 @@ export type Database = {
           criado_em?: string
           hr?: string
           id?: string
+          pronuncia_pt?: string | null
           pt?: string
         }
         Relationships: []
@@ -245,6 +248,7 @@ export type Database = {
           hr: string
           id: string
           nota_pt: string | null
+          pronuncia_pt: string | null
           pt: string
         }
         Insert: {
@@ -256,6 +260,7 @@ export type Database = {
           hr: string
           id?: string
           nota_pt?: string | null
+          pronuncia_pt?: string | null
           pt: string
         }
         Update: {
@@ -267,6 +272,7 @@ export type Database = {
           hr?: string
           id?: string
           nota_pt?: string | null
+          pronuncia_pt?: string | null
           pt?: string
         }
         Relationships: []
@@ -366,6 +372,7 @@ export type Database = {
           criado_em: string
           hr: string
           id: string
+          pronuncia_pt: string | null
           valor: number
         }
         Insert: {
@@ -374,6 +381,7 @@ export type Database = {
           criado_em?: string
           hr: string
           id?: string
+          pronuncia_pt?: string | null
           valor: number
         }
         Update: {
@@ -382,6 +390,7 @@ export type Database = {
           criado_em?: string
           hr?: string
           id?: string
+          pronuncia_pt?: string | null
           valor?: number
         }
         Relationships: []
@@ -675,6 +684,7 @@ export type Database = {
           hr: string
           id: string
           nota_pt: string | null
+          pronuncia_pt: string | null
           pt: string
         }[]
         SetofOptions: {

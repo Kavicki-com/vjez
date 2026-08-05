@@ -133,6 +133,9 @@ function CartaoDestaque({ item }: { item: LexItem }) {
               <Text style={styles.etiquetaTexto}>{item.categoria}</Text>
             </View>
           </View>
+          {item.pronuncia_pt && (
+            <Text style={styles.pronuncia}>{item.pronuncia_pt}</Text>
+          )}
           <Text style={styles.destaquePt}>{item.pt}</Text>
           {item.genero && (
             <Text style={styles.genero}>{GENERO_PT[item.genero]}</Text>
@@ -166,6 +169,9 @@ function LinhaPalavra({ item }: { item: LexItem }) {
             <Text style={styles.genero}>{GENERO_PT[item.genero]}</Text>
           )}
         </View>
+        {item.pronuncia_pt && (
+          <Text style={styles.pronuncia}>{item.pronuncia_pt}</Text>
+        )}
         <Text style={styles.pt}>{item.pt}</Text>
         {item.nota_pt && <Text style={styles.nota}>{item.nota_pt}</Text>}
       </View>
@@ -290,6 +296,16 @@ const styles = StyleSheet.create({
     lineHeight: linha.corpo,
     fontFamily: familia.normal,
     color: cores.textoSuave,
+  },
+  // Monoespaçada: as sílabas alinham entre uma entrada e outra, e fica
+  // visualmente separada do croata de verdade — ninguém confunde
+  // "VÓ-da" com grafia.
+  pronuncia: {
+    fontSize: fonte.pequena,
+    lineHeight: linha.pequena,
+    fontFamily: familia.medio,
+    color: cores.secundaria,
+    letterSpacing: 0.4,
   },
   genero: {
     fontSize: fonte.pequena,

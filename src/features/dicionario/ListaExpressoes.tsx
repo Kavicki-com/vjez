@@ -33,6 +33,9 @@ export function ListaExpressoes() {
               <BotaoAudio url={item.audioUrl} rotulo={item.hr} />
             )}
           </View>
+          {item.pronuncia_pt && (
+            <Text style={styles.pronuncia}>{item.pronuncia_pt}</Text>
+          )}
           <Text style={styles.pt}>{item.pt}</Text>
           {item.contexto && (
             <Text style={styles.contexto}>{item.contexto}</Text>
@@ -64,6 +67,13 @@ const styles = StyleSheet.create({
     fontSize: fonte.subtitulo, lineHeight: linha.subtitulo,
     fontFamily: familia.forte,
     color: cores.primaria,
+  },
+  pronuncia: {
+    fontSize: fonte.pequena,
+    lineHeight: linha.pequena,
+    fontFamily: familia.medio,
+    color: cores.secundaria,
+    letterSpacing: 0.4,
   },
   pt: { fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal, color: cores.texto },
   contexto: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },

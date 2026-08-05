@@ -25,6 +25,8 @@ export interface LexItem {
   genero?: 'm' | 'f' | 'n';
   audioUrl?: string;
   nota_pt?: string;
+  /** Respelling silábico em PT-BR, tônica em MAIÚSCULA: "VÓ-da". */
+  pronuncia_pt?: string;
 }
 
 export interface Frase {
@@ -33,6 +35,7 @@ export interface Frase {
   pt: string;
   contexto?: string;
   audioUrl?: string;
+  pronuncia_pt?: string;
 }
 
 export interface Letra {
@@ -48,6 +51,7 @@ export interface Numero {
   valor: number;
   hr: string;
   audioUrl?: string;
+  pronuncia_pt?: string;
 }
 
 // ---------- EXERCÍCIOS (templates) ----------

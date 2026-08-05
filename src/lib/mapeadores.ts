@@ -46,6 +46,7 @@ export function paraNumero(linha: Tables<'numeros'>): Numero {
     valor: linha.valor,
     hr: linha.hr,
     audioUrl: ou(linha.audio_url),
+    pronuncia_pt: ou(linha.pronuncia_pt),
   };
 }
 
@@ -58,6 +59,7 @@ export function paraLexItem(linha: Tables<'lex_items'>): LexItem {
     genero: ou(linha.genero),
     audioUrl: ou(linha.audio_url),
     nota_pt: ou(linha.nota_pt),
+    pronuncia_pt: ou(linha.pronuncia_pt),
   };
 }
 
@@ -68,6 +70,7 @@ export function paraFrase(linha: Tables<'frases'>): Frase {
     pt: linha.pt,
     contexto: ou(linha.contexto),
     audioUrl: ou(linha.audio_url),
+    pronuncia_pt: ou(linha.pronuncia_pt),
   };
 }
 
