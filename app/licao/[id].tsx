@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { useQueryClient } from '@tanstack/react-query';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import {
@@ -42,7 +43,9 @@ export default function TelaLicao() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
   const { data: licao, isPending, isError } = useLicao(id);
-  const { concluirLicao } = useProgressoLocal();
+  const { concluirLicao, registrarTentativa: registrarTentativaLocal } =
+    useProgressoLocal();
+  const cliente = useQueryClient();
 
   const [indice, setIndice] = useState(0);
   const [respostas, setRespostas] = useState<Record<string, Resposta>>({});
@@ -110,6 +113,9 @@ export default function TelaLicao() {
     if (!resposta) return;
     const resultado = corrigir(exercicio, resposta);
     setVereditos((atual) => ({ ...atual, [exercicio.id]: resultado }));
+    // O checkpoint prioriza erros: sem isso, convidado faria uma prova sem
+    // priorização nenhuma, porque nada dele é gravado no servidor.
+    registrarTentativaLocal(exercicio.id, resultado.acertou);
     // Não bloqueia a lição se a gravação falhar (ou se for convidado).
     void registrarTentativa({
       exercicio,
@@ -125,7 +131,12 @@ export default function TelaLicao() {
       // O estado local destrava a trilha na hora; o Supabase só grava se
       // houver conta (convidado migra no portão de login).
       concluirLicao(licao.id, nota);
-      void registrarNota({ licaoId: licao.id, nota });
+      // O XP é recalculado no banco por trigger; sem invalidar, o Perfil só
+      // mostraria o valor novo depois de recarregar o app.
+      void registrarNota({ licaoId: licao.id, nota }).then(() => {
+        void cliente.invalidateQueries({ queryKey: ['perfil'] });
+        void cliente.invalidateQueries({ queryKey: ['progresso-licoes'] });
+      });
       return;
     }
     setIndice((i) => i + 1);

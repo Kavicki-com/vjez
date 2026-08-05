@@ -27,3 +27,6 @@ export const ORDEM_ATIVIDADES = [
   'traducao',
   'producao_livre',
 ] as const;
+
+/** XP por ponto de nota: lição perfeita (10) vale 100 XP. */
+export const XP_POR_PONTO = 10;

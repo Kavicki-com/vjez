@@ -1,16 +1,12 @@
 import { router } from 'expo-router';
-import { useMemo } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { Carregando, Erro } from '@/components/Estados';
-import { useTrilha } from '@/features/licao/hooks';
-import { useProgressoLocal } from '@/features/perfil/ProgressoLocal';
-import { usePerfil, useProgressoLicoes } from '@/features/perfil/hooks';
+import { usePerfil } from '@/features/perfil/hooks';
 import { CabecalhoTrilha } from '@/features/trilha/CabecalhoTrilha';
 import { NoDoModulo } from '@/features/trilha/NoDoModulo';
-import { montarTrilha } from '@/features/trilha/estado';
+import { useTrilhaMontada } from '@/features/trilha/useTrilhaMontada';
 import { cores, espaco, larguraMaximaConteudo } from '@/theme/tokens';
-import type { ProgressoLicao } from '@/types/schema';
 
 /** Serpenteado do caminho: desloca cada nó por uma onda suave. */
 function desvioDoNo(indice: number): number {
@@ -18,24 +14,8 @@ function desvioDoNo(indice: number): number {
 }
 
 export default function Inicio() {
-  const { data: modulos, isPending, isError } = useTrilha();
+  const { trilha, isPending, isError } = useTrilhaMontada();
   const { data: perfil } = usePerfil();
-  const { data: progressoServidor } = useProgressoLicoes();
-  const { notas } = useProgressoLocal();
-
-  const trilha = useMemo(() => {
-    if (!modulos) return [];
-    // O progresso da sessão entra junto com o do servidor, então a trilha
-    // reage assim que a lição termina — sem esperar refetch.
-    const local: ProgressoLicao[] = Object.entries(notas).map(([licaoId, nota]) => ({
-      usuarioId: perfil?.id ?? 'convidado',
-      licaoId,
-      nota,
-      concluida: true,
-      data: '',
-    }));
-    return montarTrilha(modulos, [...(progressoServidor ?? []), ...local]);
-  }, [modulos, progressoServidor, notas, perfil?.id]);
 
   if (isPending) return <Carregando />;
   if (isError) return <Erro />;

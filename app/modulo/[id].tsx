@@ -6,10 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Carregando, Erro } from '@/components/Estados';
 import { Sahovnica } from '@/components/Sahovnica';
-import { useTrilha } from '@/features/licao/hooks';
-import { useProgressoLocal } from '@/features/perfil/ProgressoLocal';
-import { usePerfil, useProgressoLicoes } from '@/features/perfil/hooks';
-import { montarTrilha } from '@/features/trilha/estado';
+import { useTrilhaMontada } from '@/features/trilha/useTrilhaMontada';
 import { etiquetaDoCaso } from '@/lib/padez';
 import {
   CHECKPOINT_NOTA_MINIMA,
@@ -25,42 +22,23 @@ import {
   raio,
   tracking,
 } from '@/theme/tokens';
-import type { ProgressoLicao } from '@/types/schema';
 
 export default function TelaModulo() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
-  const { data: modulos, isPending, isError } = useTrilha();
-  const { data: perfil } = usePerfil();
-  const { data: progressoServidor } = useProgressoLicoes();
-  const { notas } = useProgressoLocal();
-
-  const trilha = useMemo(() => {
-    if (!modulos) return [];
-    const local: ProgressoLicao[] = Object.entries(notas).map(
-      ([licaoId, nota]) => ({
-        usuarioId: perfil?.id ?? 'convidado',
-        licaoId,
-        nota,
-        concluida: true,
-        data: '',
-      }),
-    );
-    return montarTrilha(modulos, [...(progressoServidor ?? []), ...local]);
-  }, [modulos, progressoServidor, notas, perfil?.id]);
+  const { trilha, isPending, isError, notasDoServidor, notasLocais } =
+    useTrilhaMontada();
 
   const modulo = trilha.find((m) => m.id === id);
 
   // Nota da unidade: média das lições já feitas, sobre 10.
   const notasDoModulo = useMemo(() => {
     if (!modulo) return [];
-    const doServidor = new Map(
-      (progressoServidor ?? []).map((p) => [p.licaoId, p.nota]),
-    );
+    const doServidor = new Map(notasDoServidor.map((p) => [p.licaoId, p.nota]));
     return modulo.licoes
-      .map((l) => notas[l.id] ?? doServidor.get(l.id))
+      .map((l) => notasLocais[l.id] ?? doServidor.get(l.id))
       .filter((n): n is number => typeof n === 'number');
-  }, [modulo, notas, progressoServidor]);
+  }, [modulo, notasLocais, notasDoServidor]);
 
   if (isPending) return <Carregando />;
   if (isError || !modulo) return <Erro mensagem="Unidade não encontrada." />;
@@ -76,10 +54,11 @@ export default function TelaModulo() {
 
   // Módulo bloqueado abre para consulta, mas as lições não.
   const trancado = modulo.estado === 'bloqueado';
+  const podeFazerCheckpoint = !trancado && modulo.checkpointLiberado;
 
   const notaDaLicao = (licaoId: string) =>
-    notas[licaoId] ??
-    (progressoServidor ?? []).find((p) => p.licaoId === licaoId)?.nota;
+    notasLocais[licaoId] ??
+    notasDoServidor.find((p) => p.licaoId === licaoId)?.nota;
 
   return (
     <View style={styles.tela}>
@@ -227,24 +206,52 @@ export default function TelaModulo() {
           )}
 
           <Text style={styles.secao}>Checkpoint</Text>
-          <View style={[styles.checkpoint, !tudoFeito && styles.checkpointTrancado]}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Fazer o checkpoint da unidade"
+            accessibilityState={{ disabled: !podeFazerCheckpoint }}
+            disabled={!podeFazerCheckpoint}
+            onPress={() => router.push(`/checkpoint/${modulo.id}`)}
+            style={({ pressed }) => [
+              styles.checkpoint,
+              modulo.checkpointPassado && styles.checkpointFeito,
+              !podeFazerCheckpoint && styles.checkpointTrancado,
+              pressed && podeFazerCheckpoint && styles.linhaPressionada,
+            ]}
+          >
             <Ionicons
-              name={tudoFeito ? 'flag' : 'lock-closed'}
+              name={
+                modulo.checkpointPassado
+                  ? 'ribbon'
+                  : podeFazerCheckpoint
+                    ? 'flag'
+                    : 'lock-closed'
+              }
               size={22}
-              color={tudoFeito ? cores.primaria : cores.contorno}
+              color={
+                modulo.checkpointPassado
+                  ? cores.acerto
+                  : podeFazerCheckpoint
+                    ? cores.primaria
+                    : cores.contorno
+              }
             />
             <View style={styles.linhaTexto}>
-              <Text style={styles.checkpointTitulo}>
-                Prova da unidade
-              </Text>
+              <Text style={styles.checkpointTitulo}>Prova da unidade</Text>
               <Text style={styles.checkpointTexto}>
-                {tudoFeito
-                  ? `Sorteia exercícios desta unidade, priorizando os que você errou. Precisa de ${Math.round(CHECKPOINT_NOTA_MINIMA * 100)}% para passar.`
-                  : 'Abre quando todas as lições da unidade estiverem concluídas.'}
+                {modulo.checkpointPassado
+                  ? 'Você já passou. Dá para refazer quando quiser.'
+                  : podeFazerCheckpoint
+                    ? `Sorteia exercícios desta unidade, priorizando os que você errou. Precisa de ${Math.round(CHECKPOINT_NOTA_MINIMA * 100)}% para passar e liberar a próxima unidade.`
+                    : 'Abre quando todas as lições da unidade estiverem concluídas.'}
               </Text>
-              <Text style={styles.checkpointAviso}>Ainda não disponível.</Text>
             </View>
-          </View>
+            {podeFazerCheckpoint && (
+              <Text style={styles.linhaAcao}>
+                {modulo.checkpointPassado ? 'Refazer' : 'Fazer'}
+              </Text>
+            )}
+          </Pressable>
         </View>
       </ScrollView>
     </View>
@@ -444,6 +451,7 @@ const styles = StyleSheet.create({
 
   checkpoint: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: espaco.md,
     padding: espaco.md,
     borderRadius: raio.lg,
@@ -452,6 +460,7 @@ const styles = StyleSheet.create({
     backgroundColor: cores.superficie,
   },
   checkpointTrancado: { opacity: 0.7 },
+  checkpointFeito: { borderColor: cores.acerto },
   checkpointTitulo: {
     fontSize: fonte.corpo,
     lineHeight: linha.corpo,
@@ -463,12 +472,5 @@ const styles = StyleSheet.create({
     lineHeight: linha.pequena,
     fontFamily: familia.normal,
     color: cores.textoSuave,
-  },
-  checkpointAviso: {
-    fontSize: fonte.pequena,
-    lineHeight: linha.pequena,
-    fontFamily: familia.medio,
-    color: cores.contorno,
-    marginTop: espaco.xs,
   },
 });

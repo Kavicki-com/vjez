@@ -4,7 +4,11 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Botao } from '@/components/Botao';
 import { Confete } from '@/components/Confete';
 import { Sahovnica } from '@/components/Sahovnica';
-import { CHECKPOINT_NOTA_MINIMA, NOTA_MAXIMA_LICAO } from '@/lib/regras';
+import {
+  CHECKPOINT_NOTA_MINIMA,
+  NOTA_MAXIMA_LICAO,
+  XP_POR_PONTO,
+} from '@/lib/regras';
 import {
   cores,
   espaco,
@@ -32,6 +36,7 @@ type Props = {
 export function TelaFim({ titulo, nota, acertos, total, aoSair }: Props) {
   const fracao = nota / NOTA_MAXIMA_LICAO;
   const foiBem = fracao >= CHECKPOINT_NOTA_MINIMA;
+  const xp = Math.round(nota * XP_POR_PONTO);
 
   return (
     <View style={styles.tela}>
@@ -76,16 +81,10 @@ export function TelaFim({ titulo, nota, acertos, total, aoSair }: Props) {
             <View style={styles.celula}>
               <View style={styles.celulaCorpo}>
                 <View style={[styles.selo, styles.seloSecundario]}>
-                  <Ionicons
-                    name="checkmark-done"
-                    size={22}
-                    color={cores.superficie}
-                  />
+                  <Ionicons name="flash" size={22} color={cores.superficie} />
                 </View>
-                <Text style={styles.celulaValor}>
-                  {acertos}/{total}
-                </Text>
-                <Text style={styles.celulaRotulo}>exercícios certos</Text>
+                <Text style={styles.celulaValor}>+{xp}</Text>
+                <Text style={styles.celulaRotulo}>XP ganho</Text>
               </View>
             </View>
           </View>
@@ -101,6 +100,7 @@ export function TelaFim({ titulo, nota, acertos, total, aoSair }: Props) {
               />
             </View>
             <Text style={styles.barraLegenda}>
+              {acertos} de {total} exercícios certos.{' '}
               {foiBem
                 ? 'Bom o bastante para seguir em frente.'
                 : 'Errar não trava a trilha — dá para refazer quando quiser.'}

@@ -8,14 +8,12 @@ import { Sahovnica } from '@/components/Sahovnica';
 import { PortaoDeLogin } from '@/features/conta/PortaoDeLogin';
 import { useSessao } from '@/features/conta/hooks';
 import { fotoDaSessao, nomeDaSessao } from '@/features/conta/identidade';
-import { useTrilha } from '@/features/licao/hooks';
-import { useProgressoLocal } from '@/features/perfil/ProgressoLocal';
 import {
   calcularConquistas,
   type Conquista,
 } from '@/features/perfil/conquistas';
-import { usePerfil, useProgressoLicoes } from '@/features/perfil/hooks';
-import { montarTrilha } from '@/features/trilha/estado';
+import { usePerfil } from '@/features/perfil/hooks';
+import { useTrilhaMontada } from '@/features/trilha/useTrilhaMontada';
 import {
   cores,
   espaco,
@@ -26,7 +24,7 @@ import {
   raio,
   tracking,
 } from '@/theme/tokens';
-import type { Nivel, ProgressoLicao } from '@/types/schema';
+import type { Nivel } from '@/types/schema';
 
 const ROTULO_NIVEL: Record<Nivel, string> = {
   basico: 'Básico',
@@ -37,23 +35,7 @@ const ROTULO_NIVEL: Record<Nivel, string> = {
 export default function Perfil() {
   const { carregando, autenticado, sessao } = useSessao();
   const { data: perfil } = usePerfil();
-  const { data: modulos } = useTrilha();
-  const { data: progressoServidor } = useProgressoLicoes();
-  const { notas } = useProgressoLocal();
-
-  const trilha = useMemo(() => {
-    if (!modulos) return [];
-    const local: ProgressoLicao[] = Object.entries(notas).map(
-      ([licaoId, nota]) => ({
-        usuarioId: perfil?.id ?? 'convidado',
-        licaoId,
-        nota,
-        concluida: true,
-        data: '',
-      }),
-    );
-    return montarTrilha(modulos, [...(progressoServidor ?? []), ...local]);
-  }, [modulos, progressoServidor, notas, perfil?.id]);
+  const { trilha } = useTrilhaMontada();
 
   const licoesFeitas = trilha.reduce((n, m) => n + m.concluidas, 0);
   const modulosConcluidos = trilha.filter((m) => m.estado === 'concluido').length;
