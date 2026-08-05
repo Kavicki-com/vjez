@@ -2,17 +2,15 @@
 
 ## Situação
 
-O app já toca áudio: o botão de ouvir aparece sozinho em qualquer item que
-tenha `audio_url`. **Não há nenhum MP3 ainda**, então hoje nenhum botão
-aparece. Assim que os arquivos existirem, eles surgem sem tocar no código.
+**Gerado e no ar**: 180 MP3 (716 kB) no bucket `audio`, com a voz
+`hr-HR-Chirp3-HD-Achernar` a 0.9 de velocidade. Cobre alfabeto, números,
+dicionário e expressões.
 
-## Por que não gerei aqui
+O botão de ouvir aparece sozinho em qualquer item que tenha `audio_url` —
+inclusive nos que a curadoria acrescentar depois, bastando rodar o script
+de novo (ele pula o que já tem áudio).
 
-Não existe voz croata disponível localmente. O macOS tem tcheco, eslovaco e
-polonês — línguas eslavas, mas com pronúncia diferente o bastante para
-ensinarem errado. **Num app de idioma, pronúncia errada é pior que
-silêncio.** Por isso o pipeline está pronto e vazio, esperando uma voz de
-verdade.
+**Exercícios seguem sem áudio**, de propósito: veja a seção no fim.
 
 ## Gerar
 
