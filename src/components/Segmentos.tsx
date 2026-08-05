@@ -55,7 +55,9 @@ export function Segmentos<T extends string>({
 
 const styles = StyleSheet.create({
   trilho: { flexGrow: 0, flexShrink: 0 },
-  faixa: { gap: espaco.sm, paddingVertical: espaco.sm },
+  // Respiro maior em cima: as pílulas ficavam coladas na linha tracejada
+  // do cabeçalho.
+  faixa: { gap: espaco.sm, paddingTop: espaco.lg, paddingBottom: espaco.sm },
   pilula: {
     paddingVertical: espaco.sm,
     paddingHorizontal: espaco.md,
