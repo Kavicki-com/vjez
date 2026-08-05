@@ -614,6 +614,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      registrar_dia_ativo: {
+        Args: { dia_local: string }
+        Returns: {
+          atualizado_em: string
+          criado_em: string
+          estado: Database["public"]["Enums"]["estado_conta"]
+          id: string
+          nivel: Database["public"]["Enums"]["nivel"]
+          nome: string | null
+          ofensiva_dias_seguidos: number
+          ofensiva_status: Database["public"]["Enums"]["status_ofensiva"]
+          ofensiva_ultimo_dia_ativo: string | null
+          papel: Database["public"]["Enums"]["papel"]
+          provedor: Database["public"]["Enums"]["provedor"] | null
+          xp: number
+        }
+      }
       buscar_lex_items: {
         Args: { termo: string }
         Returns: {
@@ -640,6 +657,7 @@ export type Database = {
       fase: "demo" | "paralelo" | "evolucao"
       genero_gramatical: "m" | "f" | "n"
       nivel: "basico" | "intermediario" | "avancado"
+      papel: "aluno" | "curador" | "admin"
       padez:
         | "nominativ"
         | "genitiv"

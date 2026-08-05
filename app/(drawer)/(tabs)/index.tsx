@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { Carregando, Erro } from '@/components/Estados';
+import { avaliarOfensiva } from '@/features/ofensiva/regras';
 import { usePerfil } from '@/features/perfil/hooks';
 import { CabecalhoTrilha } from '@/features/trilha/CabecalhoTrilha';
 import { NoDoModulo } from '@/features/trilha/NoDoModulo';
@@ -16,6 +17,9 @@ function desvioDoNo(indice: number): number {
 export default function Inicio() {
   const { trilha, isPending, isError } = useTrilhaMontada();
   const { data: perfil } = usePerfil();
+  // Avaliado na leitura: zerar por inatividade acontece com o tempo, então
+  // o valor gravado envelhece sozinho.
+  const ofensiva = avaliarOfensiva(perfil?.ofensiva);
 
   if (isPending) return <Carregando />;
   if (isError) return <Erro />;
@@ -29,7 +33,8 @@ export default function Inicio() {
       <View style={styles.coluna}>
         <CabecalhoTrilha
           nome={perfil?.nome?.split(' ')[0]}
-          diasDeOfensiva={perfil?.ofensiva.diasSeguidos ?? 0}
+          diasDeOfensiva={ofensiva.dias}
+          statusDaOfensiva={ofensiva.status}
         />
 
         <View style={styles.caminho}>

@@ -13,6 +13,7 @@ import {
   calcularConquistas,
   type Conquista,
 } from '@/features/perfil/conquistas';
+import { avaliarOfensiva } from '@/features/ofensiva/regras';
 import { usePerfil } from '@/features/perfil/hooks';
 import { useTrilhaMontada } from '@/features/trilha/useTrilhaMontada';
 import { useLayout } from '@/theme/useLayout';
@@ -43,7 +44,7 @@ export default function Perfil() {
 
   const licoesFeitas = trilha.reduce((n, m) => n + m.concluidas, 0);
   const modulosConcluidos = trilha.filter((m) => m.estado === 'concluido').length;
-  const diasDeOfensiva = perfil?.ofensiva.diasSeguidos ?? 0;
+  const diasDeOfensiva = avaliarOfensiva(perfil?.ofensiva).dias;
   // O provedor é a fonte mais fresca: trocar a foto no Google reflete aqui.
   const nome = nomeDaSessao(sessao) ?? perfil?.nome;
 

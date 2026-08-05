@@ -28,6 +28,7 @@ import {
 } from '@/features/licao/correcao';
 import { useLicao } from '@/features/licao/hooks';
 import { registrarNota, registrarTentativa } from '@/features/licao/progresso';
+import { registrarDiaAtivo } from '@/features/ofensiva/api';
 import { useProgressoLocal } from '@/features/perfil/ProgressoLocal';
 import {
   cores,
@@ -133,10 +134,14 @@ export default function TelaLicao() {
       concluirLicao(licao.id, nota);
       // O XP é recalculado no banco por trigger; sem invalidar, o Perfil só
       // mostraria o valor novo depois de recarregar o app.
-      void registrarNota({ licaoId: licao.id, nota }).then(() => {
-        void cliente.invalidateQueries({ queryKey: ['perfil'] });
-        void cliente.invalidateQueries({ queryKey: ['progresso-licoes'] });
-      });
+      // Ofensiva depois da nota: as duas alimentam o perfil, e uma
+      // invalidação só no fim evita o Perfil piscar dois valores.
+      void registrarNota({ licaoId: licao.id, nota })
+        .then(registrarDiaAtivo)
+        .then(() => {
+          void cliente.invalidateQueries({ queryKey: ['perfil'] });
+          void cliente.invalidateQueries({ queryKey: ['progresso-licoes'] });
+        });
       return;
     }
     setIndice((i) => i + 1);
