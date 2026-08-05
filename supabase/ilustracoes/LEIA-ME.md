@@ -14,9 +14,23 @@ Sobre. O resto do fluxo abaixo continua igual.
 ## Como foram preparadas
 
 1. Baixadas em SVG pela busca do unDraw (`https://undraw.co/api/search?q=`).
-2. **Recoloridas**: o unDraw usa `#6c63ff` como cor de destaque, justamente
-   para ser trocada. Virou `#a30019`, o vermelho da marca. Os cinzas e tons
-   de pele ficaram como estavam.
+2. **Recoloridas para a bandeira** com `tricolor.py`, que reduz a paleta
+   inteira (46 cores no original) a três famílias: branco, azul e vermelho.
+
+   Como funciona: cada cor é classificada por matiz — quentes (vermelho,
+   rosa, laranja, amarelo) viram vermelho, frias (verde, ciano, azul, roxo)
+   viram azul, e neutros dependem da luminosidade: cinza claro fica como
+   está, porque cinza claro já *é* branco sombreado; cinza escuro vira
+   azul-marinho, para o traço da ilustração trazer a terceira cor no lugar
+   do preto.
+
+   A cor de saída é amostrada na rampa **pela luminosidade real** do tom
+   original, não por uma posição fixa. Isso preserva o sombreado e faz o
+   vermelho da marca cair exatamente em `#a30019` em vez de escorregar para
+   o tom vizinho.
+
+   Para regerar: `cd supabase/ilustracoes && python3 tricolor.py aplicar`
+   (ou `previa '#abcdef'` para testar uma cor).
 3. Convertidas para PNG com fundo transparente (640px de largura, 2x), para
    funcionarem no nativo sem depender de `react-native-svg`.
 4. Enviadas para o bucket público `ilustracoes` no Supabase Storage.
