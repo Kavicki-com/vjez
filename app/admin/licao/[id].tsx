@@ -6,11 +6,17 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Carregando, Erro } from '@/components/Estados';
 import { Sahovnica } from '@/components/Sahovnica';
-import { dadosDeEscolherForma, type ExercicioDoCms } from '@/features/admin/api';
-import { EditorEscolherForma } from '@/features/admin/EditorEscolherForma';
+import type { ExercicioDoCms } from '@/features/admin/api';
+import { EditorDeExercicio } from '@/features/admin/EditorDeExercicio';
 import { useEscritaDeExercicio, useLicaoDoCms } from '@/features/admin/hooks';
+import {
+  comoJson,
+  ORDEM_DOS_TIPOS,
+  TIPOS,
+} from '@/features/admin/tiposDeExercicio';
 import { voltarPara } from '@/lib/navegacao';
 import { NOTA_MAXIMA_LICAO } from '@/lib/regras';
+import type { TipoExercicio } from '@/types/schema';
 import {
   cores,
   espaco,
@@ -54,15 +60,19 @@ export default function EditorDeLicao() {
   const somaDosPesos = noAr.reduce((n, e) => n + Number(e.peso), 0);
   const pesoBate = Math.abs(somaDosPesos - NOTA_MAXIMA_LICAO) < 0.01;
 
-  const novoExercicio = (atividadeId: string, ultimaOrdem: number) => {
+  const novoExercicio = (
+    atividadeId: string,
+    ultimaOrdem: number,
+    tipo: TipoExercicio,
+  ) => {
     criar.mutate(
       {
         atividade_id: atividadeId,
-        tipo: 'escolher_forma',
+        tipo,
         ordem: ultimaOrdem + 1,
         peso: 1,
-        enunciado_pt: 'Qual é a forma certa?',
-        dados: dadosDeEscolherForma(['', ''], '', false),
+        enunciado_pt: TIPOS[tipo].rotulo,
+        dados: comoJson(TIPOS[tipo].vazio()),
         // Nasce rascunho: um exercício em branco não pode aparecer na
         // trilha entre o "criar" e o primeiro salvamento.
         publicado: false,
@@ -154,22 +164,35 @@ export default function EditorDeLicao() {
                 />
               ))}
 
-              <Pressable
-                accessibilityRole="button"
-                disabled={criar.isPending}
-                onPress={() =>
-                  novoExercicio(
-                    atividade.id,
-                    atividade.exercicios.at(-1)?.ordem ?? 0,
-                  )
-                }
-                style={styles.adicionar}
-              >
-                <Ionicons name="add-circle" size={20} color={cores.primaria} />
-                <Text style={styles.adicionarTexto}>
-                  Novo exercício de escolher forma
-                </Text>
-              </Pressable>
+              <View style={styles.novo}>
+                <Text style={styles.novoRotulo}>Novo exercício</Text>
+                <View style={styles.novoTipos}>
+                  {ORDEM_DOS_TIPOS.map((tipo) => (
+                    <Pressable
+                      key={tipo}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Criar exercício de ${TIPOS[tipo].rotulo}`}
+                      disabled={criar.isPending}
+                      onPress={() =>
+                        novoExercicio(
+                          atividade.id,
+                          atividade.exercicios.at(-1)?.ordem ?? 0,
+                          tipo,
+                        )
+                      }
+                      style={({ pressed }) => [
+                        styles.novoTipo,
+                        pressed && styles.novoTipoPressionado,
+                      ]}
+                    >
+                      <Ionicons name="add" size={15} color={cores.primaria} />
+                      <Text style={styles.novoTipoTexto}>
+                        {TIPOS[tipo].rotulo}
+                      </Text>
+                    </Pressable>
+                  ))}
+                </View>
+              </View>
             </View>
           ))}
         </View>
@@ -189,25 +212,19 @@ function Exercicio({
   aberto: boolean;
   aoAlternar: () => void;
 }) {
-  // Um tipo por vez: `escolher_forma` é o que está pronto. Os outros cinco
-  // aparecem em leitura, com o recado explícito — melhor um editor
-  // faltando e visível do que um editor que salva errado.
-  const editavel = exercicio.tipo === 'escolher_forma';
-
   return (
     <View style={styles.exercicio}>
       <Pressable
         accessibilityRole="button"
-        accessibilityState={{ expanded: aberto, disabled: !editavel }}
-        disabled={!editavel}
+        accessibilityState={{ expanded: aberto }}
         onPress={aoAlternar}
         style={({ pressed }) => [
           styles.linha,
-          pressed && editavel && styles.linhaPressionada,
+          pressed && styles.linhaPressionada,
         ]}
       >
         <View style={styles.selo}>
-          <Text style={styles.seloTexto}>{exercicio.tipo}</Text>
+          <Text style={styles.seloTexto}>{TIPOS[exercicio.tipo].rotulo}</Text>
         </View>
         {!exercicio.publicado && (
           <View style={[styles.selo, styles.seloRascunho]}>
@@ -223,16 +240,14 @@ function Exercicio({
           {Number(exercicio.peso).toFixed(1).replace('.', ',')}
         </Text>
         <Ionicons
-          name={
-            editavel ? (aberto ? 'chevron-up' : 'chevron-down') : 'lock-closed'
-          }
+          name={aberto ? 'chevron-up' : 'chevron-down'}
           size={18}
           color={cores.contorno}
         />
       </Pressable>
 
-      {aberto && editavel && (
-        <EditorEscolherForma
+      {aberto && (
+        <EditorDeExercicio
           exercicio={exercicio}
           licaoId={licaoId}
           aoFechar={aoAlternar}
@@ -369,17 +384,38 @@ const styles = StyleSheet.create({
     color: cores.textoSuave,
   },
 
-  adicionar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: espaco.xs,
-    alignSelf: 'flex-start',
-    paddingVertical: espaco.xs,
-  },
-  adicionarTexto: {
+  // Os seis tipos como pastilhas: criar já escolhendo o tipo evita a
+  // pergunta seguinte, e ver os seis lado a lado lembra que eles existem.
+  novo: { gap: espaco.xs, marginTop: espaco.xs },
+  novoRotulo: {
     fontSize: fonte.pequena,
     lineHeight: linha.pequena,
     fontFamily: familia.forte,
+    color: cores.textoSuave,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
+  novoTipos: { flexDirection: 'row', flexWrap: 'wrap', gap: espaco.xs },
+  novoTipo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    paddingVertical: espaco.xs,
+    paddingHorizontal: espaco.sm,
+    borderRadius: raio.pill,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: cores.borda,
+  },
+  novoTipoPressionado: {
+    backgroundColor: cores.primariaSuave,
+    borderStyle: 'solid',
+    borderColor: cores.primaria,
+  },
+  novoTipoTexto: {
+    fontSize: fonte.pequena,
+    lineHeight: linha.pequena,
+    fontFamily: familia.medio,
     color: cores.primaria,
   },
 });

@@ -13,9 +13,10 @@ import {
 } from '@/theme/tokens';
 import type { Padez } from '@/types/schema';
 
-import { dadosDeEscolherForma, type ExercicioDoCms } from './api';
+import type { ExercicioDoCms } from './api';
 import { Campo } from './Campo';
 import { useEscritaDeExercicio } from './hooks';
+import { comoDados, comoJson, TIPOS } from './tiposDeExercicio';
 
 const CASOS: Padez[] = [
   'nominativ',
@@ -27,24 +28,19 @@ const CASOS: Padez[] = [
   'instrumental',
 ];
 
-type Dados = {
-  opcoes?: unknown;
-  resposta?: unknown;
-  falar_opcoes?: unknown;
-};
-
 /**
- * Editor do `escolher_forma` — o primeiro tipo ponta a ponta do CMS.
+ * O editor de um exercício, qualquer que seja o tipo.
  *
- * Escolhido para abrir a série porque é o exercício com o `dados` mais
- * simples que ainda tem forma real (uma lista e uma escolha dentro dela):
- * exercita a validação, a edição de array e o vínculo entre dois campos,
- * que é o que os outros cinco tipos vão reaproveitar.
+ * O que é igual em todos mora aqui — enunciado, dica, peso, caso,
+ * publicação, salvar e apagar. O que muda vem de `TIPOS[tipo].Corpo`, que
+ * mexe só no `dados`. Foi assim que os seis tipos couberam sem seis
+ * editores: o formulário do croata é sempre o mesmo formulário com um
+ * miolo diferente.
  *
- * O estado é LOCAL até salvar. Salvamento a cada tecla mandaria um exercício
+ * O estado é LOCAL até salvar. Salvar a cada tecla mandaria um exercício
  * meio escrito para a trilha — e a trilha é lida por aluno.
  */
-export function EditorEscolherForma({
+export function EditorDeExercicio({
   exercicio,
   licaoId,
   aoFechar,
@@ -53,48 +49,34 @@ export function EditorEscolherForma({
   licaoId: string;
   aoFechar: () => void;
 }) {
-  const dados = (exercicio.dados ?? {}) as Dados;
+  const tipo = TIPOS[exercicio.tipo];
 
   const [enunciado, setEnunciado] = useState(exercicio.enunciado_pt);
   const [dica, setDica] = useState(exercicio.dica_pt ?? '');
   const [peso, setPeso] = useState(String(exercicio.peso));
   const [padez, setPadez] = useState<Padez | null>(exercicio.padez);
-  const [opcoes, setOpcoes] = useState<string[]>(
-    Array.isArray(dados.opcoes) ? dados.opcoes.map(String) : ['', ''],
-  );
-  const [resposta, setResposta] = useState(
-    typeof dados.resposta === 'string' ? dados.resposta : '',
-  );
-  const [falar, setFalar] = useState(Boolean(dados.falar_opcoes));
+  const [dados, setDados] = useState(() => comoDados(exercicio.dados));
   const [publicado, setPublicado] = useState(exercicio.publicado);
   const [erro, setErro] = useState<string | null>(null);
 
   const { salvar, apagar } = useEscritaDeExercicio(licaoId);
-
-  const limpas = opcoes.map((o) => o.trim()).filter(Boolean);
 
   /**
    * A validação vive aqui E no banco (CHECK exercicios_dados_por_tipo).
    * A do banco é a que garante; esta é a que explica — erro de constraint
    * chega como texto de Postgres, que não ajuda quem está cadastrando.
    *
-   * Só morde ao PUBLICAR. Rascunho existe justamente para poder ficar
-   * pela metade: cadastrar um exercício bom é ir e voltar, e um editor
-   * que só deixa salvar o trabalho pronto obriga a manter o meio do
-   * caminho na cabeça.
+   * Só morde ao PUBLICAR. Rascunho existe justamente para poder ficar pela
+   * metade: cadastrar um exercício bom é ir e voltar, e um editor que só
+   * deixa salvar o trabalho pronto obriga a manter o meio do caminho na
+   * cabeça.
    */
   const problema = (): string | null => {
     if (!enunciado.trim()) return 'O enunciado em português é obrigatório.';
-    if (limpas.length < 2) return 'Precisa de pelo menos duas opções.';
-    if (new Set(limpas).size !== limpas.length)
-      return 'Há opções repetidas — o aluno veria a mesma resposta duas vezes.';
-    if (!resposta.trim()) return 'Marque qual opção é a certa.';
-    if (!limpas.includes(resposta.trim()))
-      return 'A opção marcada como certa não está mais na lista.';
     const n = Number(peso.replace(',', '.'));
     if (!Number.isFinite(n) || n <= 0) return 'O peso tem que ser maior que zero.';
     if (n > 10) return 'O peso não passa de 10 — é a nota inteira da lição.';
-    return null;
+    return tipo.validar(dados);
   };
 
   const gravar = () => {
@@ -110,12 +92,12 @@ export function EditorEscolherForma({
         campos: {
           enunciado_pt: enunciado.trim() || 'Sem enunciado',
           dica_pt: dica.trim() || null,
-          // Rascunho pode estar com o peso em branco; 0 é recusado pelo
-          // banco, então o mínimo é o que entra até alguém decidir.
+          // Rascunho pode estar com o peso em branco; o banco recusa zero,
+          // então o mínimo entra até alguém decidir.
           peso: Number.isFinite(pesoLimpo) && pesoLimpo > 0 ? pesoLimpo : 0.01,
           padez,
           publicado,
-          dados: dadosDeEscolherForma(limpas, resposta.trim(), falar),
+          dados: comoJson(dados),
         },
       },
       {
@@ -126,86 +108,20 @@ export function EditorEscolherForma({
     );
   };
 
-  const trocarOpcao = (i: number, valor: string) => {
-    setOpcoes((atual) => atual.map((o, j) => (j === i ? valor : o)));
-    // Renomear a opção certa não pode desmarcá-la: a resposta acompanha.
-    if (opcoes[i].trim() && opcoes[i].trim() === resposta.trim()) {
-      setResposta(valor);
-    }
-  };
-
-  const removerOpcao = (i: number) => {
-    const fora = opcoes[i];
-    setOpcoes((atual) => atual.filter((_, j) => j !== i));
-    if (fora.trim() === resposta.trim()) setResposta('');
-  };
-
   return (
     <View style={styles.editor}>
+      <Text style={styles.resumo}>{tipo.resumo}</Text>
+
       <Campo
         rotulo="Enunciado (PT)"
         valor={enunciado}
         aoMudar={setEnunciado}
-        placeholder="Qual é a forma certa?"
+        placeholder="A instrução que o aluno lê"
         multilinha
+        dica="Sempre em português — é instrução, não conteúdo."
       />
 
-      <View style={styles.bloco}>
-        <Text style={styles.rotulo}>Opções (HR)</Text>
-        {opcoes.map((opcao, i) => {
-          const certa = Boolean(opcao.trim()) && opcao.trim() === resposta.trim();
-          return (
-            <View key={i} style={styles.linhaOpcao}>
-              <Pressable
-                accessibilityRole="radio"
-                accessibilityState={{ checked: certa }}
-                accessibilityLabel={`Marcar "${opcao || 'opção vazia'}" como certa`}
-                onPress={() => opcao.trim() && setResposta(opcao)}
-                style={[styles.marcar, certa && styles.marcarCerta]}
-              >
-                <Ionicons
-                  name={certa ? 'checkmark-circle' : 'ellipse-outline'}
-                  size={22}
-                  color={certa ? cores.acerto : cores.contorno}
-                />
-              </Pressable>
-
-              <View style={styles.campoDaOpcao}>
-                <Campo
-                  rotulo={`Opção ${i + 1}`}
-                  valor={opcao}
-                  aoMudar={(v) => trocarOpcao(i, v)}
-                  croata
-                />
-              </View>
-
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={`Remover opção ${i + 1}`}
-                disabled={opcoes.length <= 2}
-                onPress={() => removerOpcao(i)}
-                style={[styles.remover, opcoes.length <= 2 && styles.inerte]}
-              >
-                <Ionicons name="trash-outline" size={20} color={cores.erro} />
-              </Pressable>
-            </View>
-          );
-        })}
-
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => setOpcoes((a) => [...a, ''])}
-          style={styles.adicionar}
-        >
-          <Ionicons name="add" size={18} color={cores.primaria} />
-          <Text style={styles.adicionarTexto}>Mais uma opção</Text>
-        </Pressable>
-        <Text style={styles.dica}>
-          O círculo marca a resposta certa. As opções são embaralhadas? Não —
-          aparecem na ordem cadastrada, então evite deixar a certa sempre na
-          primeira.
-        </Text>
-      </View>
+      <tipo.Corpo dados={dados} aoMudar={setDados} />
 
       <Campo
         rotulo="Dica (PT)"
@@ -220,7 +136,7 @@ export function EditorEscolherForma({
         valor={peso}
         aoMudar={setPeso}
         numerico
-        dica="Fração da nota /10. A soma dos pesos da lição deve fechar em 10."
+        dica="Fração da nota /10. A soma dos pesos publicados da lição deve fechar em 10."
       />
 
       <View style={styles.bloco}>
@@ -240,29 +156,12 @@ export function EditorEscolherForma({
             />
           ))}
         </View>
+        <Text style={styles.dica}>
+          Marcado, o feedback diz “Este exercício pede o caso X”.
+        </Text>
       </View>
 
-      <View style={styles.interruptor}>
-        <View style={styles.interruptorTexto}>
-          <Text style={styles.interruptorTitulo}>Gerar áudio das opções</Text>
-          <Text style={styles.dica}>
-            Marca estas opções para virarem MP3 na próxima rodada de
-            `supabase/audio/gerar.mjs`. Ligue quando as opções forem palavras
-            ou formas de verdade; deixe desligado quando forem letras soltas
-            ou pedaços sem som próprio.
-          </Text>
-        </View>
-        <Switch
-          value={falar}
-          onValueChange={setFalar}
-          trackColor={{ true: cores.primaria, false: cores.borda }}
-          accessibilityLabel="Falar as opções ao tocar"
-        />
-      </View>
-
-      <View
-        style={[styles.publicacao, publicado && styles.publicacaoNoAr]}
-      >
+      <View style={[styles.publicacao, publicado && styles.publicacaoNoAr]}>
         <Ionicons
           name={publicado ? 'eye' : 'eye-off'}
           size={22}
@@ -289,11 +188,7 @@ export function EditorEscolherForma({
       {erro && <Text style={styles.erro}>{erro}</Text>}
 
       <View style={styles.acoes}>
-        <Botao
-          rotulo="Salvar"
-          aoTocar={gravar}
-          carregando={salvar.isPending}
-        />
+        <Botao rotulo="Salvar" aoTocar={gravar} carregando={salvar.isPending} />
         <Botao rotulo="Cancelar" variante="secundaria" aoTocar={aoFechar} />
         <Pressable
           accessibilityRole="button"
@@ -301,9 +196,7 @@ export function EditorEscolherForma({
             apagar.mutate(exercicio.id, {
               onSuccess: aoFechar,
               onError: (e) =>
-                setErro(
-                  e instanceof Error ? e.message : 'Não deu para apagar.',
-                ),
+                setErro(e instanceof Error ? e.message : 'Não deu para apagar.'),
             })
           }
           style={styles.apagar}
@@ -348,6 +241,15 @@ const styles = StyleSheet.create({
     borderColor: cores.secundaria,
     backgroundColor: cores.fundoSuave,
   },
+  resumo: {
+    fontSize: fonte.pequena,
+    lineHeight: linha.pequena,
+    fontFamily: familia.medio,
+    color: cores.sobreSecundariaContainer,
+    backgroundColor: cores.secundariaSuave,
+    padding: espaco.sm,
+    borderRadius: raio.md,
+  },
   bloco: { gap: espaco.sm },
   rotulo: {
     fontSize: fonte.pequena,
@@ -356,25 +258,6 @@ const styles = StyleSheet.create({
     color: cores.textoSuave,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
-  },
-  linhaOpcao: { flexDirection: 'row', alignItems: 'flex-start', gap: espaco.sm },
-  campoDaOpcao: { flex: 1 },
-  marcar: { paddingTop: espaco.lg },
-  marcarCerta: {},
-  remover: { paddingTop: espaco.lg },
-  inerte: { opacity: 0.3 },
-  adicionar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: espaco.xs,
-    alignSelf: 'flex-start',
-    paddingVertical: espaco.xs,
-  },
-  adicionarTexto: {
-    fontSize: fonte.pequena,
-    lineHeight: linha.pequena,
-    fontFamily: familia.forte,
-    color: cores.primaria,
   },
   dica: {
     fontSize: fonte.pequena,
@@ -405,10 +288,12 @@ const styles = StyleSheet.create({
     color: cores.sobreSecundariaContainer,
     fontFamily: familia.forte,
   },
-  interruptor: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: espaco.md,
+  interruptorTexto: { flex: 1, gap: 2 },
+  interruptorTitulo: {
+    fontSize: fonte.corpo,
+    lineHeight: linha.corpo,
+    fontFamily: familia.normal,
+    color: cores.texto,
   },
   publicacao: {
     flexDirection: 'row',
@@ -420,13 +305,9 @@ const styles = StyleSheet.create({
     borderColor: cores.borda,
     backgroundColor: cores.superficie,
   },
-  publicacaoNoAr: { borderColor: cores.acerto, backgroundColor: cores.acertoSuave },
-  interruptorTexto: { flex: 1, gap: 2 },
-  interruptorTitulo: {
-    fontSize: fonte.corpo,
-    lineHeight: linha.corpo,
-    fontFamily: familia.normal,
-    color: cores.texto,
+  publicacaoNoAr: {
+    borderColor: cores.acerto,
+    backgroundColor: cores.acertoSuave,
   },
   erro: {
     fontSize: fonte.pequena,

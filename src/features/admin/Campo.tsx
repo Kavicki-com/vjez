@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { useTecladoCroata } from '@/components/TecladoCroata';
@@ -37,10 +38,25 @@ export function Campo({
   dica,
   numerico,
 }: Props) {
+  /**
+   * A barra croata só aparece no campo em foco.
+   *
+   * Sem isto, um exercício de quatro opções empilha quatro barras iguais e
+   * a tela vira teclado. O atraso ao perder o foco existe porque tocar numa
+   * tecla da barra tira o foco do campo primeiro: sem a janela, a barra
+   * desapareceria antes de o toque chegar nela. O `onFocus` que a própria
+   * tecla dispara ao devolver o cursor cancela o desaparecimento.
+   */
+  const [focado, setFocado] = useState(false);
+  const saida = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (saida.current) clearTimeout(saida.current);
+  }, []);
+
   const { propsDoCampo, teclado } = useTecladoCroata({
     valor,
     aoMudar,
-    ativo: Boolean(croata),
+    ativo: Boolean(croata) && focado,
   });
 
   return (
@@ -54,6 +70,13 @@ export function Campo({
         placeholderTextColor={cores.contorno}
         multiline={multilinha}
         keyboardType={numerico ? 'decimal-pad' : 'default'}
+        onFocus={() => {
+          if (saida.current) clearTimeout(saida.current);
+          setFocado(true);
+        }}
+        onBlur={() => {
+          saida.current = setTimeout(() => setFocado(false), 200);
+        }}
         // Conteúdo croata não pode passar por corretor nem por
         // maiúscula automática: os dois "consertam" a grafia certa.
         autoCorrect={!croata}

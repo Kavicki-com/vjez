@@ -1,6 +1,5 @@
 import { supabase } from '@/lib/supabase';
 import type {
-  Json,
   Tables,
   TablesInsert,
   TablesUpdate,
@@ -108,18 +107,7 @@ export async function apagarExercicio(id: string): Promise<void> {
   if (error) throw error;
 }
 
-/**
- * O `dados` de um `escolher_forma`.
- *
- * O banco valida a forma por CHECK (`exercicios_dados_por_tipo`), então um
- * salvamento malformado volta como erro do Postgres em vez de virar
- * exercício quebrado na trilha. Esta função existe para o editor montar o
- * JSON no formato que o `paraExercicio` (@/lib/mapeadores) espera ler.
- */
-export function dadosDeEscolherForma(
-  opcoes: string[],
-  resposta: string,
-  falarOpcoes: boolean,
-): Json {
-  return { opcoes, resposta, falar_opcoes: falarOpcoes };
-}
+// A forma do `dados` de cada tipo — como nasce, como se valida e como se
+// edita — mora em ./tiposDeExercicio. O banco confere por CHECK
+// (`exercicios_dados_por_tipo`), então salvamento malformado volta como
+// erro do Postgres em vez de virar exercício quebrado na trilha.
