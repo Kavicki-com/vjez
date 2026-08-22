@@ -4,6 +4,13 @@
  * Regerar após cada migration com:
  *   npx supabase gen types typescript --project-id cltclnrgtlififwvpfra
  *
+ * Esse comando exige `npx supabase login` (interativo, uma vez por
+ * máquina). Sem a sessão ele devolve `Unauthorized` e o arquivo aqui
+ * envelhece em silêncio — o typecheck passa mesmo com colunas faltando,
+ * e o erro só aparece quando alguém tenta ler uma delas. Foi o que
+ * aconteceu até 2026-08-22: faltavam `usuarios.papel`, `audio_ajustes`,
+ * `criar_licao` e `e_curador`.
+ *
  * Formas de domínio (camelCase, do CLAUDE.md) vivem em ./schema.ts;
  * a tradução entre os dois está em @/lib/mapeadores.
  */
@@ -17,35 +24,13 @@ export type Json =
   | Json[]
 
 export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "14.15"
   }
   public: {
     Tables: {
-      audio_hr: {
-        Row: {
-          atualizado_em: string
-          audio_url: string
-          criado_em: string
-          id: string
-          texto: string
-        }
-        Insert: {
-          atualizado_em?: string
-          audio_url: string
-          criado_em?: string
-          id?: string
-          texto: string
-        }
-        Update: {
-          atualizado_em?: string
-          audio_url?: string
-          criado_em?: string
-          id?: string
-          texto?: string
-        }
-        Relationships: []
-      }
       atividades: {
         Row: {
           atualizado_em: string
@@ -84,6 +69,51 @@ export type Database = {
           },
         ]
       }
+      audio_ajustes: {
+        Row: {
+          criado_em: string
+          motivo: string | null
+          texto: string
+          texto_falado: string
+        }
+        Insert: {
+          criado_em?: string
+          motivo?: string | null
+          texto: string
+          texto_falado: string
+        }
+        Update: {
+          criado_em?: string
+          motivo?: string | null
+          texto?: string
+          texto_falado?: string
+        }
+        Relationships: []
+      }
+      audio_hr: {
+        Row: {
+          atualizado_em: string
+          audio_url: string
+          criado_em: string
+          id: string
+          texto: string
+        }
+        Insert: {
+          atualizado_em?: string
+          audio_url: string
+          criado_em?: string
+          id?: string
+          texto: string
+        }
+        Update: {
+          atualizado_em?: string
+          audio_url?: string
+          criado_em?: string
+          id?: string
+          texto?: string
+        }
+        Relationships: []
+      }
       checkpoints: {
         Row: {
           atualizado_em: string
@@ -119,6 +149,27 @@ export type Database = {
           },
         ]
       }
+      curadores_autorizados: {
+        Row: {
+          criado_em: string
+          email: string
+          nota: string | null
+          papel: Database["public"]["Enums"]["papel"]
+        }
+        Insert: {
+          criado_em?: string
+          email: string
+          nota?: string | null
+          papel?: Database["public"]["Enums"]["papel"]
+        }
+        Update: {
+          criado_em?: string
+          email?: string
+          nota?: string | null
+          papel?: Database["public"]["Enums"]["papel"]
+        }
+        Relationships: []
+      }
       exercicios: {
         Row: {
           atividade_id: string
@@ -132,6 +183,7 @@ export type Database = {
           ordem: number
           padez: Database["public"]["Enums"]["padez"] | null
           peso: number
+          publicado: boolean
           tipo: Database["public"]["Enums"]["tipo_exercicio"]
         }
         Insert: {
@@ -146,6 +198,7 @@ export type Database = {
           ordem: number
           padez?: Database["public"]["Enums"]["padez"] | null
           peso: number
+          publicado?: boolean
           tipo: Database["public"]["Enums"]["tipo_exercicio"]
         }
         Update: {
@@ -160,6 +213,7 @@ export type Database = {
           ordem?: number
           padez?: Database["public"]["Enums"]["padez"] | null
           peso?: number
+          publicado?: boolean
           tipo?: Database["public"]["Enums"]["tipo_exercicio"]
         }
         Relationships: [
@@ -736,32 +790,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      migrar_progresso: {
-        Args: {
-          licoes?: Json
-          tentativas?: Json
-          modulos?: Json
-          dia_local?: string | null
-        }
-        Returns: undefined
-      }
-      registrar_dia_ativo: {
-        Args: { dia_local: string }
-        Returns: {
-          atualizado_em: string
-          criado_em: string
-          estado: Database["public"]["Enums"]["estado_conta"]
-          id: string
-          nivel: Database["public"]["Enums"]["nivel"]
-          nome: string | null
-          ofensiva_dias_seguidos: number
-          ofensiva_status: Database["public"]["Enums"]["status_ofensiva"]
-          ofensiva_ultimo_dia_ativo: string | null
-          papel: Database["public"]["Enums"]["papel"]
-          provedor: Database["public"]["Enums"]["provedor"] | null
-          xp: number
-        }
-      }
       buscar_lex_items: {
         Args: { termo: string }
         Returns: {
@@ -783,13 +811,54 @@ export type Database = {
           isSetofReturn: true
         }
       }
+      criar_licao: {
+        Args: {
+          p_atividades: Json
+          p_modulo_ordem: number
+          p_ordem: number
+          p_titulo: string
+        }
+        Returns: string
+      }
+      e_curador: { Args: never; Returns: boolean }
+      migrar_progresso: {
+        Args: {
+          dia_local?: string
+          licoes?: Json
+          modulos?: Json
+          tentativas?: Json
+        }
+        Returns: undefined
+      }
+      registrar_dia_ativo: {
+        Args: { dia_local: string }
+        Returns: {
+          atualizado_em: string
+          criado_em: string
+          estado: Database["public"]["Enums"]["estado_conta"]
+          id: string
+          nivel: Database["public"]["Enums"]["nivel"]
+          nome: string | null
+          ofensiva_dias_seguidos: number
+          ofensiva_status: Database["public"]["Enums"]["status_ofensiva"]
+          ofensiva_ultimo_dia_ativo: string | null
+          papel: Database["public"]["Enums"]["papel"]
+          provedor: Database["public"]["Enums"]["provedor"] | null
+          xp: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "usuarios"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       estado_conta: "convidado" | "autenticado"
       fase: "demo" | "paralelo" | "evolucao"
       genero_gramatical: "m" | "f" | "n"
       nivel: "basico" | "intermediario" | "avancado"
-      papel: "aluno" | "curador" | "admin"
       padez:
         | "nominativ"
         | "genitiv"
@@ -798,6 +867,7 @@ export type Database = {
         | "vokativ"
         | "lokativ"
         | "instrumental"
+      papel: "aluno" | "curador" | "admin"
       provedor: "google" | "apple"
       status_ofensiva: "ativa" | "em_recuperacao" | "zerada"
       status_submissao:
@@ -920,6 +990,23 @@ export type Enums<
     ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
     : never
 
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
 export const Constants = {
   public: {
     Enums: {
@@ -936,6 +1023,7 @@ export const Constants = {
         "lokativ",
         "instrumental",
       ],
+      papel: ["aluno", "curador", "admin"],
       provedor: ["google", "apple"],
       status_ofensiva: ["ativa", "em_recuperacao", "zerada"],
       status_submissao: [

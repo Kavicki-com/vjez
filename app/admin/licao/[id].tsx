@@ -46,9 +46,12 @@ export default function EditorDeLicao() {
     );
 
   const exercicios = licao.atividades.flatMap((a) => a.exercicios);
-  const somaDosPesos = exercicios.reduce((n, e) => n + Number(e.peso), 0);
-  // A nota da lição é a soma dos pesos acertados: se os pesos não fecham
-  // em 10, o aluno não consegue tirar 10 — ou tira mais que 10.
+  const noAr = exercicios.filter((e) => e.publicado);
+  const rascunhos = exercicios.length - noAr.length;
+  // Só o que está publicado conta: a nota do aluno é a soma dos pesos dos
+  // exercícios que ele de fato recebe. Somar rascunho aqui daria um "10"
+  // falso e a lição não fecharia na trilha.
+  const somaDosPesos = noAr.reduce((n, e) => n + Number(e.peso), 0);
   const pesoBate = Math.abs(somaDosPesos - NOTA_MAXIMA_LICAO) < 0.01;
 
   const novoExercicio = (atividadeId: string, ultimaOrdem: number) => {
@@ -60,6 +63,9 @@ export default function EditorDeLicao() {
         peso: 1,
         enunciado_pt: 'Qual é a forma certa?',
         dados: dadosDeEscolherForma(['', ''], '', false),
+        // Nasce rascunho: um exercício em branco não pode aparecer na
+        // trilha entre o "criar" e o primeiro salvamento.
+        publicado: false,
       },
       { onSuccess: (criado) => setAberto(criado.id) },
     );
@@ -105,7 +111,10 @@ export default function EditorDeLicao() {
               color={pesoBate ? cores.acerto : cores.erro}
             />
             <Text style={styles.somaTexto}>
-              {exercicios.length} exercícios, pesos somando{' '}
+              {noAr.length} no ar
+              {rascunhos > 0
+                ? ` e ${rascunhos} em rascunho`
+                : ''}, pesos somando{' '}
               {somaDosPesos.toFixed(1).replace('.', ',')} de {NOTA_MAXIMA_LICAO}
               {pesoBate ? '.' : ' — a lição não fecha a nota.'}
             </Text>
@@ -114,8 +123,9 @@ export default function EditorDeLicao() {
           <View style={styles.avisoAoVivo}>
             <Ionicons name="eye" size={18} color={cores.textoSuave} />
             <Text style={styles.avisoTexto}>
-              Não há rascunho: o que você salvar aqui vale para o aluno na
-              próxima vez que ele abrir a lição.
+              Exercício publicado vale para o aluno na próxima vez que ele
+              abrir a lição — não há fila de aprovação. O que nasce aqui nasce
+              rascunho; publicar é um passo à parte, dentro do exercício.
             </Text>
           </View>
 
@@ -199,6 +209,13 @@ function Exercicio({
         <View style={styles.selo}>
           <Text style={styles.seloTexto}>{exercicio.tipo}</Text>
         </View>
+        {!exercicio.publicado && (
+          <View style={[styles.selo, styles.seloRascunho]}>
+            <Text style={[styles.seloTexto, styles.seloRascunhoTexto]}>
+              rascunho
+            </Text>
+          </View>
+        )}
         <Text style={styles.enunciado} numberOfLines={aberto ? undefined : 2}>
           {exercicio.enunciado_pt}
         </Text>
@@ -336,6 +353,8 @@ const styles = StyleSheet.create({
     fontFamily: familia.medio,
     color: cores.textoSuave,
   },
+  seloRascunho: { backgroundColor: cores.primariaSuave },
+  seloRascunhoTexto: { color: cores.primaria, fontFamily: familia.forte },
   enunciado: {
     flex: 1,
     fontSize: fonte.pequena,

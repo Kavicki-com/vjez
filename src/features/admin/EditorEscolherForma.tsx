@@ -66,6 +66,7 @@ export function EditorEscolherForma({
     typeof dados.resposta === 'string' ? dados.resposta : '',
   );
   const [falar, setFalar] = useState(Boolean(dados.falar_opcoes));
+  const [publicado, setPublicado] = useState(exercicio.publicado);
   const [erro, setErro] = useState<string | null>(null);
 
   const { salvar, apagar } = useEscritaDeExercicio(licaoId);
@@ -76,6 +77,11 @@ export function EditorEscolherForma({
    * A validação vive aqui E no banco (CHECK exercicios_dados_por_tipo).
    * A do banco é a que garante; esta é a que explica — erro de constraint
    * chega como texto de Postgres, que não ajuda quem está cadastrando.
+   *
+   * Só morde ao PUBLICAR. Rascunho existe justamente para poder ficar
+   * pela metade: cadastrar um exercício bom é ir e voltar, e um editor
+   * que só deixa salvar o trabalho pronto obriga a manter o meio do
+   * caminho na cabeça.
    */
   const problema = (): string | null => {
     if (!enunciado.trim()) return 'O enunciado em português é obrigatório.';
@@ -87,22 +93,28 @@ export function EditorEscolherForma({
       return 'A opção marcada como certa não está mais na lista.';
     const n = Number(peso.replace(',', '.'));
     if (!Number.isFinite(n) || n <= 0) return 'O peso tem que ser maior que zero.';
+    if (n > 10) return 'O peso não passa de 10 — é a nota inteira da lição.';
     return null;
   };
 
   const gravar = () => {
-    const ruim = problema();
+    const ruim = publicado ? problema() : null;
     setErro(ruim);
     if (ruim) return;
+
+    const pesoLimpo = Number(peso.replace(',', '.'));
 
     salvar.mutate(
       {
         id: exercicio.id,
         campos: {
-          enunciado_pt: enunciado.trim(),
+          enunciado_pt: enunciado.trim() || 'Sem enunciado',
           dica_pt: dica.trim() || null,
-          peso: Number(peso.replace(',', '.')),
+          // Rascunho pode estar com o peso em branco; 0 é recusado pelo
+          // banco, então o mínimo é o que entra até alguém decidir.
+          peso: Number.isFinite(pesoLimpo) && pesoLimpo > 0 ? pesoLimpo : 0.01,
           padez,
+          publicado,
           dados: dadosDeEscolherForma(limpas, resposta.trim(), falar),
         },
       },
@@ -248,6 +260,32 @@ export function EditorEscolherForma({
         />
       </View>
 
+      <View
+        style={[styles.publicacao, publicado && styles.publicacaoNoAr]}
+      >
+        <Ionicons
+          name={publicado ? 'eye' : 'eye-off'}
+          size={22}
+          color={publicado ? cores.acerto : cores.textoSuave}
+        />
+        <View style={styles.interruptorTexto}>
+          <Text style={styles.interruptorTitulo}>
+            {publicado ? 'No ar para o aluno' : 'Rascunho'}
+          </Text>
+          <Text style={styles.dica}>
+            {publicado
+              ? 'Some da lição se você desligar — o progresso de quem já respondeu não é afetado.'
+              : 'Só a curadoria enxerga. Dá para salvar pela metade e voltar depois; ao publicar, os campos passam a ser cobrados.'}
+          </Text>
+        </View>
+        <Switch
+          value={publicado}
+          onValueChange={setPublicado}
+          trackColor={{ true: cores.acerto, false: cores.borda }}
+          accessibilityLabel="Publicado para o aluno"
+        />
+      </View>
+
       {erro && <Text style={styles.erro}>{erro}</Text>}
 
       <View style={styles.acoes}>
@@ -372,6 +410,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: espaco.md,
   },
+  publicacao: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: espaco.md,
+    padding: espaco.sm + espaco.xs,
+    borderRadius: raio.md,
+    borderWidth: 1,
+    borderColor: cores.borda,
+    backgroundColor: cores.superficie,
+  },
+  publicacaoNoAr: { borderColor: cores.acerto, backgroundColor: cores.acertoSuave },
   interruptorTexto: { flex: 1, gap: 2 },
   interruptorTitulo: {
     fontSize: fonte.corpo,

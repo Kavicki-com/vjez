@@ -53,10 +53,12 @@ export function useEscritaDeExercicio(licaoId: string) {
   const recarregar = () => {
     void cliente.invalidateQueries({ queryKey: ['cms', 'licao', licaoId] });
     void cliente.invalidateQueries({ queryKey: ['cms', 'modulos'] });
-    // O aluno lê a lição por outra chave; sem isto, a trilha só veria a
-    // edição depois de recarregar o app.
+    // O aluno lê o mesmo conteúdo por outras chaves; sem isto, a edição só
+    // apareceria depois de recarregar o app. `['licao']` sem o id casa por
+    // prefixo e alcança todas as lições em cache.
     void cliente.invalidateQueries({ queryKey: ['licao'] });
     void cliente.invalidateQueries({ queryKey: ['trilha'] });
+    void cliente.invalidateQueries({ queryKey: ['checkpoint-modulo'] });
   };
 
   const salvar = useMutation({
