@@ -28,6 +28,35 @@ const BASE = BASE_WEB;
  * Fora do `load` ele disputa banda com o bundle no primeiro acesso, que é
  * justamente quando a tela ainda está em branco.
  */
+/**
+ * Guarda o convite de instalação assim que o navegador o oferece.
+ *
+ * Tem que ser AQUI, inline no `<head>`, e não num `useEffect` lá dentro:
+ * o Chrome dispara `beforeinstallprompt` logo depois do load, e o React só
+ * monta depois de baixar e executar o bundle inteiro. O componente chegava
+ * atrasado, o evento já tinha passado, e o convite nunca aparecia — sem
+ * erro nenhum na tela, que é o pior jeito de falhar.
+ *
+ * `preventDefault` cala a barrinha do próprio Chrome, que aparece uma vez e
+ * some: quem a perde não tem como pedir de volta. Guardado aqui, o convite
+ * fica disponível o tempo que for preciso, e quem decide quando mostrar é a
+ * tela inicial (@/features/pwa/ConviteDeInstalacao).
+ */
+const CAPTURA_INSTALACAO = `
+(function () {
+  window.__vjezInstalacao = null;
+  window.addEventListener('beforeinstallprompt', function (evento) {
+    evento.preventDefault();
+    window.__vjezInstalacao = evento;
+    window.dispatchEvent(new Event('vjez:instalavel'));
+  });
+  window.addEventListener('appinstalled', function () {
+    window.__vjezInstalacao = null;
+    window.dispatchEvent(new Event('vjez:instalado'));
+  });
+})();
+`;
+
 const REGISTRA_SW = !PRODUCAO
   ? ''
   : `
@@ -146,6 +175,9 @@ export default function Root({ children }: PropsWithChildren) {
             do app — sem isto o web ganha duas barras de rolagem. */}
         <ScrollViewStyleReset />
 
+        {/* Antes do worker de propósito: este precisa estar ouvindo o mais
+            cedo possível, e o outro só age depois do `load`. */}
+        <script dangerouslySetInnerHTML={{ __html: CAPTURA_INSTALACAO }} />
         <script dangerouslySetInnerHTML={{ __html: REGISTRA_SW }} />
       </head>
       <body>{children}</body>

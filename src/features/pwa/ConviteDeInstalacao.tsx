@@ -45,6 +45,19 @@ type EventoDeInstalacao = Event & {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 };
 
+/**
+ * Quem de fato escuta o `beforeinstallprompt` é um script inline no
+ * `<head>` (app/+html.tsx) — ele dispara antes de o React existir, então
+ * ouvir daqui perdia o convite. A casca guarda o evento aqui e avisa por
+ * um evento nosso; este componente só lê.
+ */
+type JanelaComConvite = Window & { __vjezInstalacao?: EventoDeInstalacao | null };
+
+function conviteGuardado(): EventoDeInstalacao | null {
+  if (!NA_WEB || typeof window === 'undefined') return null;
+  return (window as JanelaComConvite).__vjezInstalacao ?? null;
+}
+
 const NA_WEB = Platform.OS === 'web';
 
 /** Já está rodando instalado? Então não há o que oferecer. */
@@ -89,24 +102,22 @@ export function ConviteDeInstalacao({
     if (!NA_WEB || typeof window === 'undefined') return;
 
     setInstalado(jaInstalado());
+    // O convite pode ter chegado antes de o React montar — o caso comum,
+    // porque o bundle é grande. Por isso a primeira coisa é perguntar à
+    // casca se ela já tem um guardado, e só depois passar a ouvir.
+    setEvento(conviteGuardado());
 
-    const aoPoderInstalar = (e: Event) => {
-      // Sem isto o Chrome mostra a própria barrinha, que aparece uma vez e
-      // some — e o aluno que perdeu não tem como pedir de volta.
-      e.preventDefault();
-      setEvento(e as EventoDeInstalacao);
-    };
-
+    const aoPoderInstalar = () => setEvento(conviteGuardado());
     const aoInstalar = () => {
       setInstalado(true);
       setEvento(null);
     };
 
-    window.addEventListener('beforeinstallprompt', aoPoderInstalar);
-    window.addEventListener('appinstalled', aoInstalar);
+    window.addEventListener('vjez:instalavel', aoPoderInstalar);
+    window.addEventListener('vjez:instalado', aoInstalar);
     return () => {
-      window.removeEventListener('beforeinstallprompt', aoPoderInstalar);
-      window.removeEventListener('appinstalled', aoInstalar);
+      window.removeEventListener('vjez:instalavel', aoPoderInstalar);
+      window.removeEventListener('vjez:instalado', aoInstalar);
     };
   }, []);
 
@@ -129,7 +140,9 @@ export function ConviteDeInstalacao({
     if (!evento) return;
     void evento.prompt();
     void evento.userChoice.then(({ outcome }) => {
-      // Aceito ou recusado, o evento não serve duas vezes.
+      // Aceito ou recusado, o evento não serve duas vezes — some daqui e
+      // da casca, senão um toque seguinte tentaria reusá-lo e falharia.
+      (window as JanelaComConvite).__vjezInstalacao = null;
       setEvento(null);
       if (outcome === 'dismissed') setDispensado(true);
     });
