@@ -20,10 +20,12 @@ export default function DrawerLayout() {
         headerShown: false,
         // Tela larga: lateral sempre visível. Estreita: gaveta por cima.
         drawerType: largo ? 'permanent' : 'front',
+        // O painel inteiro é azul: a cor precisa vir daqui também, senão a
+        // faixa abaixo do último item fica branca quando o conteúdo é curto.
         drawerStyle: {
           width: larguraNavLateral,
-          backgroundColor: cores.superficie,
-          borderRightColor: cores.borda,
+          backgroundColor: cores.secundaria,
+          borderRightColor: cores.secundaria,
           borderRightWidth: largo ? 1 : 0,
         },
         overlayColor: 'rgba(30, 30, 30, 0.35)',
@@ -36,6 +38,10 @@ export default function DrawerLayout() {
     >
       {/* As abas trazem o próprio cabeçalho; as telas do menu usam o do drawer. */}
       <Drawer.Screen name="(tabs)" />
+      <Drawer.Screen
+        name="padezi"
+        options={{ headerShown: true, title: 'Padeži' }}
+      />
       <Drawer.Screen
         name="configuracoes"
         options={{ headerShown: true, title: 'Configurações' }}

@@ -54,6 +54,41 @@ export interface Numero {
   pronuncia_pt?: string;
 }
 
+/**
+ * Uma terminação da grade de declinação: é gênero × número.
+ * `terminacao` vem só com o sufixo ("-ima", "—" quando é vazio); as
+ * palavras-modelo já flexionadas vêm em `exemplos_hr` — duas quando a
+ * terminação alterna (grad / prijatelja), uma no resto.
+ */
+export interface TerminacaoPadez {
+  id: string;
+  padez: Padez;
+  genero: 'm' | 'f' | 'n';
+  plural: boolean;
+  terminacao: string;
+  exemplos_hr: string[];
+}
+
+/**
+ * Linha do quadro dos casos (item Padeži do menu lateral). Material de consulta:
+ * a pergunta que o caso responde, para que serve, as preposições que o
+ * pedem, um exemplo e a grade de terminações.
+ */
+export interface CasoPadez {
+  id: string;
+  padez: Padez;
+  /** Ordem canônica croata (N G D A V L I), 1 a 7. */
+  numero: number;
+  pergunta_hr: string;
+  pergunta_pt: string;
+  uso_pt: string;
+  preposicoes_hr: string[];
+  exemplo_hr: string;
+  exemplo_pt: string;
+  nota_pt?: string;
+  terminacoes: TerminacaoPadez[];
+}
+
 // ---------- EXERCÍCIOS (templates) ----------
 export type TipoExercicio =
   | 'preencher_lacuna'
@@ -195,12 +230,21 @@ export interface Ofensiva {
   status: 'ativa' | 'em_recuperacao' | 'zerada';
 }
 
+/**
+ * Quem pode escrever conteúdo. `aluno` é todo mundo; `curador` é o
+ * professor ou nativo que alimenta o app pelo CMS; `admin` também mexe em
+ * papéis. Quem manda de verdade é a RLS do banco (`e_curador()`) — este
+ * campo só decide o que a interface mostra.
+ */
+export type Papel = 'aluno' | 'curador' | 'admin';
+
 export interface Usuario {
   id: string;
   estado: EstadoConta;
   provedor?: Provedor;
   nome?: string;
   nivel: Nivel;
+  papel: Papel;
   xp: number;
   ofensiva: Ofensiva;
   criadoEm: string;

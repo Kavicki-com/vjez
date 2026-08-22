@@ -1,5 +1,6 @@
 import { StyleSheet, TextInput, View } from 'react-native';
 
+import { useTecladoCroata } from '@/components/TecladoCroata';
 import {
   cores,
   espaco,
@@ -27,9 +28,16 @@ export function RespostaTexto({
   placeholder,
   rotuloAcessivel,
 }: Props) {
+  const { propsDoCampo, teclado } = useTecladoCroata({
+    valor,
+    aoMudar,
+    ativo: !travado,
+  });
+
   return (
-    <View>
+    <View style={styles.bloco}>
       <TextInput
+        {...propsDoCampo}
         value={valor}
         onChangeText={aoMudar}
         editable={!travado}
@@ -44,11 +52,13 @@ export function RespostaTexto({
           travado && acertou === false && styles.errado,
         ]}
       />
+      {teclado}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  bloco: { gap: espaco.sm },
   campo: {
     minHeight: 56,
     paddingHorizontal: espaco.md,

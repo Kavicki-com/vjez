@@ -10,6 +10,7 @@
 import type { Tables } from '@/types/database';
 import type {
   Atividade,
+  CasoPadez,
   Exercicio,
   Frase,
   Letra,
@@ -20,6 +21,7 @@ import type {
   Ofensiva,
   ProgressoLicao,
   ProgressoModulo,
+  TerminacaoPadez,
   Usuario,
 } from '@/types/schema';
 
@@ -71,6 +73,38 @@ export function paraFrase(linha: Tables<'frases'>): Frase {
     contexto: ou(linha.contexto),
     audioUrl: ou(linha.audio_url),
     pronuncia_pt: ou(linha.pronuncia_pt),
+  };
+}
+
+export function paraTerminacaoPadez(
+  linha: Tables<'padez_terminacoes'>,
+): TerminacaoPadez {
+  return {
+    id: linha.id,
+    padez: linha.padez,
+    genero: linha.genero,
+    plural: linha.plural,
+    terminacao: linha.terminacao,
+    exemplos_hr: linha.exemplos_hr,
+  };
+}
+
+export function paraCasoPadez(
+  linha: Tables<'padezi'>,
+  terminacoes: TerminacaoPadez[],
+): CasoPadez {
+  return {
+    id: linha.id,
+    padez: linha.padez,
+    numero: linha.numero,
+    pergunta_hr: linha.pergunta_hr,
+    pergunta_pt: linha.pergunta_pt,
+    uso_pt: linha.uso_pt,
+    preposicoes_hr: linha.preposicoes_hr,
+    exemplo_hr: linha.exemplo_hr,
+    exemplo_pt: linha.exemplo_pt,
+    nota_pt: ou(linha.nota_pt),
+    terminacoes,
   };
 }
 
@@ -192,6 +226,7 @@ export function paraUsuario(linha: Tables<'usuarios'>): Usuario {
     provedor: ou(linha.provedor),
     nome: ou(linha.nome),
     nivel: linha.nivel,
+    papel: linha.papel,
     xp: linha.xp,
     ofensiva,
     criadoEm: linha.criado_em,

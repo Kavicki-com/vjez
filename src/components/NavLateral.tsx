@@ -8,6 +8,7 @@ import {
 } from 'expo-router/drawer';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { useEhCurador } from '@/features/admin/hooks';
 import {
   cores,
   espaco,
@@ -15,6 +16,7 @@ import {
   fonte,
   linha,
   raio,
+  sombraSolida,
 } from '@/theme/tokens';
 
 type Destino = {
@@ -30,6 +32,29 @@ const PRINCIPAIS: Destino[] = [
   { href: '/dicionario', rotulo: 'Dicionário', icone: 'book-outline', iconeAtivo: 'book' },
   { href: '/perfil', rotulo: 'Perfil', icone: 'person-outline', iconeAtivo: 'person' },
 ];
+
+/**
+ * Consulta. Não é aba: é material que o aluno abre no meio de uma lição
+ * para conferir uma terminação e fecha em seguida. Fica no grupo de cima
+ * porque é conteúdo, não ajuste do app.
+ */
+const CONSULTA: Destino[] = [
+  { href: '/padezi', rotulo: 'Padeži', icone: 'grid-outline', iconeAtivo: 'grid' },
+];
+
+/**
+ * A curadoria, para quem tem papel para isso.
+ *
+ * Aparece por último e separada: é ferramenta de trabalho, não parte do
+ * aprender. Um aluno nunca vê este item — e mesmo que chegue em /admin
+ * pela URL, a RLS do banco recusa cada gravação.
+ */
+const CURADORIA: Destino = {
+  href: '/admin',
+  rotulo: 'Curadoria',
+  icone: 'construct-outline',
+  iconeAtivo: 'construct',
+};
 
 const SECUNDARIOS: Destino[] = [
   { href: '/configuracoes', rotulo: 'Configurações', icone: 'settings-outline', iconeAtivo: 'settings' },
@@ -57,7 +82,7 @@ function Item({ destino, ativo }: { destino: Destino; ativo: boolean }) {
       <Ionicons
         name={ativo ? destino.iconeAtivo : destino.icone}
         size={22}
-        color={ativo ? cores.primaria : cores.textoSuave}
+        color={ativo ? cores.superficie : cores.secundariaSuave}
       />
       <Text
         numberOfLines={1}
@@ -72,6 +97,7 @@ function Item({ destino, ativo }: { destino: Destino; ativo: boolean }) {
 /** Conteúdo do drawer: gaveta no celular, lateral fixa em tela larga. */
 export function NavLateral(props: DrawerContentComponentProps) {
   const pathname = usePathname();
+  const { ehCurador } = useEhCurador();
 
   return (
     <DrawerContentScrollView
@@ -84,7 +110,7 @@ export function NavLateral(props: DrawerContentComponentProps) {
       </View>
 
       <View style={styles.grupo}>
-        {PRINCIPAIS.map((d) => (
+        {[...PRINCIPAIS, ...CONSULTA].map((d) => (
           <Item key={String(d.href)} destino={d} ativo={estaAtivo(pathname, d.href)} />
         ))}
       </View>
@@ -95,14 +121,28 @@ export function NavLateral(props: DrawerContentComponentProps) {
         {SECUNDARIOS.map((d) => (
           <Item key={String(d.href)} destino={d} ativo={estaAtivo(pathname, d.href)} />
         ))}
+        {ehCurador && (
+          <Item destino={CURADORIA} ativo={estaAtivo(pathname, CURADORIA.href)} />
+        )}
       </View>
     </DrawerContentScrollView>
   );
 }
 
+/**
+ * A lateral é um painel azul sólido, e tudo dentro dela é branco.
+ * Como o fundo já é a cor de ênfase, o estado ativo não pode ser mais
+ * azul: ele se separa por profundidade (pílula em azul escuro) e por
+ * peso do texto — branco cheio no ativo, branco recuado no resto.
+ */
 const styles = StyleSheet.create({
-  fundo: { backgroundColor: cores.superficie },
-  conteudo: { paddingHorizontal: espaco.sm, paddingBottom: espaco.lg },
+  fundo: { backgroundColor: cores.secundaria },
+  conteudo: {
+    flexGrow: 1,
+    backgroundColor: cores.secundaria,
+    paddingHorizontal: espaco.sm,
+    paddingBottom: espaco.lg,
+  },
   marca: {
     paddingHorizontal: espaco.sm,
     paddingTop: espaco.sm,
@@ -111,7 +151,7 @@ const styles = StyleSheet.create({
   marcaTexto: {
     fontSize: fonte.titulo, lineHeight: linha.titulo,
     fontFamily: familia.forte,
-    color: cores.primaria,
+    color: cores.superficie,
     letterSpacing: -0.5,
   },
   grupo: { gap: espaco.xs },
@@ -123,18 +163,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: espaco.sm,
     borderRadius: raio.md,
   },
-  itemAtivo: { backgroundColor: cores.primariaSuave },
-  itemPressionado: { backgroundColor: cores.fundoSuave },
+  itemAtivo: { backgroundColor: cores.sobreSecundariaContainer },
+  itemPressionado: { backgroundColor: sombraSolida.secundaria },
   rotulo: {
     fontSize: fonte.corpo, lineHeight: linha.corpo,
-    color: cores.textoSuave,
+    color: cores.secundariaSuave,
     fontFamily: familia.medio,
     flexShrink: 1,
   },
-  rotuloAtivo: { color: cores.primaria },
+  rotuloAtivo: { color: cores.superficie, fontFamily: familia.forte },
   divisor: {
     height: 1,
-    backgroundColor: cores.borda,
+    backgroundColor: sombraSolida.secundaria,
     marginVertical: espaco.md,
     marginHorizontal: espaco.sm,
   },

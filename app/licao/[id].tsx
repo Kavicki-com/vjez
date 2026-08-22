@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useQueryClient } from '@tanstack/react-query';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -28,11 +28,15 @@ import {
   type Veredito,
 } from '@/features/licao/correcao';
 import { useLicao } from '@/features/licao/hooks';
+import { corrigirProducaoLivre } from '@/features/licao/producaoLivre';
 import { registrarNota, registrarTentativa } from '@/features/licao/progresso';
 import { registrarDiaAtivo } from '@/features/ofensiva/api';
+import { useSomDeResposta } from '@/features/audio/sons';
 import { useSessao } from '@/features/conta/hooks';
 import { useProgressoLocal } from '@/features/perfil/ProgressoLocal';
+import { voltarPara } from '@/lib/navegacao';
 import { ORDEM_LICAO_PORTAO_LOGIN } from '@/lib/regras';
+import type { Correcao } from '@/types/schema';
 import {
   cores,
   espaco,
@@ -51,6 +55,7 @@ export default function TelaLicao() {
     useProgressoLocal();
   const cliente = useQueryClient();
   const { autenticado } = useSessao();
+  const tocarVeredito = useSomDeResposta();
 
   const [indice, setIndice] = useState(0);
   const [respostas, setRespostas] = useState<Record<string, Resposta>>({});
@@ -58,11 +63,17 @@ export default function TelaLicao() {
   const [terminou, setTerminou] = useState(false);
   // A abertura é o passo zero: some assim que o aluno começa.
   const [naAbertura, setNaAbertura] = useState(true);
+  // Produção livre: a IA responde depois do ponto, então tem estado próprio.
+  const [correcoes, setCorrecoes] = useState<Record<string, Correcao>>({});
+  const [avisos, setAvisos] = useState<Record<string, string>>({});
+  const [corrigindo, setCorrigindo] = useState(false);
 
   const exercicios = licao?.exercicios ?? [];
   const exercicio = exercicios[indice];
   const veredito = exercicio ? vereditos[exercicio.id] : undefined;
   const resposta = exercicio ? (respostas[exercicio.id] ?? null) : null;
+  const correcao = exercicio ? correcoes[exercicio.id] : undefined;
+  const aviso = exercicio ? avisos[exercicio.id] : undefined;
 
   const atividadeAtual = useMemo(
     () => licao?.atividades.find((a) => a.exercicios.some((e) => e.id === exercicio?.id)),
@@ -81,7 +92,8 @@ export default function TelaLicao() {
   );
 
   if (isPending) return <Carregando />;
-  if (isError || !licao) return <Erro />;
+  // Sem a lição não dá para saber a unidade dela: a saída é a trilha.
+  if (isError || !licao) return <Erro aoVoltar={() => voltarPara('/')} />;
 
   if (terminou) {
     return (
@@ -93,12 +105,18 @@ export default function TelaLicao() {
         // Guest-first: a Lição 1 é aberta, e o portão aparece no fim dela —
         // no momento em que o progresso passa a valer alguma coisa.
         ofereceConta={!autenticado && licao.ordem === ORDEM_LICAO_PORTAO_LOGIN}
-        aoSair={() => router.back()}
+        aoSair={() => voltarPara(`/modulo/${licao.moduloId}`)}
       />
     );
   }
 
-  if (!exercicio) return <Erro mensagem="Esta lição ainda não tem exercícios." />;
+  if (!exercicio)
+    return (
+      <Erro
+        mensagem="Esta lição ainda não tem exercícios."
+        aoVoltar={() => voltarPara(`/modulo/${licao.moduloId}`)}
+      />
+    );
 
   // Sem intro cadastrada a abertura não aparece: quem decide é o conteúdo.
   if (naAbertura && licao.intro_pt) {
@@ -117,10 +135,42 @@ export default function TelaLicao() {
   const podeVerificar = resposta !== null && !veredito;
   const ultimo = indice === exercicios.length - 1;
 
+  /**
+   * Manda o texto para a IA. Roda DEPOIS de o ponto estar dado: correção é
+   * conteúdo de aprendizado, não nota — se a rede cair, o aluno não perde
+   * ponto nenhum, só a explicação.
+   */
+  const pedirCorrecao = async (id: string, texto: string) => {
+    if (!autenticado) {
+      setAvisos((atual) => ({
+        ...atual,
+        [id]: 'Entre na sua conta para um professor de IA corrigir o que você escreveu.',
+      }));
+      return;
+    }
+
+    setCorrigindo(true);
+    const resultado = await corrigirProducaoLivre({ exercicioId: id, texto });
+    setCorrigindo(false);
+
+    if (resultado.estado === 'ok') {
+      setCorrecoes((atual) => ({ ...atual, [id]: resultado.correcao }));
+    } else {
+      setAvisos((atual) => ({ ...atual, [id]: resultado.mensagem }));
+    }
+  };
+
   const verificar = () => {
     if (!resposta) return;
     const resultado = corrigir(exercicio, resposta);
     setVereditos((atual) => ({ ...atual, [exercicio.id]: resultado }));
+    // No mesmo quadro em que o rodapé muda de cor: o som é a mesma
+    // informação por outro canal, não um aviso que chega depois.
+    tocarVeredito(resultado.acertou);
+
+    if (exercicio.tipo === 'producao_livre' && resposta.tipo === 'envio') {
+      void pedirCorrecao(exercicio.id, resposta.valor);
+    }
     // O checkpoint prioriza erros: sem isso, convidado faria uma prova sem
     // priorização nenhuma, porque nada dele é gravado no servidor.
     registrarTentativaLocal(exercicio.id, resultado.acertou, licao.moduloId);
@@ -165,7 +215,7 @@ export default function TelaLicao() {
           accessibilityRole="button"
           accessibilityLabel="Sair da lição"
           hitSlop={espaco.sm}
-          onPress={() => router.back()}
+          onPress={() => voltarPara(`/modulo/${licao.moduloId}`)}
         >
           <Ionicons name="close" size={26} color={cores.texto} />
         </Pressable>
@@ -230,11 +280,24 @@ export default function TelaLicao() {
         ]}
       >
         <View style={styles.coluna}>
-          {veredito && <Feedback exercicio={exercicio} veredito={veredito} />}
+          {veredito && (
+            <Feedback
+              exercicio={exercicio}
+              veredito={veredito}
+              correcao={correcao}
+              aviso={corrigindo ? undefined : aviso}
+            />
+          )}
+          {corrigindo && (
+            <Text style={styles.corrigindo}>Corrigindo o que você escreveu…</Text>
+          )}
           <Botao
             rotulo={veredito ? (ultimo ? 'Ver resultado' : 'Continuar') : 'Verificar'}
             aoTocar={veredito ? continuar : verificar}
             desabilitado={!veredito && !podeVerificar}
+            // Continuar durante a correção perderia a resposta da IA — o
+            // exercício sai da tela junto com ela.
+            carregando={corrigindo}
             variante={
               veredito?.acertou === true
                 ? 'acerto'
@@ -251,6 +314,12 @@ export default function TelaLicao() {
 
 const styles = StyleSheet.create({
   tela: { flex: 1, backgroundColor: cores.fundo },
+  corrigindo: {
+    fontSize: fonte.pequena,
+    lineHeight: linha.pequena,
+    fontFamily: familia.normal,
+    color: cores.textoSuave,
+  },
   cabecalho: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -270,7 +339,7 @@ const styles = StyleSheet.create({
     backgroundColor: cores.fundoSuave,
     overflow: 'hidden',
   },
-  barraCheia: { height: '100%', backgroundColor: cores.primaria },
+  barraCheia: { height: '100%', backgroundColor: cores.secundaria },
   contagem: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 
   corpo: { flex: 1 },

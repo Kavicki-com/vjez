@@ -11,6 +11,7 @@ import {
   familia,
   fonte,
   linha,
+  sombraSolida,
 } from '@/theme/tokens';
 import { useLayout } from '@/theme/useLayout';
 
@@ -49,13 +50,17 @@ export default function TabsLayout() {
                 accessibilityLabel="Abrir menu"
               />
             ),
-        tabBarActiveTintColor: cores.primaria,
-        tabBarInactiveTintColor: cores.textoSuave,
+        // A barra inferior é a mesma navegação da lateral, só que deitada:
+        // painel azul sólido, item ativo em branco cheio, inativo em branco
+        // recuado. Manter as duas iguais é o que faz a navegação parecer
+        // uma coisa só ao trocar de celular para tela larga.
+        tabBarActiveTintColor: cores.superficie,
+        tabBarInactiveTintColor: cores.secundariaSuave,
         tabBarStyle: {
-          backgroundColor: cores.superficie,
+          backgroundColor: cores.secundaria,
           // Tracejado do mockup no lugar da linha cheia.
           borderTopWidth: 2,
-          borderTopColor: cores.borda,
+          borderTopColor: sombraSolida.secundaria,
           borderStyle: 'dashed',
           height: ALTURA_BARRA + insets.bottom,
           paddingTop: espaco.sm,

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { BotaoFalarTexto } from '@/features/audio/BotaoFalarTexto';
 import {
   cores,
   espaco,
@@ -33,6 +34,15 @@ export function MontarFrase({
 
   return (
     <View style={styles.caixa}>
+      {/* Ouvir a frase pronta entrega a ordem das palavras — e é para
+          entregar: montar frase é exercício de ordem, e a ordem do croata
+          se aprende no ouvido antes de se aprender na regra. */}
+      <BotaoFalarTexto
+        texto={exercicio.alvo_hr}
+        rotulo="a frase montada"
+        chamada="Ouça a frase"
+      />
+
       <View style={styles.linhaMontada}>
         {escolhidos.length === 0 ? (
           <Text style={styles.vazio}>Toque nas palavras para montar a frase</Text>
@@ -102,11 +112,11 @@ const styles = StyleSheet.create({
     backgroundColor: cores.superficie,
   },
   fichaMontada: {
-    borderColor: cores.primaria,
-    backgroundColor: cores.primariaSuave,
+    borderColor: cores.secundaria,
+    backgroundColor: cores.secundariaSuave,
   },
   pressionada: { opacity: 0.85 },
   texto: { fontSize: fonte.corpo, lineHeight: linha.corpo, fontFamily: familia.normal, color: cores.texto },
-  textoMontado: { fontSize: fonte.corpo, lineHeight: linha.corpo, color: cores.primaria, fontFamily: familia.medio },
+  textoMontado: { fontSize: fonte.corpo, lineHeight: linha.corpo, color: cores.secundaria, fontFamily: familia.medio },
   vazio: { fontSize: fonte.pequena, lineHeight: linha.pequena, fontFamily: familia.normal, color: cores.textoSuave },
 });

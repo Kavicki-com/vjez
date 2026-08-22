@@ -1,12 +1,6 @@
-import {
-  NunitoSans_400Regular,
-  NunitoSans_600SemiBold,
-  NunitoSans_700Bold,
-  NunitoSans_800ExtraBold,
-  useFonts,
-} from '@expo-google-fonts/nunito-sans';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
+import Head from 'expo-router/head';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
@@ -16,18 +10,17 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ProvedorPreferencias } from '@/features/config/Preferencias';
 import { MigracaoDeProgresso } from '@/features/conta/migracao';
 import { ProvedorProgresso } from '@/features/perfil/ProgressoLocal';
+import { useFontesDaMarca } from '@/theme/fontes';
 
 // Segura a splash até a Nunito Sans estar pronta: sem isso a tela pisca
 // na fonte do sistema e depois salta para a da marca.
 void SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const [fontesProntas] = useFonts({
-    NunitoSans_400Regular,
-    NunitoSans_600SemiBold,
-    NunitoSans_700Bold,
-    NunitoSans_800ExtraBold,
-  });
+  // Na web isto já nasce pronto: a fonte é webfont declarada no <head>
+  // (app/+html.tsx) e baixa em paralelo com o bundle. No nativo, é o
+  // expo-font carregando as TTF. Ver @/theme/fontes.
+  const fontesProntas = useFontesDaMarca();
 
   // Cache em memória: acelera a navegação e serve de base para o offline.
   const [cliente] = useState(
@@ -43,7 +36,10 @@ export default function RootLayout() {
     if (fontesProntas) void SplashScreen.hideAsync();
   }, [fontesProntas]);
 
-  if (!fontesProntas) return null;
+  // Enquanto a fonte não vem, só o <head>: o export estático renderiza este
+  // componente com as fontes ainda carregando, e nada que venha depois de um
+  // `return null` chega ao HTML — era por isso que a aba saía sem nome.
+  if (!fontesProntas) return <Cabeca />;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -54,11 +50,25 @@ export default function RootLayout() {
               <StatusBar style="dark" />
               {/* Fica na raiz: o login pode acontecer em qualquer tela. */}
               <MigracaoDeProgresso />
-              <Stack screenOptions={{ headerShown: false }} />
+              <Cabeca />
+              <Stack screenOptions={{ headerShown: false, title: 'Vjež' }} />
             </SafeAreaProvider>
           </ProvedorProgresso>
         </ProvedorPreferencias>
       </QueryClientProvider>
     </GestureHandlerRootView>
+  );
+}
+
+/** Título e descrição da página no web. No nativo, o <Head> é inócuo. */
+function Cabeca() {
+  return (
+    <Head>
+      <title>Vjež</title>
+      <meta
+        name="description"
+        content="Croata do zero para falantes de português: os sete casos, áudio e uma lição por dia."
+      />
+    </Head>
   );
 }

@@ -1,5 +1,6 @@
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { useTecladoCroata } from '@/components/TecladoCroata';
 import { MAX_CARACTERES_PRODUCAO_LIVRE } from '@/lib/regras';
 import {
   cores,
@@ -22,16 +23,24 @@ export function ProducaoLivre({
   const texto = resposta?.tipo === 'envio' ? resposta.valor : '';
   const restam = MAX_CARACTERES_PRODUCAO_LIVRE - texto.length;
 
+  const escrever = (v: string) =>
+    aoResponder({
+      tipo: 'envio',
+      valor: v.slice(0, MAX_CARACTERES_PRODUCAO_LIVRE),
+    });
+
+  const { propsDoCampo, teclado } = useTecladoCroata({
+    valor: texto,
+    aoMudar: escrever,
+    ativo: !travado,
+  });
+
   return (
     <View style={styles.caixa}>
       <TextInput
+        {...propsDoCampo}
         value={texto}
-        onChangeText={(v) =>
-          aoResponder({
-            tipo: 'envio',
-            valor: v.slice(0, MAX_CARACTERES_PRODUCAO_LIVRE),
-          })
-        }
+        onChangeText={escrever}
         editable={!travado}
         multiline
         textAlignVertical="top"
@@ -40,13 +49,16 @@ export function ProducaoLivre({
         accessibilityLabel={exercicio.prompt_pt}
         style={styles.campo}
       />
+      {teclado}
       <Text style={[styles.contador, restam < 40 && styles.contadorAlerta]}>
         {restam} caracteres restantes
       </Text>
-      {travado && (
+      {/* O que acontece depois de enviar (correção, espera ou convite para
+          entrar) aparece no rodapé, junto do botão — aqui embaixo do campo
+          seria a segunda vez que a tela diz a mesma coisa. */}
+      {!travado && (
         <Text style={styles.nota}>
-          Enviado. A correção da IA chega depois — esta atividade pontua por
-          participação.
+          Esta atividade pontua por participação: escreva sem medo de errar.
         </Text>
       )}
     </View>

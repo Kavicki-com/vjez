@@ -12,7 +12,7 @@ import {
   raio,
 } from '@/theme/tokens';
 
-import { entrarComGoogle } from './api';
+import { useEntrarComGoogle } from './entrar';
 
 type Props = {
   titulo: string;
@@ -22,6 +22,7 @@ type Props = {
 export function PortaoDeLogin({ titulo, explicacao }: Props) {
   const [erro, setErro] = useState<string | null>(null);
   const [entrando, setEntrando] = useState(false);
+  const entrarComGoogle = useEntrarComGoogle();
 
   const entrar = async () => {
     setErro(null);

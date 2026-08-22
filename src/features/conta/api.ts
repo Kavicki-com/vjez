@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 
+import { urlDaRaizDoApp } from '@/lib/base';
 import { supabase } from '@/lib/supabase';
 
 /**
@@ -19,7 +20,17 @@ export async function entrarComGoogle(): Promise<void> {
 
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.origin },
+    // Volta para a RAIZ do app, não para a tela atual e não para a origem.
+    //
+    // A origem é a landing — HTML estático, que não sabe ler a sessão que
+    // vem na URL: o aluno voltaria do Google deslogado, sem erro na tela.
+    //
+    // E a tela atual também não serve: o retorno do Google é um pedido novo
+    // ao servidor, e no export estático só `/app/` é um caminho real —
+    // `/app/conta` existe em disco como `conta.html`. Enquanto o servidor
+    // não tiver a regra que resolve isso, voltar para a tela de origem dá
+    // 404 com a sessão já criada, que é o pior dos mundos.
+    options: { redirectTo: urlDaRaizDoApp() },
   });
   if (error) throw error;
 }

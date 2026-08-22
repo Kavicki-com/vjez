@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { BotaoAudio } from '@/features/audio/BotaoAudio';
 import { useAudioDeTexto } from '@/features/audio/useAudioDeTexto';
 import { cores, espaco, familia, fonte, linha } from '@/theme/tokens';
-import type { Exercicio, Padez } from '@/types/schema';
+import type { Correcao, Exercicio, Padez } from '@/types/schema';
 
 import type { Veredito } from './correcao';
 
@@ -22,6 +22,13 @@ const NOME_DO_CASO: Record<Padez, string> = {
 type Props = {
   exercicio: Exercicio;
   veredito: Veredito;
+  /** Só na produção livre: o que a IA devolveu. */
+  correcao?: Correcao;
+  /**
+   * Só na produção livre: por que não veio correção — sem conta, sem rede,
+   * teto do dia. Aparece no lugar dela, nunca junto.
+   */
+  aviso?: string;
 };
 
 /**
@@ -29,7 +36,7 @@ type Props = {
  * Sai sem caixa própria — quem tinge o bloco é o rodapé da lição, para o
  * acerto e o erro ocuparem a mesma faixa e não empurrarem o conteúdo.
  */
-export function Feedback({ exercicio, veredito }: Props) {
+export function Feedback({ exercicio, veredito, correcao, aviso }: Props) {
   const certo = veredito.acertou;
   const cor = certo ? cores.acerto : cores.erro;
   const { data: audios } = useAudioDeTexto();
@@ -60,10 +67,36 @@ export function Feedback({ exercicio, veredito }: Props) {
             <Text style={styles.formaCerta}>{veredito.esperado}</Text>
           </Text>
           {audioDaForma && (
-            <BotaoAudio url={audioDaForma} rotulo={veredito.esperado} />
+            <BotaoAudio
+              url={audioDaForma}
+              rotulo={veredito.esperado}
+              // No acerto a forma fala sozinha: é o instante em que a
+              // pronúncia gruda, com a resposta ainda fresca. No erro não —
+              // ali o aluno está lendo a correção, e som por cima de leitura
+              // atrapalha os dois.
+              automatico={certo}
+            />
           )}
         </View>
       )}
+
+      {/* Produção livre: o ponto é por participação, e o que ensina é isto —
+          o texto do aluno reescrito, com o porquê em português. */}
+      {correcao && (
+        <View style={styles.correcao}>
+          {correcao.texto_corrigido_hr && (
+            <Text style={styles.esperado}>
+              Como ficaria:{' '}
+              <Text style={styles.formaCerta}>
+                {correcao.texto_corrigido_hr}
+              </Text>
+            </Text>
+          )}
+          <Text style={styles.comentario}>{correcao.comentario_pt}</Text>
+        </View>
+      )}
+
+      {aviso && <Text style={styles.comentario}>{aviso}</Text>}
 
       {exercicio.padez && (
         <Text style={styles.motivo}>
@@ -96,6 +129,15 @@ const styles = StyleSheet.create({
     color: cores.texto,
   },
   formaCerta: { fontFamily: familia.forte },
+  correcao: { gap: espaco.xs, paddingVertical: espaco.xs },
+  // Maior que `motivo`: são até três frases de explicação, e é o que o
+  // aluno de fato lê depois de escrever.
+  comentario: {
+    fontSize: fonte.rotulo,
+    lineHeight: linha.rotulo,
+    fontFamily: familia.normal,
+    color: cores.texto,
+  },
   motivo: {
     fontSize: fonte.pequena,
     lineHeight: linha.pequena,

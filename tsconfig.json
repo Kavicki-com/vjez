@@ -14,5 +14,6 @@
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
   ],
-  "exclude": ["node_modules"]
+  "comentario": "supabase/functions roda em Deno, não no bundle do app: tem globais e imports próprios, e o tsc daqui não os conhece.",
+  "exclude": ["node_modules", "supabase/functions", "dist", "publicar"]
 }

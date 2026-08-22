@@ -45,3 +45,6 @@ yarn-error.*
 
 # env
 .env
+
+# Pasta pronta para o SFTP (gerada por npm run publicar)
+publicar/

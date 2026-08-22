@@ -1,0 +1,805 @@
+/* =====================================================================
+   Vjez — landing.
+
+   As cores, os raios e os espaçamentos são os mesmos de
+   `src/theme/tokens.ts`. Aquele arquivo é a fonte da verdade: mudou a
+   paleta lá, replique aqui (a landing não passa pelo bundler do app, então
+   não dá para importar).
+
+   Mobile-first: a referência é 390px, como no app. Acima disso o layout
+   abre por breakpoint — 720 (médio) e 1080 (largo), os mesmos do
+   `breakpoints` dos tokens.
+   ===================================================================== */
+
+/* ---------- Fontes ------------------------------------------------- */
+/* TTF em vez de WOFF2 porque é o formato que vem no pacote
+   @expo-google-fonts. Convertendo para WOFF2 o peso cai uns 60% — ver o
+   LEIA-ME. `swap` para o texto aparecer antes da fonte chegar. */
+@font-face {
+  font-family: 'Nunito Sans';
+  src: url('fontes/NunitoSans_400Regular.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Nunito Sans';
+  src: url('fontes/NunitoSans_700Bold.ttf') format('truetype');
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: 'Nunito Sans';
+  src: url('fontes/NunitoSans_800ExtraBold.ttf') format('truetype');
+  font-weight: 800; font-style: normal; font-display: swap;
+}
+
+/* ---------- Tokens ------------------------------------------------- */
+:root {
+  color-scheme: light;
+
+  --fundo: #fcf9f8;
+  --superficie: #ffffff;
+  --fundo-suave: #f6f3f2;
+  --superficie-alta: #eae7e7;
+
+  --texto: #1c1b1b;
+  --texto-suave: #5c3f3d;
+  --contorno: #916f6c;
+  /* O `borda` dos tokens (#e6bdba) não vem para cá de propósito: na landing
+     nenhuma peça tem contorno. Quem separa cartão do fundo é sombra. */
+
+  --primaria: #a30019;
+  --primaria-viva: #ce1126;
+  --primaria-suave: #ffdad7;
+
+  --secundaria: #0c5fae;
+  --secundaria-suave: #d5e3ff;
+  --destaque: #e8a33d;
+  --destaque-suave: #fdeed6;
+  --sobre-destaque: #8a5510;
+
+  /* Escala de espaço dos tokens. */
+  --e-xs: 4px;  --e-sm: 8px;  --e-md: 16px;
+  --e-lg: 24px; --e-xl: 40px; --e-xxl: 64px;
+
+  --raio-md: 8px;
+  --raio-lg: 12px;
+  --raio-xl: 24px;
+  --raio-pill: 999px;
+
+  /* Relevo por sombra, não por contorno. Três camadas: uma rente que cola a
+     peça no fundo, uma média que dá o corpo, e uma larga e fraca que é o
+     que faz parecer luz de verdade em vez de borda cinza. */
+  --sombra-cartao:
+    0 1px 2px rgba(28, 27, 27, .05),
+    0 6px 16px rgba(28, 27, 27, .06),
+    0 14px 36px rgba(28, 27, 27, .05);
+  --sombra-alta:
+    0 2px 4px rgba(28, 27, 27, .04),
+    0 12px 28px rgba(28, 27, 27, .10),
+    0 24px 60px rgba(28, 27, 27, .07);
+
+  /* O `sombraSolida` dos tokens (a borda inferior escura do `Botao.tsx`) não
+     vem para cá: na landing o relevo é sombra, em botão e em cartão. */
+
+  --coluna: 1120px;
+  --topo-altura: 64px;
+}
+
+/* ---------- Base --------------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  /* Âncoras não podem parar debaixo do cabeçalho fixo. */
+  scroll-padding-top: calc(var(--topo-altura) + var(--e-md));
+  /* O parallax move camadas no eixo Y; nada deve vazar na horizontal.
+     `clip` e não `hidden`: `hidden` transforma o elemento em contêiner de
+     rolagem e atrapalha o `position: fixed` do topo. */
+  overflow-x: clip;
+}
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: 'Nunito Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { margin: 0; line-height: 1.15; letter-spacing: -0.02em; font-weight: 800; }
+h1 { font-size: clamp(2.4rem, 7.5vw, 4.2rem); }
+h2 { font-size: clamp(1.9rem, 4.6vw, 3rem); }
+h3 { font-size: clamp(1.15rem, 2.2vw, 1.4rem); letter-spacing: -0.01em; }
+p  { margin: 0; }
+img { max-width: 100%; height: auto; display: block; }
+/* `<picture>` existe só para escolher a fonte. Tirando ele da caixa, quem
+   posiciona é sempre o `<img>` — senão as alturas em % cascateiam duas
+   vezes e o fundo das cenas sai com o dobro do tamanho. */
+picture { display: contents; }
+i  { font-style: normal; }
+
+a { color: var(--primaria); text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+
+:focus-visible {
+  outline: 3px solid var(--secundaria);
+  outline-offset: 3px;
+  border-radius: var(--e-xs);
+}
+
+.pular {
+  position: absolute; left: var(--e-md); top: -100px; z-index: 60;
+  background: var(--superficie); color: var(--texto);
+  padding: var(--e-sm) var(--e-md); border-radius: var(--raio-md);
+  font-weight: 700; text-decoration: none;
+  transition: top .18s ease;
+}
+.pular:focus { top: var(--e-md); }
+
+/* ---------- Peças de marca ------------------------------------------ */
+
+/* Šahovnica: o quadriculado da bandeira, o mesmo motivo do
+   `Sahovnica.tsx`. Em CSS sai de um gradiente cônico repetido — escala em
+   qualquer largura sem asset e sem borrar. */
+.sahovnica {
+  height: 10px;
+  background:
+    repeating-conic-gradient(var(--primaria) 0% 25%, transparent 0% 50%)
+    0 0 / 20px 20px;
+  position: relative; z-index: 2;
+}
+
+/* Faixa cheia: tile de 40px dá quadrados de 20px e duas fileiras completas.
+   Em 10px de altura o quadriculado só mostra uma fatia da primeira fileira
+   e lê como linha pontilhada, não como xadrez.
+
+   O quadrado alternado fica transparente e não branco: assim a mesma faixa
+   serve no off-white entre as seções e no branco do rodapé. */
+.sahovnica--faixa {
+  height: 40px;
+  background:
+    repeating-conic-gradient(var(--primaria) 0% 25%, transparent 0% 50%)
+    0 0 / 40px 40px;
+}
+
+/* Entre o herói e os números a faixa precisa de ar dos dois lados: encostada,
+   briga com a seta de rolagem em cima e com os números embaixo. */
+.sahovnica--divisor {
+  margin-top: var(--e-xxl);
+  margin-bottom: var(--e-xl);
+}
+
+/* O escudo com o Ž — o mesmo ícone do app (assets/icon.png). */
+.marca__selo {
+  width: 28px; height: 28px; flex: none;
+  border-radius: 6px;
+}
+
+/* Sprite de ícones: existe só para o `<use>` alcançar. Sem isso o `<svg>`
+   vazio ainda ocuparia a caixa padrão de 300×150 no começo da página. */
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+/* O traço vem como atributo em cada `<g>` do sprite, não daqui: regra de CSS
+   aplicada a conteúdo dentro de `<defs>` nem sempre atravessa o clone do
+   `<use>`, e isso varia por navegador. Sem `fill: none` o SVG cai no padrão
+   (preto sólido) e cada ícone vira um borrão. */
+
+/* ---------- Botões -------------------------------------------------- */
+/* Relevo por sombra, como nos cartões — nada de contorno nem de borda
+   inferior sólida. A sombra é tingida de vermelho e não de cinza: sombra
+   neutra sob peça saturada lê como sujeira, sombra da própria cor lê como
+   luz. Ao pressionar, o botão desce 2px e a sombra encolhe junto: é o que
+   dá o "afunda" sem mexer no box model. */
+.botao {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 52px; padding: 0 var(--e-lg);
+  border-radius: var(--raio-pill);
+  border: 0;
+  background: var(--primaria);
+  color: var(--superficie);
+  font: inherit; font-weight: 700; letter-spacing: .3px;
+  text-decoration: none;
+  box-shadow:
+    0 2px 4px rgba(163, 0, 25, .16),
+    0 8px 20px rgba(163, 0, 25, .22);
+  transition: transform .12s ease, box-shadow .12s ease, filter .15s ease;
+}
+.botao:hover { filter: brightness(1.06); }
+.botao:active {
+  transform: translateY(2px);
+  box-shadow:
+    0 1px 2px rgba(163, 0, 25, .18),
+    0 3px 8px rgba(163, 0, 25, .16);
+}
+
+/* Pílula pede respiro lateral maior que caixa reta: o raio come as pontas e
+   o rótulo parece colado se o padding não crescer junto. */
+.botao--pequeno { min-height: 42px; padding: 0 var(--e-lg); font-size: .95rem; }
+.botao--grande  { min-height: 60px; padding: 0 var(--e-xxl); font-size: 1.15rem; }
+
+/* Ação secundária: branca por dentro, azul no traço e no texto — o mesmo
+   par de cores que o app usa para ênfase secundária.
+
+   O traço é `inset` e não `border`: assim a caixa não muda de tamanho e o
+   botão não pula meio pixel ao lado do primário, que não tem borda. */
+.botao--fantasma {
+  background: var(--superficie);
+  color: var(--secundaria);
+  box-shadow:
+    inset 0 0 0 1.5px var(--secundaria),
+    0 2px 4px rgba(12, 95, 174, .10),
+    0 8px 20px rgba(12, 95, 174, .16);
+}
+.botao--fantasma:hover { background: var(--secundaria-suave); filter: none; }
+.botao--fantasma:active {
+  box-shadow:
+    inset 0 0 0 1.5px var(--secundaria),
+    0 1px 2px rgba(12, 95, 174, .12),
+    0 3px 8px rgba(12, 95, 174, .12);
+}
+
+/* No celular, botão de conteúdo ocupa a largura toda: alvo de toque maior e
+   a coluna fica com uma borda só, em vez de um botão curto boiando nela.
+   O `--pequeno` fica de fora — é o do cabeçalho, e ele divide a linha com a
+   marca. Esticá-lo empurraria o logo para fora da barra. */
+@media (max-width: 719px) {
+  .botao:not(.botao--pequeno) { width: 100%; }
+  .acoes { flex-direction: column; align-items: stretch; }
+}
+
+/* ---------- Cabeçalho ----------------------------------------------- */
+.sentinela {
+  position: absolute; top: 0; left: 0;
+  width: 1px; height: 60vh;
+  pointer-events: none;
+}
+
+.topo {
+  position: fixed; inset: 0 0 auto; z-index: 50;
+  height: var(--topo-altura);
+  display: flex; align-items: center;
+  transition: background-color .25s ease, box-shadow .25s ease,
+              backdrop-filter .25s ease;
+}
+/* Sobre a bandeira o topo é vidro; depois dela vira barra sólida. */
+.topo--solido {
+  background: rgba(252, 249, 248, .92);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 1px 12px rgba(28, 27, 27, .08);
+}
+
+.topo__interno {
+  width: min(100% - var(--e-lg) * 2, var(--coluna));
+  margin-inline: auto;
+  display: flex; align-items: center; gap: var(--e-md);
+}
+
+.marca {
+  display: flex; align-items: center; gap: var(--e-sm);
+  text-decoration: none; color: var(--texto);
+  margin-right: auto;
+}
+.marca__nome { font-weight: 800; font-size: 1.25rem; letter-spacing: -.02em; }
+
+.topo__links { display: none; gap: var(--e-lg); }
+.topo__links a {
+  color: var(--texto-suave); text-decoration: none; font-weight: 700;
+  font-size: .95rem;
+}
+.topo__links a:hover { color: var(--primaria); }
+
+@media (min-width: 860px) { .topo__links { display: flex; } }
+
+/* Enquanto o topo está transparente ele flutua sobre a máscara azul: marca e
+   links escuros sumiriam ali. Voltam ao tom normal assim que a barra fica
+   sólida. */
+.topo:not(.topo--solido) .marca__nome { color: var(--superficie); }
+.topo:not(.topo--solido) .topo__links a { color: rgba(255, 255, 255, .82); }
+.topo:not(.topo--solido) .topo__links a:hover { color: var(--superficie); }
+
+/* O escudo tem cantos azuis: no campo azul do herói eles se fundem com o
+   fundo e o ícone parece cortado. O anel resolve nos dois estados — sobre a
+   barra sólida branca ele é branco no branco, ou seja, invisível. */
+.marca__selo { box-shadow: 0 0 0 2px rgba(255, 255, 255, .92); }
+
+/* ---------- Cena 1 — herói ------------------------------------------ */
+.heroi {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid; align-items: center;
+  overflow: hidden;
+  isolation: isolate;
+  /* `--saida` vai de 0 a 1 conforme o herói sai da tela; quem escreve é o
+     parallax.js. Todo o movimento daqui deriva dela. */
+  --saida: 0;
+}
+
+/* Empilhamento explícito. Antes o fundo ficava em z-index negativo e
+   dependia do texto não criar contexto próprio — só que `.heroi__texto` tem
+   `transform`, e aí a foto subia por cima da headline. Com as duas camadas
+   numeradas isso não tem como acontecer. */
+.heroi__fundo { position: absolute; inset: 0; z-index: 0; }
+
+.heroi__foto {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: 62% 40%;
+  /* Fundo anda menos que a página: a foto desce um pouco e cresce de leve. */
+  transform: translate3d(0, calc(var(--saida) * 12vh), 0)
+             scale(calc(1 + var(--saida) * .12));
+  transform-origin: 62% 50%;
+  will-change: transform;
+}
+
+/* Máscara azul sobre a foto. O azul é o `sobreSecundariaContainer` dos
+   tokens puxado para o escuro — a mesma família da cor de estrutura do app,
+   não um azul qualquer.
+
+   Duas camadas com papéis distintos: uma que nunca zera, para a foto inteira
+   virar um só campo de cor em vez de meia foto tingida; e o gradiente que
+   fecha à esquerda, onde mora o texto.
+
+   Em 90° e não em 100°: dez graus de inclinação parecem pouco, mas sobre
+   uma caixa de tela cheia a faixa quase opaca do começo do gradiente varre
+   o topo inteiro — e o que se vê é uma tarja entre o cabeçalho e a foto,
+   como se a imagem começasse mais para baixo. */
+.heroi__veu {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, transparent 74%, var(--fundo) 100%),
+    linear-gradient(90deg,
+      rgba(2, 38, 76, .93) 0%,
+      rgba(2, 38, 76, .84) 34%,
+      rgba(2, 38, 76, .52) 66%,
+      rgba(2, 38, 76, .26) 100%);
+}
+
+/* Sem coluna livre à direita, o texto atravessa a foto toda e precisa de
+   campo fechado embaixo dele. */
+@media (max-width: 860px) {
+  .heroi__veu {
+    background:
+      linear-gradient(180deg, transparent 78%, var(--fundo) 100%),
+      linear-gradient(180deg,
+        rgba(2, 38, 76, .72) 0%,
+        rgba(2, 38, 76, .86) 45%,
+        rgba(2, 38, 76, .80) 100%);
+  }
+}
+
+.heroi__texto {
+  position: relative; z-index: 1;
+  width: min(100% - var(--e-lg) * 2, var(--coluna));
+  margin-inline: auto;
+  max-width: 44rem;
+  padding-block: calc(var(--topo-altura) + var(--e-xl)) var(--e-xxl);
+  /* Texto sobe mais rápido que a foto e desaparece: é o parallax do herói. */
+  transform: translate3d(0, calc(var(--saida) * -14vh), 0);
+  opacity: calc(1 - var(--saida) * 1.3);
+  will-change: transform, opacity;
+}
+
+.sobrancelha {
+  text-transform: uppercase; letter-spacing: .14em;
+  font-size: .78rem; font-weight: 800;
+  color: var(--primaria);
+  margin-bottom: var(--e-md);
+}
+.sobrancelha--escura { color: var(--secundaria); }
+
+/* ---- Herói sobre a máscara azul ----
+   Tudo aqui é claro. O vermelho da marca não some: ele volta no traço do
+   grifo e no botão primário, que é onde ele significa alguma coisa. */
+.heroi h1 { color: var(--superficie); }
+.heroi .sobrancelha { color: var(--secundaria-suave); }
+.heroi .linha-fina { color: rgba(255, 255, 255, .88); }
+.heroi .miudo { color: rgba(255, 255, 255, .68); }
+
+.grifo {
+  position: relative;
+  color: var(--primaria);
+  white-space: nowrap;
+}
+/* Traço por baixo da palavra, atrás do texto. */
+.grifo::after {
+  content: '';
+  position: absolute; left: 0; right: 0; bottom: .06em;
+  height: .12em;
+  background: var(--primaria-suave);
+  z-index: -1;
+}
+/* No azul, a palavra fica branca como o resto do título e quem marca é o
+   traço, no vermelho vivo da bandeira: o campo azul, a palavra branca e a
+   linha vermelha montam a tricolor. */
+.heroi .grifo { color: var(--superficie); }
+.heroi .grifo::after { background: var(--primaria-viva); height: .16em; }
+
+.linha-fina {
+  margin-top: var(--e-lg);
+  max-width: 34rem;
+  font-size: clamp(1.05rem, 2.1vw, 1.2rem);
+  color: var(--texto-suave);
+}
+.linha-fina--escura { color: var(--texto-suave); }
+
+.acoes {
+  display: flex; flex-wrap: wrap; gap: var(--e-md);
+  margin-top: var(--e-xl);
+}
+
+.miudo {
+  margin-top: var(--e-md);
+  font-size: .85rem; color: var(--contorno);
+}
+
+/* Seta de rolagem: pulsa devagar, some assim que a pessoa rola. */
+.heroi__seta {
+  position: absolute; left: 50%; bottom: var(--e-lg);
+  translate: -50% 0;
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border-radius: var(--raio-pill);
+  background: rgba(255, 255, 255, .7);
+  box-shadow: 0 2px 10px rgba(28, 27, 27, .12);
+  opacity: calc(1 - var(--saida) * 3);
+}
+.heroi__seta span {
+  width: 10px; height: 10px;
+  border-right: 2.5px solid var(--primaria);
+  border-bottom: 2.5px solid var(--primaria);
+  rotate: 45deg; translate: 0 -2px;
+  animation: pulso 1.8s ease-in-out infinite;
+}
+@keyframes pulso {
+  0%, 100% { translate: 0 -3px; }
+  50%      { translate: 0 3px; }
+}
+
+/* ---------- Cena 2 — números ---------------------------------------- */
+.promessa {
+  width: min(100% - var(--e-lg) * 2, var(--coluna));
+  margin-inline: auto;
+  padding-block: var(--e-xxl);
+}
+
+.faixa {
+  display: grid; gap: var(--e-lg);
+  grid-template-columns: 1fr 1fr;
+}
+@media (min-width: 860px) { .faixa { grid-template-columns: repeat(4, 1fr); } }
+
+.numero strong {
+  display: block;
+  font-size: clamp(2.6rem, 6vw, 3.6rem);
+  font-weight: 800; line-height: 1;
+  letter-spacing: -.03em;
+  color: var(--primaria);
+  font-variant-numeric: tabular-nums;
+}
+.numero span {
+  display: block;
+  margin-top: var(--e-sm);
+  font-size: .95rem; color: var(--texto-suave);
+}
+
+/* ---------- Cenas com foto de fundo ---------------------------------- */
+.cena { position: relative; overflow: hidden; isolation: isolate; }
+
+.cena__fundo { position: absolute; inset: 0; z-index: -2; }
+/* A camada de fundo é maior que a cena: o parallax a desloca até ±70px e
+   sem essa folga apareceria faixa vazia nas pontas. */
+.cena__fundo img {
+  position: absolute; left: 0; top: -12%;
+  width: 100%; height: 124%;
+  object-fit: cover;
+  will-change: transform;
+}
+
+.cena--mar {
+  min-height: 92vh;
+  display: grid; align-content: center;
+  padding-block: var(--e-xxl);
+  color: var(--superficie);
+}
+.cena__veu {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, var(--fundo) 0%, rgba(252,249,248,0) 14%),
+    linear-gradient(0deg,   var(--fundo) 0%, rgba(252,249,248,0) 14%),
+    linear-gradient(90deg,
+      rgba(0, 30, 60, .78) 0%,
+      rgba(0, 30, 60, .55) 45%,
+      rgba(0, 30, 60, .22) 100%);
+}
+
+.cena__texto {
+  width: min(100% - var(--e-lg) * 2, var(--coluna));
+  margin-inline: auto;
+  max-width: 40rem;
+  will-change: transform;
+}
+.cena__texto p {
+  margin-top: var(--e-lg);
+  font-size: clamp(1.05rem, 2.1vw, 1.2rem);
+  color: rgba(255, 255, 255, .9);
+}
+
+/* Cartões de frase: no celular entram no fluxo, empilhados sob o texto.
+   Só viram camadas soltas quando há largura para isso. */
+.frases {
+  list-style: none; margin: var(--e-xl) 0 0; padding: 0;
+  width: min(100% - var(--e-lg) * 2, var(--coluna));
+  margin-inline: auto;
+  display: flex; flex-wrap: wrap; gap: var(--e-md);
+}
+
+.frase {
+  background: rgba(255, 255, 255, .96);
+  color: var(--texto);
+  border-radius: var(--raio-xl);
+  padding: var(--e-md) var(--e-lg);
+  /* Estes flutuam sobre foto escura: a sombra é mais fechada e mais forte
+     que a dos cartões do fundo claro, senão some no azul do mar. */
+  box-shadow:
+    0 2px 6px rgba(0, 20, 40, .16),
+    0 14px 36px rgba(0, 20, 40, .22);
+  will-change: transform;
+}
+.frase b {
+  display: block;
+  font-size: 1.2rem; font-weight: 800; color: var(--primaria);
+  letter-spacing: -.01em;
+}
+.frase span { font-size: .9rem; color: var(--texto-suave); }
+
+/* Os cartões só saem do fluxo e viram camadas soltas a partir de 1200px.
+   O texto tem 40rem e vive no centro da cena; abaixo disso não sobra
+   margem dos dois lados para um cartão flutuar sem cobrir a linha. */
+@media (min-width: 1200px) {
+  .cena--mar { min-height: 108vh; }
+  .frases {
+    position: absolute; inset: 0; margin: 0;
+    width: 100%; display: block; pointer-events: none;
+  }
+  .frase { position: absolute; pointer-events: auto; max-width: 15rem; }
+  /* Um de cada lado: os da direita cercam o texto por cima e por baixo, e o
+     do meio vai para a esquerda, onde só tem mar. */
+  .frase--a { right: 6%; top: 12%; }
+  .frase--b { left: 5%;  top: 46%; }
+  .frase--c { right: 9%; top: 74%; }
+}
+
+/* ---------- Cena 4 — método ----------------------------------------- */
+.metodo {
+  width: min(100% - var(--e-lg) * 2, var(--coluna));
+  margin-inline: auto;
+  padding-block: var(--e-xxl);
+}
+
+.secao__cabeca { max-width: 42rem; margin-inline: auto; text-align: center; }
+.secao__cabeca--esquerda { margin-inline: 0; text-align: left; }
+.secao__cabeca .linha-fina { margin-inline: auto; }
+.secao__cabeca--esquerda .linha-fina { margin-inline: 0; }
+
+.degraus {
+  list-style: none; margin: var(--e-xxl) 0 0; padding: 0;
+  display: grid; gap: var(--e-xl);
+}
+@media (min-width: 860px) { .degraus { grid-template-columns: repeat(3, 1fr); } }
+
+.degrau {
+  background: var(--superficie);
+  border-radius: var(--raio-xl);
+  box-shadow: var(--sombra-cartao);
+  padding: var(--e-lg);
+}
+.degrau img {
+  width: 100%; max-width: 220px; height: 200px;
+  object-fit: contain; object-position: center bottom;
+  margin: 0 auto var(--e-lg);
+  will-change: transform;
+}
+.degrau__ordem {
+  font-size: .8rem; font-weight: 800; letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--primaria);
+  margin-bottom: var(--e-sm);
+}
+.degrau h3 { margin-bottom: var(--e-sm); }
+.degrau p:last-child { color: var(--texto-suave); font-size: .98rem; }
+
+/* ---------- Cena 5 — mapa e trilha ----------------------------------- */
+.cena--mapa {
+  width: min(100% - var(--e-lg) * 2, var(--coluna));
+  margin-inline: auto;
+  padding-block: var(--e-xxl);
+  overflow: visible;
+}
+
+/* O mapa vira um cartão: cantos de 24px e sombra. O `overflow: hidden` é o
+   que faz o recorte valer também para a imagem que se desloca por dentro —
+   sem ele o parallax vazaria pelos cantos arredondados. */
+.mapa {
+  position: relative;
+  margin-bottom: var(--e-xl);
+  border-radius: var(--raio-xl);
+  overflow: hidden;
+  background: var(--superficie);
+  box-shadow: var(--sombra-alta);
+}
+.mapa img { margin-inline: auto; will-change: transform; }
+
+.modulos {
+  list-style: none; margin: var(--e-xl) 0 0; padding: 0;
+  display: grid; gap: var(--e-sm);
+}
+.modulos li {
+  display: flex; align-items: center; gap: var(--e-md);
+  background: var(--superficie);
+  border-radius: var(--raio-lg);
+  /* Sombra mais curta que a dos cartões: são dez linhas empilhadas, e a
+     sombra larga de cartão em dez peças vira sujeira cinza entre elas. */
+  box-shadow:
+    0 1px 2px rgba(28, 27, 27, .05),
+    0 3px 10px rgba(28, 27, 27, .05);
+  padding: var(--e-sm) var(--e-md);
+  font-size: .98rem;
+}
+.modulos b { color: var(--primaria); font-weight: 800; }
+.modulos__n {
+  flex: none;
+  width: 30px; height: 30px;
+  display: grid; place-items: center;
+  border-radius: var(--raio-pill);
+  background: var(--primaria-suave);
+  color: var(--primaria);
+  font-weight: 800; font-size: .85rem;
+}
+/* Da metade em diante é a fase de trilha paralela: os casos. */
+.modulos li:nth-child(n+4) .modulos__n {
+  background: var(--secundaria-suave);
+  color: var(--secundaria);
+}
+
+@media (min-width: 1080px) {
+  .cena--mapa {
+    display: grid; gap: var(--e-xxl);
+    grid-template-columns: 1fr 1fr; align-items: center;
+  }
+  .mapa { margin-bottom: 0; }
+  .modulos { grid-template-columns: 1fr; }
+}
+
+/* ---------- Cena 6 — recursos ---------------------------------------- */
+.recursos {
+  width: min(100% - var(--e-lg) * 2, var(--coluna));
+  margin-inline: auto;
+  padding-block: var(--e-xxl);
+}
+
+.cartoes {
+  margin-top: var(--e-xl);
+  display: grid; gap: var(--e-md);
+}
+@media (min-width: 720px)  { .cartoes { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1080px) { .cartoes { grid-template-columns: repeat(3, 1fr); } }
+
+.cartao {
+  background: var(--superficie);
+  border-radius: var(--raio-xl);
+  box-shadow: var(--sombra-cartao);
+  padding: var(--e-lg);
+}
+/* Ícone solto, sem caixa atrás. Azul porque na regra 60-30-10 dos tokens o
+   vermelho é só šahovnica e CTA — ícone de apoio é azul. */
+.cartao__icone {
+  display: block;
+  width: 34px; height: 34px;
+  margin-bottom: var(--e-md);
+  color: var(--secundaria);
+}
+.cartao__icone svg { width: 100%; height: 100%; }
+/* A ofensiva é semântica e fica fora da conta: a chama é laranja no app. */
+.cartao__icone--quente { color: var(--sobre-destaque); }
+
+.cartao h3 { margin-bottom: var(--e-sm); }
+.cartao p { color: var(--texto-suave); font-size: .98rem; }
+
+/* ---------- Cena 7 — fecho ------------------------------------------- */
+.fecho {
+  width: min(100% - var(--e-lg) * 2, var(--coluna));
+  margin-inline: auto;
+  padding-block: var(--e-xxl);
+  display: grid; gap: var(--e-xl);
+  justify-items: center; text-align: center;
+}
+.fecho__arte {
+  width: min(300px, 70%); height: auto;
+  justify-self: center;
+  will-change: transform;
+}
+.fecho__texto .linha-fina { margin-inline: auto; }
+.fecho .botao { margin-top: var(--e-xl); }
+
+/* O `justify-items: center` do fecho encolhe cada bloco ao próprio conteúdo,
+   e um botão de largura total dentro de um bloco encolhido continua curto.
+   No celular o texto passa a esticar — o `text-align` segura a centralização. */
+@media (max-width: 719px) {
+  .fecho__texto { justify-self: stretch; }
+}
+
+@media (min-width: 860px) {
+  .fecho {
+    grid-template-columns: auto 1fr;
+    align-items: center; text-align: left;
+  }
+  .fecho__texto .linha-fina { margin-inline: 0; }
+}
+
+/* ---------- Rodapé ---------------------------------------------------- */
+.rodape {
+  background: var(--superficie);
+  padding-block: 0 var(--e-xl);
+}
+.rodape__interno {
+  width: min(100% - var(--e-lg) * 2, var(--coluna));
+  margin-inline: auto;
+  /* Folga da faixa: o `margin` vive aqui e não no `padding` do rodapé,
+     senão empurraria a própria faixa para baixo junto. */
+  margin-top: var(--e-xxl);
+  display: grid; gap: var(--e-md);
+}
+.rodape__marca {
+  display: flex; align-items: center; gap: var(--e-sm);
+  font-weight: 800; font-size: 1.1rem;
+}
+.rodape__links { display: flex; flex-wrap: wrap; gap: var(--e-lg); }
+.rodape__links a { color: var(--texto-suave); text-decoration: none; font-weight: 700; }
+.rodape__links a:hover { color: var(--primaria); }
+.rodape__miudo { font-size: .85rem; color: var(--contorno); }
+
+@media (min-width: 860px) {
+  .rodape__interno {
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+  }
+  .rodape__links { justify-content: center; }
+  .rodape__miudo { text-align: right; }
+}
+
+/* ---------- Revelação ao entrar na tela ------------------------------ */
+[data-revela] {
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+  transition: opacity .6s ease, transform .6s cubic-bezier(.2, .7, .3, 1);
+}
+[data-revela].visivel { opacity: 1; transform: none; }
+/* Escalona os irmãos: a lista entra em cascata, não em bloco. */
+.degraus [data-revela]:nth-child(2),
+.modulos [data-revela]:nth-child(2),
+.cartoes [data-revela]:nth-child(2) { transition-delay: .08s; }
+.degraus [data-revela]:nth-child(3),
+.modulos [data-revela]:nth-child(3),
+.cartoes [data-revela]:nth-child(3) { transition-delay: .16s; }
+.modulos [data-revela]:nth-child(n+4),
+.cartoes [data-revela]:nth-child(n+4) { transition-delay: .2s; }
+
+/* Camadas de parallax: o JS só escreve `--y`; o transform mora aqui. */
+[data-parallax] { transform: translate3d(0, var(--y, 0px), 0); }
+
+/* ---------- Movimento reduzido ---------------------------------------- */
+/* Quem pediu menos movimento não recebe parallax nenhum: o JS desliga o
+   laço e aqui as camadas voltam ao lugar. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+  [data-parallax] { transform: none !important; }
+  [data-revela] { opacity: 1; transform: none; }
+  .heroi__foto, .heroi__texto { transform: none; opacity: 1; }
+  .heroi__seta { opacity: 1; }
+}

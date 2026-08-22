@@ -5,6 +5,36 @@
  * com os assets de marca no vermelho #a30019.
  * Referência de layout = 390px; acima disso o layout expande por breakpoint.
  * Nada de px fixo em posição: só flex, %, e os espaçamentos daqui.
+ *
+ * ---------------------------------------------------------------------
+ * REGRA DE COR — 60-30-10
+ * ---------------------------------------------------------------------
+ * 60% NEUTRO    `fundo`, `superficie`, `fundoSuave`, `superficie*`
+ *               Fundo de tela, cartões, listas, campos.
+ *
+ * 30% VERMELHO  `primaria` e família
+ *               A cor da marca e da ação: šahovnica, wordmark, CTA,
+ *               títulos de comemoração, capas, ícones de conteúdo.
+ *               É o que faz o app parecer o app.
+ *
+ * 10% AZUL      `secundaria` e família
+ *               Duas coisas, e só elas:
+ *               1. A CASCA DA NAVEGAÇÃO — a lateral e a barra inferior
+ *                  são painéis azuis sólidos, com os itens em branco.
+ *                  Contam como 10% porque são moldura: ficam na borda da
+ *                  tela e o conteúdo nunca é azul.
+ *               2. PROGRESSO — barras de avanço, o nó "atual" da trilha,
+ *                  XP, e a opção selecionada dentro do exercício.
+ *
+ * O teste é o significado, não a área: se o elemento diz "ação", "marca"
+ * ou "escolha de conteúdo" (chips do dicionário), é vermelho; se diz
+ * "onde você está" ou "o quanto você andou", é azul.
+ *
+ * BORDA: cinza é o padrão de todo cartão. Borda colorida é estado, nunca
+ * decoração — verde quando a lição ou a prova foi concluída.
+ *
+ * Fora da conta: `erro`, `acerto` e `destaque` (ofensiva) — semânticas,
+ * só aparecem no instante em que significam algo.
  */
 
 export const cores = {
@@ -27,10 +57,15 @@ export const cores = {
   textoSuave: '#5c3f3d',
   /** outline. */
   contorno: '#916f6c',
-  /** outline-variant: a borda padrão dos cartões. */
-  borda: '#e6bdba',
+  /**
+   * outline-variant: a borda padrão dos cartões — cinza neutro.
+   * Era um rosa-avermelhado (#e6bdba) que punha um contorno vermelho em
+   * todo cartão do app e comia o orçamento dos 30%. Borda colorida agora
+   * só significa estado: verde quando a lição ou a prova foi concluída.
+   */
+  borda: '#d9d4d3',
 
-  /** Vermelho da marca. Ações primárias. */
+  /** Vermelho da marca. Os 30%: identidade e ação. */
   primaria: '#a30019',
   /** primary-container: vermelho vivo da bandeira, para selos e realces. */
   primariaContainer: '#ce1126',
@@ -38,7 +73,11 @@ export const cores = {
   /** primary-fixed: preenchimento claro. */
   primariaSuave: '#ffdad7',
 
-  /** Azul do Stitch/Figma. Estado atual, ênfase secundária. */
+  /**
+   * Azul do Stitch/Figma. Os 10%: progresso, seleção e posição.
+   * Escasso de propósito — é o acento que só aparece onde a interface
+   * precisa dizer "você está aqui" ou "você andou isto".
+   */
   secundaria: '#0c5fae',
   secundariaContainer: '#6eaafe',
   sobreSecundariaContainer: '#003e76',
@@ -64,6 +103,37 @@ export const cores = {
   /** Ofensiva. */
   destaque: '#E8A33D',
 } as const;
+
+/**
+ * CORES DE ASSOCIAÇÃO — exceção declarada à regra 60-30-10.
+ *
+ * Usadas em um lugar só: o exercício de ligar pares. Ali a cor não é
+ * enfeite nem marca, é a própria resposta — é o que diz "este croata vai
+ * com este português". Sem ela o aluno liga seis pares e fica com seis
+ * fichas cinzas iguais, sem enxergar o que ligou com o quê.
+ *
+ * Por que não resolver com o azul de seleção: azul significa "onde você
+ * está" e é um só. Associação precisa de VÁRIAS cores simultâneas e
+ * distinguíveis entre si — é uma dimensão diferente da paleta, não uma
+ * ampliação dos 10%.
+ *
+ * Seis tons, todos passando em contraste sobre o texto escuro, escolhidos
+ * para se separarem também em daltonismo (nenhum par vermelho/verde
+ * vizinho). A cor nunca anda sozinha: as duas fichas ligadas também exibem
+ * o texto da parceira, então quem não distingue a cor lê a ligação.
+ *
+ * Nenhuma delas é `acerto` ou `erro`: depois de verificar, verde e vermelho
+ * entram por cima e a associação sai de cena — corrigido manda mais que
+ * ligado.
+ */
+export const associacao = [
+  { borda: '#0c5fae', fundo: '#dbe6fb', texto: '#003e76' },
+  { borda: '#8c3220', fundo: '#f7e0d9', texto: '#5f1b0d' },
+  { borda: '#5b3fa8', fundo: '#e6def9', texto: '#33206e' },
+  { borda: '#0f6b62', fundo: '#d5eae6', texto: '#04443d' },
+  { borda: '#8a5e12', fundo: '#f4e7c9', texto: '#5a3c05' },
+  { borda: '#a3336f', fundo: '#f8dde9', texto: '#6b1c47' },
+] as const;
 
 /**
  * Dourado da medalha de conquista. Três paradas porque medalha sem
@@ -93,6 +163,33 @@ export const sombraSolida = {
 
 /** Espessura da borda inferior que dá o relevo. */
 export const relevo = 4;
+
+/**
+ * Drop shadow dos elementos elevados.
+ *
+ * É o que substituiu o relevo sólido no botão: a mesma leitura de "isto
+ * está acima da tela", sem a borda inferior escura. O par existe porque
+ * a sombra também é a animação — ao pressionar ela encolhe e o botão
+ * desce 1px, que é o que dá o toque físico agora.
+ *
+ * `elevation` é o que o Android lê; `shadow*` cobre iOS e web.
+ */
+export const sombra = {
+  elevada: {
+    shadowColor: '#1c1b1b',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.22,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  pressionada: {
+    shadowColor: '#1c1b1b',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.14,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+} as const;
 
 /** Escala de espaçamento do Stitch. */
 export const espaco = {

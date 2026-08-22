@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vjež — croata do zero, em português</title>
+<meta name="description" content="Aprenda croata em português: os sete casos explicados na sua língua, áudio de nativo e uma lição por dia. A primeira lição não pede login.">
+<meta name="theme-color" content="#a30019">
+<!-- Escudo com o Ž, o mesmo ícone do app. Gerados de assets/icon.png. -->
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="favicon-512.png">
+<link rel="apple-touch-icon" href="favicon-180.png">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Vjež — croata do zero, em português">
+<meta property="og:description" content="Os sete casos do croata explicados em português, com áudio de nativo. A primeira lição não pede login.">
+<meta property="og:image" content="midia/dubrovnik-1600.jpg">
+<meta property="og:locale" content="pt_BR">
+
+<link rel="preload" href="fontes/NunitoSans_800ExtraBold.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="midia/bandeira-1280.jpg" as="image" fetchpriority="high">
+<link rel="stylesheet" href="estilo.css">
+</head>
+
+<body>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+
+<!-- Ícones dos cartões: Ionicons, os mesmos glifos que o app usa via
+     @expo/vector-icons. Copiados do pacote `ionicons` (MIT) em vez de
+     redesenhados, senão o traço não bate com o do app.
+     viewBox de 512 e stroke 32 são os do original — mexer num sem o outro
+     engrossa ou afina o traço em relação ao app. -->
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <defs>
+    <g id="i-livro" fill="none" stroke="currentColor" stroke-width="32" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M256 160c16-63.16 76.43-95.41 208-96a15.94 15.94 0 0 1 16 16v288a16 16 0 0 1-16 16c-128 0-177.45 25.81-208 64-30.37-38-80-64-208-64-9.88 0-16-8.05-16-17.93V80a15.94 15.94 0 0 1 16-16c131.57.59 192 32.84 208 96M256 160v288"/>
+    </g>
+    <g id="i-som" fill="none" stroke="currentColor" stroke-width="32" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M126 192H56a8 8 0 0 0-8 8v112a8 8 0 0 0 8 8h69.65a15.93 15.93 0 0 1 10.14 3.54l91.47 74.89A8 8 0 0 0 240 392V120a8 8 0 0 0-12.74-6.43l-91.47 74.89A15 15 0 0 1 126 192M320 320c9.74-19.38 16-40.84 16-64 0-23.48-6-44.42-16-64M368 368c19.48-33.92 32-64.06 32-112s-12-77.74-32-112M416 416c30-46 48-91.43 48-160s-18-113-48-160"/>
+    </g>
+    <g id="i-chama" fill="none" stroke="currentColor" stroke-width="32" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M112 320c0-93 124-165 96-272 66 0 192 96 192 272a144 144 0 0 1-288 0"/>
+      <path d="M320 368c0 57.71-32 80-64 80s-64-22.29-64-80 40-86 32-128c42 0 96 70.29 96 128"/>
+    </g>
+    <g id="i-bandeira" fill="none" stroke="currentColor" stroke-width="32" stroke-linecap="round" stroke-miterlimit="10">
+      <path d="M80 464V68.14a8 8 0 0 1 4-6.9C91.81 56.66 112.92 48 160 48c64 0 145 48 192 48a199.5 199.5 0 0 0 77.23-15.77 2 2 0 0 1 2.77 1.85v219.36a4 4 0 0 1-2.39 3.65C421.37 308.7 392.33 320 352 320c-48 0-128-32-192-32s-80 16-80 16"/>
+    </g>
+    <g id="i-voltar" fill="none" stroke="currentColor" stroke-width="32" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M320 146s24.36-12-64-12a160 160 0 1 0 160 160" stroke-miterlimit="10"/>
+      <path d="m256 58 80 80-80 80"/>
+    </g>
+    <g id="i-aberto" fill="none" stroke="currentColor" stroke-width="32" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M336 112a80 80 0 0 0-160 0v96"/>
+      <rect width="320" height="272" x="96" y="208" rx="48" ry="48"/>
+    </g>
+  </defs>
+</svg>
+
+<!-- Sentinela: enquanto ela estiver na tela, o topo fica transparente sobre a
+     bandeira. Barato e sem ouvir scroll só para trocar uma classe. -->
+<div class="sentinela" aria-hidden="true"></div>
+
+<header class="topo" id="topo">
+  <div class="topo__interno">
+    <a class="marca" href="#topo" aria-label="Vjež, página inicial">
+      <img class="marca__selo" src="midia/marca.png" alt="" width="96" height="96">
+      <span class="marca__nome">Vjež</span>
+    </a>
+
+    <nav class="topo__links" aria-label="Seções da página">
+      <a href="#metodo">Como funciona</a>
+      <a href="#casos">A trilha</a>
+      <a href="#recursos">O que tem dentro</a>
+    </nav>
+
+    <a class="botao botao--pequeno" data-cta href="/app/">Comece agora</a>
+  </div>
+</header>
+
+<main id="conteudo">
+
+  <!-- ==========================================================
+       Cena 1 — a bandeira. O fundo sobe devagar, o texto sobe
+       rápido e some: é o que separa o herói do resto da página.
+       =========================================================== -->
+  <section class="heroi" data-heroi>
+    <div class="heroi__fundo" aria-hidden="true">
+      <picture>
+        <source media="(max-width: 720px)" srcset="midia/bandeira-800.jpg">
+        <img class="heroi__foto" src="midia/bandeira-1280.jpg" alt=""
+             width="1280" height="853" fetchpriority="high">
+      </picture>
+      <div class="heroi__veu"></div>
+    </div>
+
+    <div class="heroi__texto">
+      <p class="sobrancelha">Croata para quem fala português</p>
+      <h1>
+        Croata do zero,<br>
+        <span class="grifo">na sua língua</span>.
+      </h1>
+      <p class="linha-fina">
+        Os sete casos explicados em português, com áudio de nativo e uma
+        lição por dia. A primeira não pede login — é só abrir e começar.
+      </p>
+      <div class="acoes">
+        <a class="botao" data-cta href="/app/">Comece agora</a>
+        <a class="botao botao--fantasma" href="#metodo">Ver como funciona</a>
+      </div>
+      <p class="miudo">Grátis para começar · sem cadastro na primeira lição</p>
+    </div>
+
+    <a class="heroi__seta" href="#promessa" aria-label="Rolar para a próxima seção">
+      <span aria-hidden="true"></span>
+    </a>
+  </section>
+
+  <div class="sahovnica sahovnica--faixa sahovnica--divisor" role="presentation"></div>
+
+  <!-- ==========================================================
+       Cena 2 — a promessa em números.
+       =========================================================== -->
+  <section class="promessa" id="promessa">
+    <div class="faixa">
+      <div class="numero" data-revela>
+        <strong data-conta="30">30</strong>
+        <span>letras, cada uma com um som só</span>
+      </div>
+      <div class="numero" data-revela>
+        <strong data-conta="7">7</strong>
+        <span>casos — <i lang="hr">padeži</i> — um módulo para cada</span>
+      </div>
+      <div class="numero" data-revela>
+        <strong data-conta="10">10</strong>
+        <span>módulos temáticos, do alfabeto ao Vokativ</span>
+      </div>
+      <div class="numero" data-revela>
+        <strong data-conta="0">0</strong>
+        <span>minutos de cadastro antes de aprender algo</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       Cena 3 — Dubrovnik. Foto em parallax profundo, cartões de
+       frase flutuando em velocidades diferentes por cima.
+       =========================================================== -->
+  <section class="cena cena--mar" data-cena>
+    <div class="cena__fundo" aria-hidden="true">
+      <picture>
+        <source media="(max-width: 720px)" srcset="midia/dubrovnik-800.jpg">
+        <img src="midia/dubrovnik-1600.jpg" alt="" width="1600" height="1067"
+             loading="lazy" data-parallax="70">
+      </picture>
+      <div class="cena__veu"></div>
+    </div>
+
+    <div class="cena__texto" data-parallax="-40">
+      <h2>Isso não é para uma prova.</h2>
+      <p>
+        É para pedir café em Split, ler o cardápio em Dubrovnik, entender a
+        sua avó no telefone. Por isso cada exercício sai de uma frase que
+        alguém realmente diz — não de uma tabela de declinação.
+      </p>
+    </div>
+
+    <ul class="frases" aria-label="Exemplos de frases em croata">
+      <li class="frase frase--a" data-parallax="-110">
+        <b lang="hr">Dobar dan!</b><span>Bom dia!</span>
+      </li>
+      <li class="frase frase--b" data-parallax="-60">
+        <b lang="hr">Koliko košta?</b><span>Quanto custa?</span>
+      </li>
+      <li class="frase frase--c" data-parallax="-150">
+        <b lang="hr">Vidimo se!</b><span>Até mais!</span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ==========================================================
+       Cena 4 — o método: as três atividades da lição.
+       =========================================================== -->
+  <section class="metodo" id="metodo">
+    <header class="secao__cabeca" data-revela>
+      <p class="sobrancelha sobrancelha--escura">Dentro de uma lição</p>
+      <h2>Três degraus, sempre na mesma ordem.</h2>
+      <p class="linha-fina linha-fina--escura">
+        Cada lição vale 10. Errar tira ponto, mas não tranca nada: o feedback
+        mostra a forma certa e explica por que o caso é aquele.
+      </p>
+    </header>
+
+    <ol class="degraus">
+      <li class="degrau" data-revela>
+        <img src="midia/ilustracoes/1-1.svg" alt="" width="240" height="252"
+             loading="lazy" data-parallax="-22">
+        <p class="degrau__ordem">1 · Transformação</p>
+        <h3>Coloque a palavra na forma certa.</h3>
+        <p>
+          Você recebe a palavra como ela aparece no dicionário e a frase que
+          precisa dela. Preencher a lacuna, escolher a forma, montar a frase
+          arrastando as peças.
+        </p>
+      </li>
+
+      <li class="degrau" data-revela>
+        <img src="midia/ilustracoes/5-1.svg" alt="" width="240" height="252"
+             loading="lazy" data-parallax="-30">
+        <p class="degrau__ordem">2 · Tradução</p>
+        <h3>Do português para o croata.</h3>
+        <p>
+          Agora sem apoio: a frase vem em português e você escreve em croata.
+          A correção é tolerante — acento faltando e espaço a mais não
+          reprovam ninguém.
+        </p>
+      </li>
+
+      <li class="degrau" data-revela>
+        <img src="midia/ilustracoes/2-2.svg" alt="" width="240" height="252"
+             loading="lazy" data-parallax="-22">
+        <p class="degrau__ordem">3 · Produção livre</p>
+        <h3>Escreva do seu jeito.</h3>
+        <p>
+          Até 400 caracteres sobre o tema da lição. A correção volta na hora,
+          feita por IA, e um falante nativo revisa por cima depois. Aqui
+          ninguém perde ponto por tentar.
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- ==========================================================
+       Cena 5 — o mapa e a trilha dos casos.
+       =========================================================== -->
+  <section class="cena cena--mapa" id="casos" data-cena>
+    <div class="mapa" aria-hidden="true">
+      <picture>
+        <source media="(max-width: 720px)" srcset="midia/mapa-600.png">
+        <img src="midia/mapa-900.png" alt="" width="900" height="900"
+             loading="lazy" data-parallax="55">
+      </picture>
+    </div>
+
+    <div class="trilha">
+      <header class="secao__cabeca secao__cabeca--esquerda" data-revela>
+        <p class="sobrancelha sobrancelha--escura">A trilha</p>
+        <h2>Sete casos, um de cada vez.</h2>
+        <p class="linha-fina linha-fina--escura">
+          Cada módulo ancora um caso num tema do dia a dia. No fim vem o
+          checkpoint, montado na hora com os exercícios que você errou —
+          70% para seguir.
+        </p>
+      </header>
+
+      <ol class="modulos">
+        <li data-revela><span class="modulos__n">1</span> Alfabeto e sons</li>
+        <li data-revela><span class="modulos__n">2</span> Números</li>
+        <li data-revela><span class="modulos__n">3</span> Saudações e apresentações</li>
+        <li data-revela><span class="modulos__n">4</span> <b lang="hr">Nominativ</b> — pessoas e família</li>
+        <li data-revela><span class="modulos__n">5</span> <b lang="hr">Akuzativ</b> — comida e compras</li>
+        <li data-revela><span class="modulos__n">6</span> <b lang="hr">Genitiv</b> — posse e quantidade</li>
+        <li data-revela><span class="modulos__n">7</span> <b lang="hr">Dativ</b> — dar e receber</li>
+        <li data-revela><span class="modulos__n">8</span> <b lang="hr">Lokativ</b> — casa e lugares</li>
+        <li data-revela><span class="modulos__n">9</span> <b lang="hr">Instrumental</b> — companhia e meio</li>
+        <li data-revela><span class="modulos__n">10</span> <b lang="hr">Vokativ</b> — chamar e cumprimentar</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       Cena 6 — o que mais tem dentro.
+       =========================================================== -->
+  <section class="recursos" id="recursos">
+    <header class="secao__cabeca" data-revela>
+      <p class="sobrancelha sobrancelha--escura">O que tem dentro</p>
+      <h2>Tudo o que vem junto.</h2>
+    </header>
+
+    <div class="cartoes">
+      <article class="cartao" data-revela>
+        <span class="cartao__icone" aria-hidden="true">
+          <svg viewBox="0 0 512 512"><use href="#i-livro"/></svg>
+        </span>
+        <h3>Dicionário sempre à mão</h3>
+        <p>
+          Alfabeto, números, expressões e busca PT↔HR que ignora acento — dá
+          para procurar <i lang="hr">"cokolada"</i> e achar
+          <i lang="hr">čokolada</i>.
+        </p>
+      </article>
+
+      <article class="cartao" data-revela>
+        <span class="cartao__icone" aria-hidden="true">
+          <svg viewBox="0 0 512 512"><use href="#i-som"/></svg>
+        </span>
+        <h3>Áudio de verdade em tudo</h3>
+        <p>
+          Cada letra, palavra e frase tem MP3. Você toca antes de responder e
+          toca de novo no feedback, já com a forma certa.
+        </p>
+      </article>
+
+      <article class="cartao" data-revela>
+        <span class="cartao__icone cartao__icone--quente" aria-hidden="true">
+          <svg viewBox="0 0 512 512"><use href="#i-chama"/></svg>
+        </span>
+        <h3>Ofensiva que perdoa um dia</h3>
+        <p>
+          Faltou um dia? A ofensiva entra em recuperação: você salva fazendo a
+          lição pendente mais a de hoje. Só zera com dois dias parados.
+        </p>
+      </article>
+
+      <article class="cartao" data-revela>
+        <span class="cartao__icone" aria-hidden="true">
+          <svg viewBox="0 0 512 512"><use href="#i-bandeira"/></svg>
+        </span>
+        <h3>Checkpoint feito dos seus erros</h3>
+        <p>
+          No fim do módulo, o app sorteia os exercícios priorizando o que você
+          errou. Não passou? Refaz só o checkpoint, não o módulo inteiro.
+        </p>
+      </article>
+
+      <article class="cartao" data-revela>
+        <span class="cartao__icone" aria-hidden="true">
+          <svg viewBox="0 0 512 512"><use href="#i-voltar"/></svg>
+        </span>
+        <h3>Revisão geral a cada 3 módulos</h3>
+        <p>
+          Puxa de tudo que você já concluiu, com peso extra no que é mais
+          antigo. É o que impede o módulo 2 de evaporar quando você chega no 8.
+        </p>
+      </article>
+
+      <article class="cartao" data-revela>
+        <span class="cartao__icone" aria-hidden="true">
+          <svg viewBox="0 0 512 512"><use href="#i-aberto"/></svg>
+        </span>
+        <h3>Comece sem conta</h3>
+        <p>
+          A lição 1 abre direto. Quando você entrar com Google ou Apple, o
+          progresso que já fez migra junto — nada se perde.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ==========================================================
+       Cena 7 — fecho.
+       =========================================================== -->
+  <section class="fecho" data-cena>
+    <img class="fecho__arte" src="midia/ilustracoes/10-1.svg" alt=""
+         width="320" height="320" loading="lazy" data-parallax="-35">
+    <div class="fecho__texto" data-revela>
+      <h2><span lang="hr">Bok!</span> Vamos começar?</h2>
+      <p class="linha-fina linha-fina--escura">
+        A primeira lição leva uns cinco minutos e não pede nada de você.
+      </p>
+      <a class="botao botao--grande" data-cta href="/app/">Comece agora</a>
+    </div>
+  </section>
+</main>
+
+<footer class="rodape">
+  <!-- A šahovnica fecha a página como abre a marca. Aqui em quadrado maior
+       que o das faixas de seção: é o pé do site, não um divisor. -->
+  <div class="sahovnica sahovnica--faixa" role="presentation"></div>
+
+  <div class="rodape__interno">
+    <p class="rodape__marca">
+      <img class="marca__selo" src="midia/marca.png" alt="" width="96" height="96">
+      Vjež
+    </p>
+    <nav class="rodape__links" aria-label="Rodapé">
+      <a href="/app/privacidade">Privacidade e termos</a>
+      <a data-cta href="/app/">Abrir o app</a>
+    </nav>
+    <p class="rodape__miudo">
+      Desenvolvido por
+      <a href="https://kavicki.com" rel="noopener">kavicki.com</a>
+    </p>
+  </div>
+</footer>
+
+<script src="parallax.js" defer></script>
+</body>
+</html>

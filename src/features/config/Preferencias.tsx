@@ -13,8 +13,19 @@ import {
  * junto com a conta, na tabela de usuário.
  */
 type Preferencias = {
-  /** Tocar o áudio do exercício assim que ele aparece. */
+  /**
+   * Tocar áudio sem o aluno pedir: o do exercício quando ele aparece, e o
+   * da forma certa quando a resposta acerta.
+   */
   audioAutomatico: boolean;
+  /**
+   * O tom curto de acerto e o grave de erro ao verificar uma questão.
+   *
+   * Separado do `audioAutomatico` de propósito: aquele é pronúncia, ou
+   * seja, CONTEÚDO — quem estuda no ônibus sem fone desliga o croata em voz
+   * alta e ainda quer a confirmação de que acertou.
+   */
+  efeitosSonoros: boolean;
   /** Lembrete diário da ofensiva. */
   notificacoes: boolean;
 };
@@ -23,7 +34,11 @@ type Estado = Preferencias & {
   alternar: (chave: keyof Preferencias) => void;
 };
 
-const PADRAO: Preferencias = { audioAutomatico: true, notificacoes: false };
+const PADRAO: Preferencias = {
+  audioAutomatico: true,
+  efeitosSonoros: true,
+  notificacoes: false,
+};
 
 const Contexto = createContext<Estado | null>(null);
 

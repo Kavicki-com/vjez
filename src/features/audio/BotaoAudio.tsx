@@ -49,6 +49,12 @@ export function BotaoAudio({
   }, [status.isLoaded, automatico, audioAutomatico]);
 
   const tocar = () => {
+    // Só toca com a faixa carregada. Chamar `play()` antes disso deixa a
+    // promessa do navegador pendente até o arquivo chegar, e qualquer pausa
+    // nesse meio-tempo — trocar de exercício, sair da tela — a rejeita com
+    // `AbortError` no console. São MP3 de poucos kB, criados junto com o
+    // botão: quando o dedo chega, já carregaram.
+    if (!status.isLoaded) return;
     // Tocar de novo com a faixa no fim não faz nada sem voltar ao início —
     // e repetir é justamente o uso mais comum aqui.
     player.seekTo(0);

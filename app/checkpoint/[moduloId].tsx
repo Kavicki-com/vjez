@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useQueryClient } from '@tanstack/react-query';
-import { router, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -17,6 +17,7 @@ import { Botao } from '@/components/Botao';
 import { Confete } from '@/components/Confete';
 import { Carregando, Erro } from '@/components/Estados';
 import { Sahovnica } from '@/components/Sahovnica';
+import { useSomDeResposta } from '@/features/audio/sons';
 import { registrarCheckpoint } from '@/features/checkpoint/api';
 import {
   useHistoricoDoModulo,
@@ -33,6 +34,7 @@ import { CampoDoExercicio } from '@/features/licao/exercicios';
 import { registrarTentativa } from '@/features/licao/progresso';
 import { useTrilha } from '@/features/licao/hooks';
 import { useProgressoLocal } from '@/features/perfil/ProgressoLocal';
+import { voltarPara } from '@/lib/navegacao';
 import type { Exercicio } from '@/types/schema';
 import {
   cores,
@@ -58,6 +60,8 @@ export default function TelaCheckpoint() {
     registrarTentativa: registrarTentativaLocal,
     concluirCheckpoint,
   } = useProgressoLocal();
+
+  const tocarVeredito = useSomDeResposta();
 
   const [indice, setIndice] = useState(0);
   const [respostas, setRespostas] = useState<Record<string, Resposta>>({});
@@ -112,14 +116,29 @@ export default function TelaCheckpoint() {
   );
 
   if (isPending) return <Carregando />;
-  if (isError || !modulo) return <Erro mensagem="Checkpoint não encontrado." />;
-  if (!prova || !exercicio) return <Carregando />;
+  if (isError || !modulo)
+    return (
+      <Erro
+        mensagem="Checkpoint não encontrado."
+        aoVoltar={() => voltarPara('/')}
+      />
+    );
+  if (!prova) return <Carregando />;
 
+  // A prova vazia tem que ser checada ANTES do guard do exercício: com
+  // `prova.length === 0` não existe `prova[indice]`, então o guard antigo
+  // (`!prova || !exercicio`) devolvia <Carregando /> para sempre e esta
+  // mensagem nunca aparecia — a tela ficava girando sem saída.
   if (prova.length === 0) {
     return (
-      <Erro mensagem="Este módulo ainda não tem exercícios suficientes para um checkpoint." />
+      <Erro
+        mensagem="Este módulo ainda não tem exercícios suficientes para um checkpoint."
+        aoVoltar={() => voltarPara(`/modulo/${modulo.id}`)}
+      />
     );
   }
+
+  if (!exercicio) return <Carregando />;
 
   const moduloSeguinte = trilha?.find((m) => m.ordem === modulo.ordem + 1);
 
@@ -143,7 +162,7 @@ export default function TelaCheckpoint() {
         tema={modulo.tema_pt}
         temProximo={Boolean(moduloSeguinte)}
         aoRefazer={recomecar}
-        aoSair={() => router.back()}
+        aoSair={() => voltarPara(`/modulo/${modulo.id}`)}
       />
     );
   }
@@ -155,6 +174,7 @@ export default function TelaCheckpoint() {
     if (!resposta) return;
     const resultado = corrigir(exercicio, resposta);
     setVereditos((atual) => ({ ...atual, [exercicio.id]: resultado }));
+    tocarVeredito(resultado.acertou);
     registrarTentativaLocal(exercicio.id, resultado.acertou, modulo.id);
     void registrarTentativa({
       exercicio,
@@ -192,7 +212,7 @@ export default function TelaCheckpoint() {
           accessibilityRole="button"
           accessibilityLabel="Sair do checkpoint"
           hitSlop={espaco.sm}
-          onPress={() => router.back()}
+          onPress={() => voltarPara(`/modulo/${modulo.id}`)}
         >
           <Ionicons name="close" size={26} color={cores.texto} />
         </Pressable>

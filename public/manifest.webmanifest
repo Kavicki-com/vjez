@@ -1,0 +1,46 @@
+{
+  "name": "Vjež — croata em português",
+  "short_name": "Vjež",
+  "description": "Croata do zero para falantes de português: os sete casos, áudio e uma lição por dia.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "/app/",
+  "scope": "/app/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#A30019",
+  "theme_color": "#A30019",
+  "categories": ["education"],
+  "icons": [
+    {
+      "src": "/app/icones/icone-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/app/icones/icone-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/app/icones/icone-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dicionário",
+      "url": "/app/dicionario",
+      "icons": [{ "src": "/app/icones/icone-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Padeži",
+      "url": "/app/padezi",
+      "icons": [{ "src": "/app/icones/icone-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

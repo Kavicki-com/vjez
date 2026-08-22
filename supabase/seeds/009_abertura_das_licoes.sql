@@ -10,7 +10,7 @@ from (values
   (1, 1, 'text',
    'O croata se escreve com 30 letras e tem sons que o português não tem. A boa notícia: cada letra tem um som só, sempre o mesmo. Depois que você aprende, lê qualquer palavra sem adivinhar.'),
   (1, 2, 'ear',
-   'Algumas letras andam em par e valem por um som só: LJ, NJ e DŽ. E o J croata não é o J do português — ele soa como o "i" de "pai".'),
+   'Algumas letras andam em par e valem por um som só: LJ, NJ e DŽ. E o J croata não é o J do português — ele soa como o "i" em "pai".'),
 
   -- Módulo 2 — Números
   (2, 1, 'calculator',

@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   chip: {
     paddingVertical: espaco.sm,
     paddingHorizontal: espaco.md,
-    borderRadius: raio.pill,
+    borderRadius: raio.lg,
     borderWidth: 1,
     borderColor: cores.borda,
     backgroundColor: cores.superficieAlta,

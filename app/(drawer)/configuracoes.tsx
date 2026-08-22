@@ -14,7 +14,8 @@ import {
 } from '@/theme/tokens';
 
 export default function Configuracoes() {
-  const { audioAutomatico, notificacoes, alternar } = usePreferencias();
+  const { audioAutomatico, efeitosSonoros, notificacoes, alternar } =
+    usePreferencias();
 
   return (
     <ScrollView
@@ -43,13 +44,27 @@ export default function Configuracoes() {
           <Linha
             icone="volume-high"
             titulo="Tocar áudio automaticamente"
-            detalhe="Reproduz a pronúncia assim que o exercício abre"
+            detalhe="Toca a pronúncia quando o exercício abre e quando você acerta"
             controle={
               <Switch
                 value={audioAutomatico}
                 onValueChange={() => alternar('audioAutomatico')}
                 trackColor={{ true: cores.primaria, false: cores.borda }}
                 accessibilityLabel="Tocar áudio automaticamente"
+              />
+            }
+          />
+          <Divisor />
+          <Linha
+            icone="musical-note"
+            titulo="Som de acerto e erro"
+            detalhe="Um tom curto quando você verifica a resposta"
+            controle={
+              <Switch
+                value={efeitosSonoros}
+                onValueChange={() => alternar('efeitosSonoros')}
+                trackColor={{ true: cores.primaria, false: cores.borda }}
+                accessibilityLabel="Som de acerto e erro"
               />
             }
           />

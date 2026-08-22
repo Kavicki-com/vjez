@@ -4,9 +4,11 @@ import { useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { Botao } from '@/components/Botao';
 import { Carregando, Erro } from '@/components/Estados';
 import { Sahovnica } from '@/components/Sahovnica';
 import { useTrilhaMontada } from '@/features/trilha/useTrilhaMontada';
+import { voltarPara } from '@/lib/navegacao';
 import { etiquetaDoCaso } from '@/lib/padez';
 import {
   CHECKPOINT_NOTA_MINIMA,
@@ -41,7 +43,10 @@ export default function TelaModulo() {
   }, [modulo, notasLocais, notasDoServidor]);
 
   if (isPending) return <Carregando />;
-  if (isError || !modulo) return <Erro mensagem="Unidade não encontrada." />;
+  if (isError || !modulo)
+    return (
+      <Erro mensagem="Unidade não encontrada." aoVoltar={() => voltarPara('/')} />
+    );
 
   const media =
     notasDoModulo.length > 0
@@ -60,6 +65,28 @@ export default function TelaModulo() {
     notasLocais[licaoId] ??
     notasDoServidor.find((p) => p.licaoId === licaoId)?.nota;
 
+  // Onde o aluno parou: a primeira lição ainda não feita — e, quando todas
+  // estão feitas, a prova, que é o passo seguinte de verdade. Sem isto ele
+  // volta à unidade e tem que varrer a lista para achar onde continuar,
+  // que é exatamente o atrito que faz a ofensiva morrer.
+  const proximaLicao = trancado
+    ? undefined
+    : modulo.licoes.find((l) => typeof notaDaLicao(l.id) !== 'number');
+
+  const proximoPasso = proximaLicao
+    ? {
+        rotulo: modulo.concluidas === 0 ? 'Começar a unidade' : 'Continuar',
+        detalhe: `Lição ${proximaLicao.ordem} · ${proximaLicao.titulo_pt}`,
+        ir: () => router.push(`/licao/${proximaLicao.id}`),
+      }
+    : tudoFeito && podeFazerCheckpoint && !modulo.checkpointPassado
+      ? {
+          rotulo: 'Fazer a prova da unidade',
+          detalhe: 'Todas as lições concluídas',
+          ir: () => router.push(`/checkpoint/${modulo.id}`),
+        }
+      : null;
+
   return (
     <View style={styles.tela}>
       <Sahovnica altura={6} />
@@ -69,7 +96,7 @@ export default function TelaModulo() {
           accessibilityRole="button"
           accessibilityLabel="Voltar para a trilha"
           hitSlop={espaco.sm}
-          onPress={() => router.back()}
+          onPress={() => voltarPara('/')}
         >
           <Ionicons name="arrow-back" size={24} color={cores.texto} />
         </Pressable>
@@ -127,6 +154,18 @@ export default function TelaModulo() {
             </View>
           </View>
 
+          {proximoPasso && (
+            <View style={styles.proximo}>
+              <View style={styles.proximoTexto}>
+                <Text style={styles.proximoRotulo}>Próximo passo</Text>
+                <Text style={styles.proximoTitulo} numberOfLines={2}>
+                  {proximoPasso.detalhe}
+                </Text>
+              </View>
+              <Botao rotulo={proximoPasso.rotulo} aoTocar={proximoPasso.ir} />
+            </View>
+          )}
+
           <Text style={styles.secao}>Lições</Text>
 
           {trancado && modulo.licoes.length > 0 && (
@@ -165,6 +204,7 @@ export default function TelaModulo() {
                     onPress={() => router.push(`/licao/${licao.id}`)}
                     style={({ pressed }) => [
                       styles.linha,
+                      feita && styles.linhaFeita,
                       trancado && styles.linhaTrancada,
                       pressed && !trancado && styles.linhaPressionada,
                     ]}
@@ -329,7 +369,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginTop: espaco.xs,
   },
-  barraCheia: { height: '100%', backgroundColor: cores.primaria },
+  barraCheia: { height: '100%', backgroundColor: cores.secundaria },
   progressoTexto: {
     fontSize: fonte.pequena,
     lineHeight: linha.pequena,
@@ -362,6 +402,32 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
+  // Cartão do próximo passo: fica acima da lista porque é a resposta para
+  // "e agora?", que é a pergunta com que o aluno abre esta tela.
+  proximo: {
+    gap: espaco.md,
+    padding: espaco.md,
+    borderRadius: raio.lg,
+    borderWidth: 1,
+    borderColor: cores.borda,
+    backgroundColor: cores.superficie,
+  },
+  proximoTexto: { gap: 2 },
+  proximoRotulo: {
+    fontSize: fonte.pequena,
+    lineHeight: linha.pequena,
+    fontFamily: familia.forte,
+    color: cores.textoSuave,
+    textTransform: 'uppercase',
+    letterSpacing: 0.6,
+  },
+  proximoTitulo: {
+    fontSize: fonte.subtitulo,
+    lineHeight: linha.subtitulo,
+    fontFamily: familia.forte,
+    color: cores.texto,
+  },
+
   secao: {
     fontSize: fonte.pequena,
     lineHeight: linha.pequena,
@@ -382,6 +448,8 @@ const styles = StyleSheet.create({
     borderColor: cores.borda,
     backgroundColor: cores.superficie,
   },
+  // Borda verde = concluída. Cinza (a padrão) = ainda não feita.
+  linhaFeita: { borderColor: cores.acerto },
   linhaPressionada: { backgroundColor: cores.primariaSuave },
   linhaTrancada: { opacity: 0.55 },
   aviso: {

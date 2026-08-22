@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text } from 'react-native';
 
 import {
   cores,
@@ -7,8 +7,7 @@ import {
   fonte,
   linha,
   raio,
-  relevo,
-  sombraSolida,
+  sombra,
 } from '@/theme/tokens';
 
 type Props = {
@@ -16,55 +15,68 @@ type Props = {
   aoTocar: () => void;
   desabilitado?: boolean;
   variante?: 'primaria' | 'secundaria' | 'acerto' | 'erro';
+  /**
+   * Espera visível. O botão fica do tamanho que estava — trocar o rótulo
+   * por um giro menor faria o rodapé inteiro pular no meio da espera.
+   */
+  carregando?: boolean;
 };
 
 const TONS = {
-  primaria: { fundo: cores.primaria, baixo: sombraSolida.primaria, texto: cores.superficie },
-  acerto: { fundo: cores.acerto, baixo: sombraSolida.acerto, texto: cores.superficie },
-  erro: { fundo: cores.erro, baixo: sombraSolida.erro, texto: cores.superficie },
-  secundaria: { fundo: cores.superficie, baixo: sombraSolida.neutra, texto: cores.texto },
+  primaria: { fundo: cores.primaria, texto: cores.superficie },
+  acerto: { fundo: cores.acerto, texto: cores.superficie },
+  erro: { fundo: cores.erro, texto: cores.superficie },
+  secundaria: { fundo: cores.superficie, texto: cores.texto },
 } as const;
 
 /**
- * Botão com relevo sólido: a borda inferior escura some ao pressionar e o
- * botão desce, dando a sensação de afundar. A margem compensa a borda
- * perdida para o bloco não pular de altura.
+ * Botão pílula com drop shadow.
+ *
+ * O relevo sólido (borda inferior escura que sumia ao pressionar) saiu:
+ * quem dá a elevação agora é a sombra, e o toque é ela encolhendo com o
+ * botão descendo 1px. Sem borda de baixo não há altura para compensar,
+ * então o bloco não pula mais — o `translateY` é só visual.
  */
 export function Botao({
   rotulo,
   aoTocar,
   desabilitado,
   variante = 'primaria',
+  carregando,
 }: Props) {
   const tom = TONS[variante];
+  const inerte = desabilitado || carregando;
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ disabled: desabilitado }}
-      disabled={desabilitado}
+      accessibilityState={{ disabled: inerte, busy: carregando }}
+      disabled={inerte}
       onPress={aoTocar}
       style={({ pressed }) => [
         styles.base,
         {
           backgroundColor: tom.fundo,
-          borderBottomColor: tom.baixo,
           borderColor: variante === 'secundaria' ? cores.borda : tom.fundo,
-          borderBottomWidth: relevo,
         },
-        variante === 'secundaria' && styles.secundaria,
-        pressed && !desabilitado && styles.pressionado,
+        // Desabilitado não é elevado: nada a tocar, nada acima da tela.
+        !inerte && (pressed ? sombra.pressionada : sombra.elevada),
+        pressed && !inerte && styles.pressionado,
         desabilitado && styles.desabilitado,
       ]}
     >
-      <Text
-        style={[
-          styles.rotulo,
-          { color: desabilitado ? cores.textoSuave : tom.texto },
-        ]}
-      >
-        {rotulo}
-      </Text>
+      {carregando ? (
+        <ActivityIndicator color={tom.texto} />
+      ) : (
+        <Text
+          style={[
+            styles.rotulo,
+            { color: desabilitado ? cores.textoSuave : tom.texto },
+          ]}
+        >
+          {rotulo}
+        </Text>
+      )}
     </Pressable>
   );
 }
@@ -75,19 +87,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: espaco.lg,
-    borderRadius: raio.md,
+    borderRadius: raio.pill,
     borderWidth: 1,
   },
-  secundaria: { borderWidth: 1 },
-  pressionado: {
-    transform: [{ translateY: relevo }],
-    borderBottomWidth: 0,
-    marginBottom: relevo,
-  },
+  pressionado: { transform: [{ translateY: 1 }] },
   desabilitado: {
     backgroundColor: cores.fundoSuave,
     borderColor: cores.borda,
-    borderBottomColor: cores.borda,
   },
   rotulo: {
     fontSize: fonte.corpo, lineHeight: linha.corpo,

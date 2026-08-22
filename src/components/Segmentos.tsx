@@ -58,10 +58,12 @@ const styles = StyleSheet.create({
   // Respiro maior em cima: as pílulas ficavam coladas na linha tracejada
   // do cabeçalho.
   faixa: { gap: espaco.sm, paddingTop: espaco.lg, paddingBottom: espaco.sm },
+  // Chip é retângulo arredondado (12), não pílula: a pílula agora é a
+  // forma do botão, e as duas coisas não podem ter a mesma silhueta.
   pilula: {
     paddingVertical: espaco.sm,
     paddingHorizontal: espaco.md,
-    borderRadius: raio.pill,
+    borderRadius: raio.lg,
     borderWidth: 1,
     borderColor: cores.borda,
     backgroundColor: cores.superficie,

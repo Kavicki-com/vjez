@@ -178,7 +178,10 @@ Menores (classificação etária / coleta <13); **LGPD** (dados + envio ao Gemin
 - **Nome do app** (Vjez).
 - **Personagem** das telas: definir papel — **NÃO é mascote**.
 - **Sequência dos módulos** do currículo (alfabeto → números → saudações → vocabulário → … → 7 casos).
-- **Rate limit / teto de gasto** do Gemini.
+- ~~**Rate limit / teto de gasto** do Gemini.~~ Decidido: **30 correções por
+  conta a cada 24h** e **1.000 no total a cada 24h**. Ambos em variável de
+  ambiente da Edge Function (`CORRECOES_POR_CONTA_24H`, `CORRECOES_GLOBAIS_24H`),
+  ajustáveis sem deploy. Convidado não é corrigido — só conta autenticada.
 
 ## Referência de design
 

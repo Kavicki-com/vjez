@@ -395,6 +395,92 @@ export type Database = {
         }
         Relationships: []
       }
+      padez_terminacoes: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          exemplos_hr: string[]
+          genero: Database["public"]["Enums"]["genero_gramatical"]
+          id: string
+          padez: Database["public"]["Enums"]["padez"]
+          plural: boolean
+          terminacao: string
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          exemplos_hr: string[]
+          genero: Database["public"]["Enums"]["genero_gramatical"]
+          id?: string
+          padez: Database["public"]["Enums"]["padez"]
+          plural: boolean
+          terminacao: string
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          exemplos_hr?: string[]
+          genero?: Database["public"]["Enums"]["genero_gramatical"]
+          id?: string
+          padez?: Database["public"]["Enums"]["padez"]
+          plural?: boolean
+          terminacao?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "padez_terminacoes_padez_fkey"
+            columns: ["padez"]
+            isOneToOne: false
+            referencedRelation: "padezi"
+            referencedColumns: ["padez"]
+          },
+        ]
+      }
+      padezi: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          exemplo_hr: string
+          exemplo_pt: string
+          id: string
+          nota_pt: string | null
+          numero: number
+          padez: Database["public"]["Enums"]["padez"]
+          pergunta_hr: string
+          pergunta_pt: string
+          preposicoes_hr: string[]
+          uso_pt: string
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          exemplo_hr: string
+          exemplo_pt: string
+          id?: string
+          nota_pt?: string | null
+          numero: number
+          padez: Database["public"]["Enums"]["padez"]
+          pergunta_hr: string
+          pergunta_pt: string
+          preposicoes_hr?: string[]
+          uso_pt: string
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          exemplo_hr?: string
+          exemplo_pt?: string
+          id?: string
+          nota_pt?: string | null
+          numero?: number
+          padez?: Database["public"]["Enums"]["padez"]
+          pergunta_hr?: string
+          pergunta_pt?: string
+          preposicoes_hr?: string[]
+          uso_pt?: string
+        }
+        Relationships: []
+      }
       progresso_licao: {
         Row: {
           concluida: boolean
@@ -611,6 +697,7 @@ export type Database = {
           ofensiva_dias_seguidos: number
           ofensiva_status: Database["public"]["Enums"]["status_ofensiva"]
           ofensiva_ultimo_dia_ativo: string | null
+          papel: Database["public"]["Enums"]["papel"]
           provedor: Database["public"]["Enums"]["provedor"] | null
           xp: number
         }
@@ -624,6 +711,7 @@ export type Database = {
           ofensiva_dias_seguidos?: number
           ofensiva_status?: Database["public"]["Enums"]["status_ofensiva"]
           ofensiva_ultimo_dia_ativo?: string | null
+          papel?: Database["public"]["Enums"]["papel"]
           provedor?: Database["public"]["Enums"]["provedor"] | null
           xp?: number
         }
@@ -637,6 +725,7 @@ export type Database = {
           ofensiva_dias_seguidos?: number
           ofensiva_status?: Database["public"]["Enums"]["status_ofensiva"]
           ofensiva_ultimo_dia_ativo?: string | null
+          papel?: Database["public"]["Enums"]["papel"]
           provedor?: Database["public"]["Enums"]["provedor"] | null
           xp?: number
         }

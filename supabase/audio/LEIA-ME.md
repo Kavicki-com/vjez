@@ -10,6 +10,11 @@ O botão de ouvir aparece sozinho em qualquer item que tenha `audio_url` —
 inclusive nos que a curadoria acrescentar depois, bastando rodar o script
 de novo (ele pula o que já tem áudio).
 
+O alvo `padezi` (quadro dos casos) também está no ar: 27 faixas novas — as 7
+frases de exemplo e cada forma da grade de terminações. As 6 formas de *žena*
+o script pulou, porque já existiam pelos exercícios: a mesma faixa serve aos
+dois lugares, que é o ponto de indexar por texto.
+
 **Exercícios seguem sem áudio**, de propósito: veja a seção no fim.
 
 ## Gerar
@@ -23,7 +28,7 @@ node supabase/audio/gerar.mjs
 
 Opções:
 
-- `--so=letras,numeros,palavras,frases` — gera só o que você listar
+- `--so=letras,numeros,palavras,frases,opcoes,padezi` — gera só o que você listar
 - `--refazer` — regera mesmo o que já tem áudio (troca de voz, por exemplo)
 
 O script pula o que já tem `audio_url`, então dá para rodar de novo depois de

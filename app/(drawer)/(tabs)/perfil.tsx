@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
     backgroundColor: cores.superficieVariante,
     overflow: 'hidden',
   },
-  barraCheia: { height: '100%', backgroundColor: cores.primaria },
+  barraCheia: { height: '100%', backgroundColor: cores.secundaria },
 
   grade: { flexDirection: 'row', flexWrap: 'wrap', gap: espaco.sm },
   conquista: {

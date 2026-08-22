@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagnóstico do PWA — Vjež</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    font: 16px/1.5 system-ui, sans-serif;
+    max-width: 42rem; margin: 0 auto; padding: 2rem 1rem;
+  }
+  h1 { font-size: 1.5rem; margin-bottom: .25rem; }
+  p.sub { color: #666; margin-top: 0; }
+  ul { list-style: none; padding: 0; }
+  li { padding: .6rem 0; border-bottom: 1px solid #8883; }
+  .marca { font-weight: 700; margin-right: .5rem; }
+  .ok .marca { color: #107c41; }
+  .erro .marca { color: #ba1a1a; }
+  .aviso .marca { color: #b06000; }
+  .detalhe { display: block; color: #666; font-size: .875rem; margin-top: .15rem; }
+  code { background: #8882; padding: .1rem .3rem; border-radius: .2rem; }
+</style>
+</head>
+<body>
+<h1>Diagnóstico do PWA</h1>
+<p class="sub">Roda dentro do escopo do app, em <code id="onde"></code>.</p>
+<ul id="lista"><li>Verificando…</li></ul>
+
+<script>
+const lista = document.getElementById('lista');
+document.getElementById('onde').textContent = location.href;
+lista.innerHTML = '';
+
+function item(estado, titulo, detalhe) {
+  const li = document.createElement('li');
+  li.className = estado;
+  const marca = { ok: '✓', erro: '✗', aviso: '!' }[estado];
+  li.innerHTML = `<span class="marca">${marca}</span><span>${titulo}</span>`;
+  if (detalhe) {
+    const d = document.createElement('span');
+    d.className = 'detalhe';
+    d.textContent = detalhe;
+    li.append(d);
+  }
+  lista.append(li);
+}
+
+(async function () {
+  // 1. Origem segura ------------------------------------------------------
+  item(
+    isSecureContext ? 'ok' : 'erro',
+    isSecureContext ? 'Origem segura' : 'Origem NÃO segura',
+    isSecureContext
+      ? 'https ou localhost — service worker permitido.'
+      : 'Sem isto o navegador ignora o service worker e o app não instala.',
+  );
+
+  // 2. Bundle de desenvolvimento ------------------------------------------
+  const emDev = [...document.scripts].some((s) => s.src.includes('dev=true'))
+    || location.port === '8081';
+  item(
+    emDev ? 'erro' : 'ok',
+    emDev ? 'Servidor de DESENVOLVIMENTO' : 'Build de produção',
+    emDev
+      ? 'O PWA só existe no export. Rode `npm run preview:web` e abra a porta 8080.'
+      : 'É o arquivo que vai para o servidor.',
+  );
+
+  // 3. Manifest -----------------------------------------------------------
+  const elo = document.querySelector('link[rel="manifest"]');
+  let manifest = null;
+  if (!elo) {
+    item('erro', 'Sem <link rel="manifest"> na página');
+  } else {
+    try {
+      const r = await fetch(elo.href);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      manifest = await r.json();
+      item('ok', 'Manifest carregado', elo.href);
+    } catch (e) {
+      item('erro', 'Manifest não carregou', `${elo.href} — ${e.message}`);
+    }
+  }
+
+  if (manifest) {
+    const faltando = ['name', 'short_name', 'start_url', 'display', 'icons']
+      .filter((c) => !manifest[c]);
+    item(
+      faltando.length ? 'erro' : 'ok',
+      faltando.length ? `Manifest sem: ${faltando.join(', ')}` : 'Campos do manifest completos',
+    );
+
+    const tamanhos = (manifest.icons || []).map((i) => i.sizes);
+    const tem192 = tamanhos.some((t) => t && t.includes('192'));
+    const tem512 = tamanhos.some((t) => t && t.includes('512'));
+    item(
+      tem192 && tem512 ? 'ok' : 'erro',
+      tem192 && tem512 ? 'Ícones 192 e 512 declarados' : 'Faltam ícones obrigatórios',
+      tamanhos.join(', '),
+    );
+
+    for (const icone of manifest.icons || []) {
+      const url = new URL(icone.src, elo.href).href;
+      try {
+        const r = await fetch(url);
+        item(r.ok ? 'ok' : 'erro', `Ícone ${icone.sizes}`, `${url} — HTTP ${r.status}`);
+      } catch (e) {
+        item('erro', `Ícone ${icone.sizes} não carregou`, `${url} — ${e.message}`);
+      }
+    }
+
+    // Escopo: a página aberta precisa estar DENTRO dele, senão o
+    // navegador entende que ela não faz parte do app.
+    const escopo = new URL(manifest.scope || './', elo.href).href;
+    const dentro = location.href.startsWith(escopo);
+    item(
+      dentro ? 'ok' : 'erro',
+      dentro ? 'Página dentro do escopo' : 'Página FORA do escopo do manifest',
+      `escopo: ${escopo}`,
+    );
+
+    const inicio = new URL(manifest.start_url, elo.href).href;
+    item(
+      inicio.startsWith(escopo) ? 'ok' : 'erro',
+      'start_url dentro do escopo',
+      inicio,
+    );
+  }
+
+  // 4. Service worker -----------------------------------------------------
+  if (!('serviceWorker' in navigator)) {
+    item('erro', 'Navegador sem suporte a service worker');
+  } else {
+    const registros = await navigator.serviceWorker.getRegistrations();
+    if (!registros.length) {
+      item('erro', 'Nenhum service worker registrado',
+        'Sem worker, o Chrome não oferece instalar. Em dev ele é desligado de propósito.');
+    } else {
+      for (const reg of registros) {
+        const estado = reg.active ? 'ativo' : reg.installing ? 'instalando' : 'esperando';
+        item(reg.active ? 'ok' : 'aviso', `Service worker ${estado}`, `escopo: ${reg.scope}`);
+      }
+    }
+    item(
+      navigator.serviceWorker.controller ? 'ok' : 'aviso',
+      navigator.serviceWorker.controller
+        ? 'A página está sendo controlada pelo worker'
+        : 'Página ainda não controlada',
+      navigator.serviceWorker.controller ? '' : 'Normal na primeira visita: recarregue uma vez.',
+    );
+  }
+
+  // 5. Convite de instalação ---------------------------------------------
+  const safari = /^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
+  if (safari) {
+    item('aviso', 'Você está no Safari',
+      'O Safari não mostra botão de instalar. No Mac: Arquivo > Adicionar ao Dock. No iPhone: Compartilhar > Adicionar à Tela de Início.');
+  }
+
+  let convidou = false;
+  window.addEventListener('beforeinstallprompt', () => { convidou = true; });
+  setTimeout(() => {
+    if (convidou) {
+      item('ok', 'O navegador ofereceu instalar', 'Tudo certo: procure o ícone na barra de endereço.');
+    } else if (!safari) {
+      item('aviso', 'O navegador não ofereceu instalar (ainda)',
+        'Se tudo acima está ✓, costuma ser: o app já está instalado, ou falta recarregar uma vez para o worker assumir.');
+    }
+  }, 2500);
+})();
+</script>
+</body>
+</html>

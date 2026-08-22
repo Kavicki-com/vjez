@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 
+import { BotaoFalarTexto } from '@/features/audio/BotaoFalarTexto';
 import {
   cores,
   espaco,
@@ -41,7 +42,17 @@ export function CampoDoExercicio(props: PropsExercicio<Exercicio>) {
         <View style={styles.bloco}>
           <View style={styles.cartaoFrase}>
             <Text style={styles.fraseHr}>{exercicio.frase_hr}</Text>
-            <Text style={styles.base}>forma base: {exercicio.base_hr}</Text>
+            <View style={styles.rodapeCartao}>
+              <Text style={styles.base}>forma base: {exercicio.base_hr}</Text>
+              {/* Fala a forma flexionada — que é a resposta. Entrega o
+                  exercício de propósito: fixar a sonoridade da flexão vale
+                  mais do que a dificuldade de adivinhá-la, e é justamente a
+                  terminação que a lição está ensinando. */}
+              <BotaoFalarTexto
+                texto={exercicio.resposta}
+                rotulo="a palavra que completa a frase"
+              />
+            </View>
           </View>
           <RespostaTexto
             valor={resposta?.tipo === 'texto' ? resposta.valor : ''}
@@ -57,8 +68,17 @@ export function CampoDoExercicio(props: PropsExercicio<Exercicio>) {
     case 'traducao':
       return (
         <View style={styles.bloco}>
-          <View style={styles.cartaoFrase}>
-            <Text style={styles.origemPt}>{exercicio.origem_pt}</Text>
+          {/* Numa tradução PT→HR, ouvir É o gabarito. Fica assim mesmo: o
+              aluno decide se quer ouvir antes ou depois de tentar, e quem
+              ouve antes ainda tem de escrever com as letras certas. */}
+          <View style={[styles.cartaoFrase, styles.cartaoComBotao]}>
+            <Text style={[styles.origemPt, styles.textoQueSobra]}>
+              {exercicio.origem_pt}
+            </Text>
+            <BotaoFalarTexto
+              texto={exercicio.respostas_aceitas[0]}
+              rotulo="a frase em croata"
+            />
           </View>
           <RespostaTexto
             valor={resposta?.tipo === 'texto' ? resposta.valor : ''}
@@ -75,6 +95,19 @@ export function CampoDoExercicio(props: PropsExercicio<Exercicio>) {
 
 const styles = StyleSheet.create({
   bloco: { gap: espaco.md },
+  rodapeCartao: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: espaco.sm,
+  },
+  /** Texto à esquerda, botão de ouvir encostado na direita do cartão. */
+  cartaoComBotao: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  textoQueSobra: { flex: 1 },
   cartaoFrase: {
     padding: espaco.md,
     borderRadius: raio.md,

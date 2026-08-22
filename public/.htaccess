@@ -1,0 +1,51 @@
+# Vjež — regras do app estático, servido de dentro de /app.
+# Este arquivo sobe junto com o resto do export, para /app/.htaccess.
+# Só vale em Apache. Se o host for Nginx, nada aqui é lido: o equivalente
+# precisa entrar na configuração do servidor (try_files).
+
+# ---------------------------------------------------------------------
+# 1. Rota dinâmica no F5
+# ---------------------------------------------------------------------
+# /licao/<id>, /modulo/<id> e /checkpoint/<id> não existem como arquivo:
+# o export estático não sabe os ids de antemão. Se o caminho pedido não
+# for arquivo nem pasta, entrega a casca e deixa o roteador do app
+# resolver no cliente. Sem isto, atualizar a página no meio de uma lição
+# devolve 404.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /app/
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /app/index.html [L]
+</IfModule>
+
+# ---------------------------------------------------------------------
+# 2. Tipos
+# ---------------------------------------------------------------------
+# Hospedagem compartilhada costuma servir .webmanifest como texto puro, e
+# aí o navegador ignora o manifest e o app não fica instalável.
+<IfModule mod_mime.c>
+  AddType application/manifest+json .webmanifest
+  AddType text/javascript .js
+  AddType audio/mpeg .mp3
+</IfModule>
+
+# ---------------------------------------------------------------------
+# 3. Cache
+# ---------------------------------------------------------------------
+# A ordem importa: quem vem depois vence. Os arquivos de /_expo/ têm hash
+# no nome — conteúdo novo, nome novo —, então cache eterno é seguro. A
+# casca, o worker e o manifest não têm hash: se ficarem em cache longo, o
+# deploy seguinte não chega em quem já visitou.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|woff2|ttf|png|jpg|jpeg|svg|mp3)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "(\.html|sw\.js|\.webmanifest)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/javascript application/javascript application/json application/manifest+json image/svg+xml
+</IfModule>

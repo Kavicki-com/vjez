@@ -5,7 +5,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Botao } from '@/components/Botao';
 import { Confete } from '@/components/Confete';
 import { Sahovnica } from '@/components/Sahovnica';
-import { entrarComGoogle } from '@/features/conta/api';
+import { useEntrarComGoogle } from '@/features/conta/entrar';
 import {
   CHECKPOINT_NOTA_MINIMA,
   NOTA_MAXIMA_LICAO,
@@ -47,6 +47,7 @@ export function TelaFim({
 }: Props) {
   const [entrando, setEntrando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  const entrarComGoogle = useEntrarComGoogle();
   const fracao = nota / NOTA_MAXIMA_LICAO;
   const foiBem = fracao >= CHECKPOINT_NOTA_MINIMA;
   const xp = Math.round(nota * XP_POR_PONTO);
@@ -76,7 +77,7 @@ export function TelaFim({
           <Text style={styles.subtitulo}>{titulo}</Text>
 
           <View style={styles.bento}>
-            <View style={[styles.celula, styles.celulaNota]}>
+            <View style={[styles.celula, foiBem && styles.celulaNota]}>
               <Sahovnica altura={6} noTopo />
               <View style={styles.celulaCorpo}>
                 <View style={[styles.selo, styles.seloPrimario]}>
@@ -212,7 +213,8 @@ const styles = StyleSheet.create({
     backgroundColor: cores.superficie,
     overflow: 'hidden',
   },
-  celulaNota: { borderColor: cores.primaria },
+  // Verde só quando a lição foi bem: a borda colorida é estado, não enfeite.
+  celulaNota: { borderColor: cores.acerto },
   celulaCorpo: { alignItems: 'center', gap: espaco.xs, padding: espaco.md },
   selo: {
     width: 44,
@@ -246,13 +248,13 @@ const styles = StyleSheet.create({
     backgroundColor: cores.superficieVariante,
     overflow: 'hidden',
   },
-  barraCheia: { height: '100%', backgroundColor: cores.primaria },
+  barraCheia: { height: '100%', backgroundColor: cores.secundaria },
   barraCheiaNeutra: { backgroundColor: cores.contorno },
   portao: {
     width: '100%',
     borderRadius: raio.lg,
     borderWidth: 1,
-    borderColor: cores.primaria,
+    borderColor: cores.borda,
     backgroundColor: cores.superficie,
     overflow: 'hidden',
   },
