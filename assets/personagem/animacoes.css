@@ -1,0 +1,66 @@
+  /* ===== O RIG EM MOVIMENTO =====
+     Tudo aqui e transformacao de grupo: nenhum caminho muda de forma.
+     Os transform-origin sao os pivos lidos da figura, em unidades do viewBox. */
+  [id="cabeca"]    { transform-origin: 426px 372px; }
+  [id="bone"]      { transform-origin: 424px 116px; }
+  [id="braco-esq"] { transform-origin: 336px 412px; transform: rotate(-58deg); }
+  [id="braco-dir"] { transform-origin: 524px 412px; transform: rotate(58deg); }
+  [id="cauda"]     { transform-origin: 594px 856px; }
+  [id="tronco"]    { transform-origin: 426px 1040px; }
+  [id="olho-esq"]  { transform-origin: 366px 206px; }
+  [id="olho-dir"]  { transform-origin: 482px 206px; }
+  [id="sombra"]    { transform-origin: 426px 1072px; }
+
+  @keyframes respiro { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.022); } }
+  @keyframes piscar  { 0%, 91%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.08); } }
+  @keyframes cauda-vai { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+
+  .cena [id="tronco"]   { animation: respiro 3.6s ease-in-out infinite; }
+  .cena [id="olho-esq"] { animation: piscar 5.4s ease-in-out infinite; }
+  .cena [id="olho-dir"] { animation: piscar 5.4s ease-in-out infinite; }
+  .cena [id="cauda"]    { animation: cauda-vai 3s ease-in-out infinite; }
+
+  /* --- parado --- */
+  @keyframes cisma { 0%, 100% { transform: rotate(-1.6deg); } 50% { transform: rotate(1.6deg); } }
+  .e-parado [id="cabeca"] { animation: cisma 5.6s ease-in-out infinite; }
+
+  /* --- acena --- */
+  @keyframes acena { 0%, 100% { transform: rotate(-22deg); } 50% { transform: rotate(-56deg); } }
+  .e-acena [id="braco-dir"] { animation: acena .62s ease-in-out infinite; }
+  .e-acena [id="cabeca"]    { transform: rotate(5deg); }
+  .e-acena [id="cauda"]     { animation: cauda-vai 1.1s ease-in-out infinite; }
+
+  /* --- comemora --- */
+  @keyframes pula   { 0%, 100% { transform: translateY(0); } 28% { transform: translateY(-58px); }
+                      52% { transform: translateY(-6px); } 72% { transform: translateY(-30px); } }
+  @keyframes sombra-pula { 0%, 100% { transform: scale(1); opacity: .13; }
+                      28% { transform: scale(.74); opacity: .06; } 72% { transform: scale(.87); opacity: .09; } }
+  .e-comemora [id="corpo"]     { animation: pula 1.05s ease-in-out infinite; }
+  .e-comemora [id="sombra"]    { animation: sombra-pula 1.05s ease-in-out infinite; }
+  .e-comemora [id="braco-esq"] { transform: rotate(44deg); }
+  .e-comemora [id="braco-dir"] { transform: rotate(-44deg); }
+  .e-comemora [id="cauda"]     { animation: cauda-vai .48s ease-in-out infinite; }
+
+  /* --- errou --- */
+  @keyframes abatido { 0%, 100% { transform: rotate(-5deg) translateY(10px); }
+                       50% { transform: rotate(-5deg) translateY(17px); } }
+  .e-errou [id="cabeca"]    { animation: abatido 2.8s ease-in-out infinite; }
+  .e-errou [id="braco-esq"] { transform: rotate(-76deg); }
+  .e-errou [id="braco-dir"] { transform: rotate(76deg); }
+  .e-errou [id="olho-esq"]  { animation: none; transform: scaleY(.55); }
+  .e-errou [id="olho-dir"]  { animation: none; transform: scaleY(.55); }
+  .e-errou [id="cauda"]     { animation: none; transform: rotate(20deg); }
+  .e-errou [id="tronco"]    { animation: respiro 5s ease-in-out infinite; }
+
+  /* --- pensa --- */
+  @keyframes pensa    { 0%, 100% { transform: rotate(-8deg); } 50% { transform: rotate(-12deg); } }
+  @keyframes bone-sobe{ 0%, 100% { transform: rotate(-9deg) translateY(-6px); }
+                        50% { transform: rotate(-14deg) translateY(-13px); } }
+  .e-pensa [id="cabeca"]    { animation: pensa 3.2s ease-in-out infinite; }
+  .e-pensa [id="bone"]      { animation: bone-sobe 3.2s ease-in-out infinite; }
+  .e-pensa [id="braco-dir"] { transform: rotate(30deg); }
+  .e-pensa [id="braco-esq"] { transform: rotate(-64deg); }
+  .e-pensa [id="cauda"]     { animation: cauda-vai 5.2s ease-in-out infinite; }
+
+  .parado * { animation: none !important; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
