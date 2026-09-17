@@ -148,6 +148,21 @@ O gerador reprova e sorteia de novo quando não há vale, quando o recorte sai
 abaixo de 0,27 de pico, ou quando a duração não cabe na janela da palavra
 exibida — esta última é o que pega "trouxe metade do portador junto".
 
+## Conferir tudo o que está no ar
+
+```bash
+SUPABASE_URL=https://cltclnrgtlififwvpfra.supabase.co \
+SUPABASE_SERVICE_ROLE_KEY=...      \
+node supabase/audio/conferir.mjs
+```
+
+Baixa as 521 faixas, decodifica cada uma e lista o que está mudo e o que
+está fraco. Sai com código 1 se achar faixa muda.
+
+O `gerar.mjs` já confere no instante em que cria, mas isso só vale para o que
+foi gerado **depois** de a conferência existir. Rode este depois de cada leva
+de conteúdo, e sempre que trocar de voz.
+
 ## Duração não vê silêncio
 
 O MP3 é de bitrate constante: 0,31s de nada pesa o mesmo que 0,31s de fala.
