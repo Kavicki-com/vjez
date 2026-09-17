@@ -12,6 +12,7 @@ import type {
   Atividade,
   CasoPadez,
   Exercicio,
+  FormaLice,
   Frase,
   Letra,
   Licao,
@@ -19,10 +20,12 @@ import type {
   Modulo,
   Numero,
   Ofensiva,
+  PessoaVerbal,
   ProgressoLicao,
   ProgressoModulo,
   TerminacaoPadez,
   Usuario,
+  VerboModelo,
 } from '@/types/schema';
 
 /** Converte `null` do Postgres em `undefined` do TS. */
@@ -105,6 +108,47 @@ export function paraCasoPadez(
     exemplo_pt: linha.exemplo_pt,
     nota_pt: ou(linha.nota_pt),
     terminacoes,
+  };
+}
+
+// ---------- CONJUGAÇÃO ----------
+
+export function paraVerboModelo(linha: Tables<'verbos_modelo'>): VerboModelo {
+  return {
+    id: linha.id,
+    infinitivo_hr: linha.infinitivo_hr,
+    ordem: linha.ordem,
+    traducao_pt: linha.traducao_pt,
+    padrao_pt: linha.padrao_pt,
+    nota_pt: ou(linha.nota_pt),
+  };
+}
+
+export function paraFormaLice(linha: Tables<'lice_formas'>): FormaLice {
+  return {
+    id: linha.id,
+    lice: linha.lice,
+    tempo: linha.tempo,
+    infinitivo_hr: linha.infinitivo_hr,
+    formas_hr: linha.formas_hr,
+  };
+}
+
+export function paraPessoaVerbal(
+  linha: Tables<'lica'>,
+  formas: FormaLice[],
+): PessoaVerbal {
+  return {
+    id: linha.id,
+    lice: linha.lice,
+    numero: linha.numero,
+    pronomes_hr: linha.pronomes_hr,
+    pronome_pt: linha.pronome_pt,
+    uso_pt: linha.uso_pt,
+    exemplo_hr: linha.exemplo_hr,
+    exemplo_pt: linha.exemplo_pt,
+    nota_pt: ou(linha.nota_pt),
+    formas,
   };
 }
 

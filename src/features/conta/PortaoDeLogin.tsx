@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useState } from 'react';
 import { Platform, StyleSheet, Text, View } from 'react-native';
 
@@ -69,6 +70,31 @@ export function PortaoDeLogin({ titulo, explicacao }: Props) {
         <Text style={styles.rodape}>
           Seu progresso desta sessão é levado para a conta ao entrar.
         </Text>
+
+        {/*
+          O aceite fica aqui, no instante do login, porque é o momento em que
+          a conta nasce: sem esta linha os Termos existem como página de menu
+          e ninguém nunca concordou com eles.
+        */}
+        <Text style={styles.rodape}>
+          Ao entrar, você aceita os{' '}
+          <Text
+            accessibilityRole="link"
+            style={styles.link}
+            onPress={() => router.navigate('/termos')}
+          >
+            Termos de Uso
+          </Text>{' '}
+          e a{' '}
+          <Text
+            accessibilityRole="link"
+            style={styles.link}
+            onPress={() => router.navigate('/privacidade')}
+          >
+            Política de Privacidade
+          </Text>
+          .
+        </Text>
       </View>
     </View>
   );
@@ -114,4 +140,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: espaco.sm,
   },
+  link: { fontFamily: familia.forte, color: cores.primaria },
 });

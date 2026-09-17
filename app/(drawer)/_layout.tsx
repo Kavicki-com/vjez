@@ -43,6 +43,10 @@ export default function DrawerLayout() {
         options={{ headerShown: true, title: 'Padeži' }}
       />
       <Drawer.Screen
+        name="konjugacija"
+        options={{ headerShown: true, title: 'Konjugacija' }}
+      />
+      <Drawer.Screen
         name="configuracoes"
         options={{ headerShown: true, title: 'Configurações' }}
       />
@@ -52,7 +56,11 @@ export default function DrawerLayout() {
       />
       <Drawer.Screen
         name="privacidade"
-        options={{ headerShown: true, title: 'Privacidade e termos' }}
+        options={{ headerShown: true, title: 'Privacidade' }}
+      />
+      <Drawer.Screen
+        name="termos"
+        options={{ headerShown: true, title: 'Termos de uso' }}
       />
     </Drawer>
   );

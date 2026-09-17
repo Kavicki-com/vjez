@@ -48,7 +48,12 @@ insert into public.audio_ajustes (texto, texto_falado, cortar_portador, motivo) 
   ('je',  'Riječ je.',  true, 'Pico 0,006, zero audível.'),
   ('ja',  'Riječ ja.',  true, 'Pico 0,007, zero audível.'),
   ('ti',  'Riječ ti.',  true, 'Pico 0,067, no fundo do audível.'),
-  ('Đ',   'Slovo đ.',   true, 'Letra solta: 0,049. O alfabeto fala a palavra de exemplo, mas esta faixa é a letra em si.')
+  ('Đ',   'Slovo đ.',   true, 'Letra solta: 0,049. O alfabeto fala a palavra de exemplo, mas esta faixa é a letra em si.'),
+
+  -- Pronomes e clíticos, encontrados ao gerar o quadro da conjugação.
+  ('mi',  'Riječ mi.',  true, 'Pronome de duas letras: pico 0,006, zero audível. Mesmo caso de ja e ti.'),
+  ('vi',  'Riječ vi.',  true, 'Pronome de duas letras: saía em 1,20s para duas letras — a voz inventava sílaba.'),
+  ('ste', 'Riječ ste.', true, 'Clítico de biti, átono: saía em 0,26–0,31s com pico 0,081.')
 on conflict (texto) do update set
   texto_falado    = excluded.texto_falado,
   cortar_portador = excluded.cortar_portador,

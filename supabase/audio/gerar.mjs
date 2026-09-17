@@ -7,7 +7,7 @@
  *   GOOGLE_TTS_API_KEY=...  \
  *   SUPABASE_URL=...        \
  *   SUPABASE_SERVICE_ROLE_KEY=... \
- *   node supabase/audio/gerar.mjs [--so=letras,numeros,palavras,frases,opcoes,padezi] [--refazer]
+ *   node supabase/audio/gerar.mjs [--so=letras,numeros,palavras,frases,opcoes,padezi,conjugacao] [--refazer]
  *
  * Roda com service_role de propósito: é trabalho em lote, fora do app, e
  * precisa escrever em conteúdo curado. Nunca embarque essa chave no cliente.
@@ -203,6 +203,40 @@ async function processarPadezi() {
   }
 
   await gerarPorTexto('padezi', textos);
+}
+
+/**
+ * Quadro da conjugação (menu lateral → Konjugacija): as formas de cada
+ * pessoa nos três tempos, e a frase de exemplo de cada pessoa.
+ *
+ * Vai para audio_hr pelo mesmo motivo das opções e do padezi: "radim" e
+ * "bio sam" são formas flexionadas que se repetem entre o quadro, os
+ * exercícios e o dicionário. Guardando por texto, a mesma faixa serve aos
+ * três.
+ *
+ * O pronome sozinho NÃO entra aqui: "ja", "ti" e "on" já estão no audio_hr
+ * pelos exercícios, e alguns deles precisam de portador para sair falados —
+ * quem cuida disso é o `audio_ajustes`, não um alvo novo.
+ */
+async function processarConjugacao() {
+  const [pessoas, celulas] = await Promise.all([
+    fetch(`${URL}/rest/v1/lica?select=exemplo_hr,pronomes_hr`, { headers: cabecalhos })
+      .then((r) => r.json()),
+    fetch(`${URL}/rest/v1/lice_formas?select=formas_hr&limit=1000`, {
+      headers: cabecalhos,
+    }).then((r) => r.json()),
+  ]);
+
+  const textos = new Set();
+  for (const p of pessoas) {
+    textos.add(p.exemplo_hr);
+    for (const pronome of p.pronomes_hr ?? []) textos.add(pronome);
+  }
+  for (const c of celulas) {
+    for (const forma of c.formas_hr ?? []) textos.add(forma);
+  }
+
+  await gerarPorTexto('conjugacao', textos);
 }
 
 /** Sintetiza textos soltos e guarda em audio_hr, indexado pelo texto. */
@@ -566,6 +600,7 @@ for (const alvo of ALVOS) {
 }
 if (!filtro || filtro.includes('opcoes')) await processarOpcoes();
 if (!filtro || filtro.includes('padezi')) await processarPadezi();
+if (!filtro || filtro.includes('conjugacao')) await processarConjugacao();
 if (suspeitos.length) {
   console.log(`\n⚠ ${suspeitos.length} no ar mesmo fora da faixa — ouça estes:`);
   for (const s of suspeitos) {

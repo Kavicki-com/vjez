@@ -331,6 +331,93 @@ export type Database = {
         }
         Relationships: []
       }
+      lica: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          exemplo_hr: string
+          exemplo_pt: string
+          id: string
+          lice: Database["public"]["Enums"]["lice"]
+          nota_pt: string | null
+          numero: number
+          pronome_pt: string
+          pronomes_hr: string[]
+          uso_pt: string
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          exemplo_hr: string
+          exemplo_pt: string
+          id?: string
+          lice: Database["public"]["Enums"]["lice"]
+          nota_pt?: string | null
+          numero: number
+          pronome_pt: string
+          pronomes_hr: string[]
+          uso_pt: string
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          exemplo_hr?: string
+          exemplo_pt?: string
+          id?: string
+          lice?: Database["public"]["Enums"]["lice"]
+          nota_pt?: string | null
+          numero?: number
+          pronome_pt?: string
+          pronomes_hr?: string[]
+          uso_pt?: string
+        }
+        Relationships: []
+      }
+      lice_formas: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          formas_hr: string[]
+          id: string
+          infinitivo_hr: string
+          lice: Database["public"]["Enums"]["lice"]
+          tempo: Database["public"]["Enums"]["tempo_verbal"]
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          formas_hr: string[]
+          id?: string
+          infinitivo_hr: string
+          lice: Database["public"]["Enums"]["lice"]
+          tempo: Database["public"]["Enums"]["tempo_verbal"]
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          formas_hr?: string[]
+          id?: string
+          infinitivo_hr?: string
+          lice?: Database["public"]["Enums"]["lice"]
+          tempo?: Database["public"]["Enums"]["tempo_verbal"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lice_formas_infinitivo_hr_fkey"
+            columns: ["infinitivo_hr"]
+            isOneToOne: false
+            referencedRelation: "verbos_modelo"
+            referencedColumns: ["infinitivo_hr"]
+          },
+          {
+            foreignKeyName: "lice_formas_lice_fkey"
+            columns: ["lice"]
+            isOneToOne: false
+            referencedRelation: "lica"
+            referencedColumns: ["lice"]
+          },
+        ]
+      }
       licoes: {
         Row: {
           atualizado_em: string
@@ -785,6 +872,39 @@ export type Database = {
         }
         Relationships: []
       }
+      verbos_modelo: {
+        Row: {
+          atualizado_em: string
+          criado_em: string
+          id: string
+          infinitivo_hr: string
+          nota_pt: string | null
+          ordem: number
+          padrao_pt: string
+          traducao_pt: string
+        }
+        Insert: {
+          atualizado_em?: string
+          criado_em?: string
+          id?: string
+          infinitivo_hr: string
+          nota_pt?: string | null
+          ordem: number
+          padrao_pt: string
+          traducao_pt: string
+        }
+        Update: {
+          atualizado_em?: string
+          criado_em?: string
+          id?: string
+          infinitivo_hr?: string
+          nota_pt?: string | null
+          ordem?: number
+          padrao_pt?: string
+          traducao_pt?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -858,6 +978,7 @@ export type Database = {
       estado_conta: "convidado" | "autenticado"
       fase: "demo" | "paralelo" | "evolucao"
       genero_gramatical: "m" | "f" | "n"
+      lice: "1s" | "2s" | "3s" | "1p" | "2p" | "3p"
       nivel: "basico" | "intermediario" | "avancado"
       padez:
         | "nominativ"
@@ -875,6 +996,7 @@ export type Database = {
         | "corrigida_ia"
         | "revisada_nativo"
         | "falha"
+      tempo_verbal: "prezent" | "perfekt" | "futur"
       tipo_atividade: "transformacao" | "traducao" | "producao_livre"
       tipo_exercicio:
         | "preencher_lacuna"
@@ -1013,6 +1135,7 @@ export const Constants = {
       estado_conta: ["convidado", "autenticado"],
       fase: ["demo", "paralelo", "evolucao"],
       genero_gramatical: ["m", "f", "n"],
+      lice: ["1s", "2s", "3s", "1p", "2p", "3p"],
       nivel: ["basico", "intermediario", "avancado"],
       padez: [
         "nominativ",
@@ -1032,6 +1155,7 @@ export const Constants = {
         "revisada_nativo",
         "falha",
       ],
+      tempo_verbal: ["prezent", "perfekt", "futur"],
       tipo_atividade: ["transformacao", "traducao", "producao_livre"],
       tipo_exercicio: [
         "preencher_lacuna",

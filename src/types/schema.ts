@@ -89,6 +89,67 @@ export interface CasoPadez {
   terminacoes: TerminacaoPadez[];
 }
 
+// ---------- CONJUGAÇÃO (aba lateral: Konjugacija) ----------
+
+/** 1ª, 2ª e 3ª pessoa, singular e plural. */
+export type Lice = '1s' | '2s' | '3s' | '1p' | '2p' | '3p';
+
+/** Os três tempos que o iniciante precisa: presente, passado, futuro. */
+export type TempoVerbal = 'prezent' | 'perfekt' | 'futur';
+
+/**
+ * Um verbo-modelo — a coluna do quadro.
+ *
+ * São quatro: `biti`, que é irregular e o mais usado da língua, e um de cada
+ * padrão de presente (-am, -im, -em). Reconhecer o padrão é o que deixa o
+ * aluno conjugar os outros verbos sozinho.
+ */
+export interface VerboModelo {
+  id: string;
+  infinitivo_hr: string;
+  ordem: number;
+  traducao_pt: string;
+  /** Rótulo da coluna, em PT: "presente em -am", "irregular". */
+  padrao_pt: string;
+  nota_pt?: string;
+}
+
+/**
+ * Uma célula do quadro: pessoa × tempo × verbo.
+ *
+ * `formas_hr` guarda a forma INTEIRA, não um sufixo: em croata o passado é
+ * clítico + particípio ("radio sam") e o futuro é clítico + infinitivo
+ * ("radit ću"). Vêm duas ou três formas quando o gênero muda a palavra —
+ * mesmo desenho do `exemplos_hr` da grade do Padeži, pelo mesmo motivo.
+ */
+export interface FormaLice {
+  id: string;
+  lice: Lice;
+  tempo: TempoVerbal;
+  infinitivo_hr: string;
+  formas_hr: string[];
+}
+
+/**
+ * Linha do quadro de conjugação (item Konjugacija do menu lateral).
+ * Material de consulta: o pronome, onde o brasileiro tropeça nesta pessoa,
+ * um exemplo, e as formas de cada verbo-modelo nos três tempos.
+ */
+export interface PessoaVerbal {
+  id: string;
+  lice: Lice;
+  /** 1 a 6, na ordem de qualquer tabela de conjugação. */
+  numero: number;
+  /** Mais de um quando a pessoa tem gênero: on / ona / ono. */
+  pronomes_hr: string[];
+  pronome_pt: string;
+  uso_pt: string;
+  exemplo_hr: string;
+  exemplo_pt: string;
+  nota_pt?: string;
+  formas: FormaLice[];
+}
+
 // ---------- EXERCÍCIOS (templates) ----------
 export type TipoExercicio =
   | 'preencher_lacuna'

@@ -40,6 +40,12 @@ const PRINCIPAIS: Destino[] = [
  */
 const CONSULTA: Destino[] = [
   { href: '/padezi', rotulo: 'Padeži', icone: 'grid-outline', iconeAtivo: 'grid' },
+  {
+    href: '/konjugacija',
+    rotulo: 'Konjugacija',
+    icone: 'swap-horizontal-outline',
+    iconeAtivo: 'swap-horizontal',
+  },
 ];
 
 /**
@@ -59,7 +65,8 @@ const CURADORIA: Destino = {
 const SECUNDARIOS: Destino[] = [
   { href: '/configuracoes', rotulo: 'Configurações', icone: 'settings-outline', iconeAtivo: 'settings' },
   { href: '/conta', rotulo: 'Conta', icone: 'person-circle-outline', iconeAtivo: 'person-circle' },
-  { href: '/privacidade', rotulo: 'Privacidade e termos', icone: 'shield-checkmark-outline', iconeAtivo: 'shield-checkmark' },
+  { href: '/privacidade', rotulo: 'Privacidade', icone: 'shield-checkmark-outline', iconeAtivo: 'shield-checkmark' },
+  { href: '/termos', rotulo: 'Termos de uso', icone: 'document-text-outline', iconeAtivo: 'document-text' },
 ];
 
 function estaAtivo(pathname: string, href: Href): boolean {

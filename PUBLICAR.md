@@ -5,8 +5,9 @@
 
 A landing e o app moram no mesmo domínio: **landing na raiz, app em `/app`**.
 É o que o `index.html` da landing já espera — os botões "Comece agora" e o
-link do rodapé apontam para `/app/`, e o "Privacidade e termos" para
-`/app/privacidade`.
+link do rodapé apontam para `/app/`, e os dois links legais do rodapé para
+`/app/privacidade` e `/app/termos` — que são também as duas URLs pedidas no
+cadastro das lojas.
 
 ## Gerar
 
