@@ -75,17 +75,6 @@ function CartaoDoCaso({
 }) {
   const { data: audios } = useAudioDeTexto();
   const audioDoExemplo = audios?.get(caso.exemplo_hr);
-  // Um player só para a grade inteira, trocando de faixa: são até 48 formas
-  // no cartão e o aluno ouve uma de cada vez. A frase de exemplo tem o
-  // player próprio do BotaoAudio, porque é a faixa que mais se repete.
-  const player = useAudioPlayer();
-
-  const falar = (forma: string) => {
-    const url = audios?.get(forma);
-    if (!url) return;
-    player.replace({ uri: url });
-    player.play();
-  };
 
   return (
     <View style={[styles.cartao, aberto && styles.cartaoAberto]}>
@@ -132,8 +121,7 @@ function CartaoDoCaso({
 
           <Grade
             terminacoes={caso.terminacoes}
-            temAudio={(forma) => Boolean(audios?.get(forma))}
-            aoTocar={falar}
+            urlDe={(forma) => audios?.get(forma)}
           />
 
           <View style={styles.exemplo}>
@@ -154,14 +142,14 @@ function CartaoDoCaso({
 }
 
 type PropsAudio = {
-  temAudio: (forma: string) => boolean;
-  aoTocar: (forma: string) => void;
+  /** Sem URL, a forma não fala e não mostra o alto-falante. */
+  urlDe: (forma: string) => string | undefined;
 };
 
 /** Terminações em gênero × número, com a palavra-modelo já flexionada. */
 function Grade({
   terminacoes,
-  ...audio
+  urlDe,
 }: { terminacoes: TerminacaoPadez[] } & PropsAudio) {
   const achar = (genero: string, plural: boolean) =>
     terminacoes.find((t) => t.genero === genero && t.plural === plural);
@@ -181,8 +169,8 @@ function Grade({
       {GENEROS.map(({ valor, rotulo }) => (
         <View key={valor} style={[styles.gradeLinha, styles.gradeLinhaDado]}>
           <Text style={styles.gradeRotulo}>{rotulo}</Text>
-          <Celula terminacao={achar(valor, false)} {...audio} />
-          <Celula terminacao={achar(valor, true)} {...audio} />
+          <Celula terminacao={achar(valor, false)} urlDe={urlDe} />
+          <Celula terminacao={achar(valor, true)} urlDe={urlDe} />
         </View>
       ))}
     </View>
@@ -195,8 +183,7 @@ function Grade({
  */
 function Celula({
   terminacao,
-  temAudio,
-  aoTocar,
+  urlDe,
 }: { terminacao?: TerminacaoPadez } & PropsAudio) {
   if (!terminacao) return <View style={styles.gradeCelula} />;
 
@@ -205,28 +192,48 @@ function Celula({
       <Text style={styles.terminacao}>{terminacao.terminacao}</Text>
       {/* Duas formas quando a terminação alterna: cada uma fala a sua, e
           ouvir "grad" sem "prijatelja" atrás é o ponto. */}
-      {terminacao.exemplos_hr.map((forma) => {
-        const soa = temAudio(forma);
-        return (
-          <Pressable
-            key={forma}
-            accessibilityRole={soa ? 'button' : 'text'}
-            accessibilityLabel={soa ? `Ouvir ${forma}` : forma}
-            disabled={!soa}
-            onPress={() => aoTocar(forma)}
-            style={({ pressed }) => [
-              styles.formaCelula,
-              pressed && soa && styles.formaPressionada,
-            ]}
-          >
-            <Text style={styles.exemploCelula}>{forma}</Text>
-            {soa && (
-              <Ionicons name="volume-low" size={13} color={cores.contorno} />
-            )}
-          </Pressable>
-        );
-      })}
+      {terminacao.exemplos_hr.map((forma) => (
+        <Forma key={forma} forma={forma} url={urlDe(forma)} />
+      ))}
     </View>
+  );
+}
+
+/**
+ * Uma forma da grade, com o próprio player.
+ *
+ * Player por forma, e não um compartilhado para a grade inteira trocando de
+ * faixa. A versão anterior fazia isso — `replace()` seguido de `play()` — e
+ * perdia a corrida: `replace()` destrói o elemento de áudio e chama `pause()`
+ * nele, e se o `play()` anterior ainda não tinha resolvido o navegador rejeita
+ * a promessa com `AbortError` e nada toca. As formas daqui são curtas
+ * (`gradu`, `ženom`, `polju`), meio segundo cada, que é justamente onde essa
+ * corrida se perde sempre.
+ *
+ * São até 48 players num cartão aberto, e um por vez fica aberto. É o mesmo
+ * desenho do `EscolherForma`, pelo mesmo motivo.
+ */
+function Forma({ forma, url }: { forma: string; url?: string }) {
+  const player = useAudioPlayer(url ? { uri: url } : null);
+
+  return (
+    <Pressable
+      accessibilityRole={url ? 'button' : 'text'}
+      accessibilityLabel={url ? `Ouvir ${forma}` : forma}
+      disabled={!url}
+      onPress={() => {
+        if (!url) return;
+        player.seekTo(0);
+        player.play();
+      }}
+      style={({ pressed }) => [
+        styles.formaCelula,
+        pressed && url && styles.formaPressionada,
+      ]}
+    >
+      <Text style={styles.exemploCelula}>{forma}</Text>
+      {url && <Ionicons name="volume-low" size={13} color={cores.contorno} />}
+    </Pressable>
   );
 }
 
