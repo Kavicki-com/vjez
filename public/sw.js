@@ -12,8 +12,15 @@
  * 2. ESTÁTICOS DO BUNDLE — cache primeiro. Os arquivos de /_expo/ têm hash
  *    no nome: quando o conteúdo muda, o nome muda. Cache eterno é seguro.
  *
- * 3. ÁUDIO — cache primeiro, com teto. Os MP3 do Storage são imutáveis e o
- *    aluno repete a mesma faixa muitas vezes.
+ * 3. ÁUDIO — cache primeiro, com teto, porque o aluno repete a mesma faixa
+ *    muitas vezes.
+ *
+ *    ATENÇÃO: o MP3 do Storage NÃO é imutável. O nome do arquivo vem do
+ *    texto, então consertar a pronúncia de uma palavra reescreve a mesma
+ *    URL — foi o que aconteceu com 14 faixas que subiram mudas. Cache
+ *    primeiro entrega a versão velha para sempre, e o servidor manda
+ *    `cache-control: no-cache` justamente para evitar isso; é este worker
+ *    que passa por cima. Por isso: REGEROU ÁUDIO, SUBA A `VERSAO`.
  *
  * NÃO toca em /rest/v1/ nem em /auth/: progresso e sessão têm que ser a
  * verdade do servidor, e servir progresso velho de cache é pior do que
@@ -22,8 +29,13 @@
 
 // Subir este número joga fora todo o cache antigo na próxima visita. Suba
 // sempre que o deploy puder ter pegado o navegador no meio do caminho —
-// tipo um SFTP que terminou depois de alguém já ter aberto o site.
-const VERSAO = 'vjez-v2';
+// tipo um SFTP que terminou depois de alguém já ter aberto o site — e
+// SEMPRE que áudio tiver sido regerado, pelo motivo no item 3 acima.
+//
+// v3: 14 faixas mudas reescritas nas mesmas URLs (vogais soltas, `pas`,
+// `pet`, `je`, `ja`, `ti`, `Đ`). Quem já tinha o PWA instalado carregava a
+// versão silenciosa do cache.
+const VERSAO = 'vjez-v3';
 const CASCA = `${VERSAO}-casca`;
 const ESTATICOS = `${VERSAO}-estaticos`;
 const AUDIO = `${VERSAO}-audio`;
