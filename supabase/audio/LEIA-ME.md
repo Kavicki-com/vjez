@@ -2,20 +2,27 @@
 
 ## Situação
 
-**Gerado e no ar**: 180 MP3 (716 kB) no bucket `audio`, com a voz
-`hr-HR-Chirp3-HD-Achernar` a 0.9 de velocidade. Cobre alfabeto, números,
-dicionário e expressões.
+**Gerado e no ar**: 180 MP3 da camada basal (alfabeto, números, dicionário,
+expressões) mais **341 faixas em `audio_hr`**, indexadas por texto. Tudo com a
+voz `hr-HR-Chirp3-HD-Achernar` a 0.9 de velocidade.
 
 O botão de ouvir aparece sozinho em qualquer item que tenha `audio_url` —
 inclusive nos que a curadoria acrescentar depois, bastando rodar o script
 de novo (ele pula o que já tem áudio).
 
-O alvo `padezi` (quadro dos casos) também está no ar: 27 faixas novas — as 7
-frases de exemplo e cada forma da grade de terminações. As 6 formas de *žena*
-o script pulou, porque já existiam pelos exercícios: a mesma faixa serve aos
-dois lugares, que é o ponto de indexar por texto.
+O alvo `padezi` (quadro dos casos) também está no ar: as 7 frases de exemplo
+e cada forma da grade de terminações. As 6 formas de *žena* o script pulou,
+porque já existiam pelos exercícios: a mesma faixa serve aos dois lugares,
+que é o ponto de indexar por texto.
 
-**Exercícios seguem sem áudio**, de propósito: veja a seção no fim.
+**Conteúdo novo chega mudo.** Uma leva de lições entra no banco sem áudio
+nenhum — o `audio_hr` só conhece o que o gerador já viu. Depois de qualquer
+seed de conteúdo, rode `--so=opcoes`: é o alvo que varre os exercícios e gera
+só o que falta. Foi o que faltou depois dos seeds 012–014, e deixou as
+lições novas mudas até o dia seguinte.
+
+**O que o script não fala em exercício** está na seção do fim: a regra é
+sobre entregar a resposta, não sobre poupar faixa.
 
 ## Gerar
 
@@ -44,7 +51,7 @@ a curadoria acrescentar conteúdo: ele gera só o que falta.
 
 ### Custo
 
-O conteúdo de hoje são **180 itens e 1.094 caracteres** no total:
+O conteúdo de hoje são **521 faixas e 3.981 caracteres** no total:
 
 | alvo | itens | caracteres |
 |---|---|---|
@@ -52,9 +59,10 @@ O conteúdo de hoje são **180 itens e 1.094 caracteres** no total:
 | números | 30 | 203 |
 | palavras | 93 | 451 |
 | expressões | 27 | 309 |
+| `audio_hr` (exercícios e padeži) | 341 | 2.887 |
 
 O Cloud TTS cobra por caractere e a faixa gratuita é contada em milhões.
-Mil caracteres é ruído estatístico dentro de qualquer plano — mesmo na
+Quatro mil caracteres é ruído estatístico dentro de qualquer plano — mesmo na
 família Chirp3-HD, que é a premium. Vale conferir o preço vigente em
 https://cloud.google.com/text-to-speech/pricing antes de rodar `--refazer`
 sobre um conteúdo muito maior, mas para o volume atual não há o que pesar.
@@ -81,12 +89,25 @@ pouco; o que fixa o som é ouvir `čokolada` para o Č.
 
 ## O que o script NÃO faz
 
-**Não gera áudio de exercício**, de propósito. O áudio pode entregar a
-resposta: numa tradução PT→HR, ouvir a palavra em croata é o gabarito.
-Onde o áudio for o enunciado (HR→PT, ou um exercício de escuta), quem decide
-é a curadoria, item a item. O app já toca `exercicios.audio_url` quando ele
-existe — inclusive tocando sozinho, se a preferência de áudio automático
-estiver ligada.
+**Não preenche `exercicios.audio_url`**, de propósito: esse campo é o áudio
+do *enunciado*, e tocá-lo antes da resposta entregaria o gabarito numa
+tradução PT→HR. Onde o enunciado for para ouvir (HR→PT, ou um exercício de
+escuta), quem decide é a curadoria, item a item. O app toca
+`exercicios.audio_url` quando ele existe — inclusive sozinho, se a
+preferência de áudio automático estiver ligada.
+
+O que ele **gera** é o áudio das palavras que aparecem no exercício, em
+`audio_hr`: as fichas croatas do `ligar_pares`, as respostas certas de cada
+template (tocadas só no feedback, depois de o aluno responder) e as opções do
+`escolher_forma`.
+
+**Opção de `escolher_forma` só fala** quando é verbete do dicionário ou
+quando a curadoria marcou `falar_opcoes` no `dados`. Sem isso o exercício
+fica mudo, e é assim que se quer em metade deles: opção em português ("fumar",
+"feminino"), nome de caso ("Genitiv"), transcrição de som ("ts", "tch") ou
+frase que mistura as duas línguas. Voz croata lendo português é pior do que
+silêncio. Onde as quatro opções são croatas, marque — ver seed
+`015_opcoes_que_falam.sql`.
 
 ## Alternativas à voz sintética
 
