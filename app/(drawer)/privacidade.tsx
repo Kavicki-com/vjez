@@ -6,7 +6,7 @@ import {
   Rodape,
   Secao,
 } from '@/features/legal/Documento';
-import { RESPONSAVEL } from '@/features/legal/responsavel';
+import { RESPONSAVEL, SEDE } from '@/features/legal/responsavel';
 
 /**
  * Política de Privacidade.
@@ -28,13 +28,13 @@ export default function Privacidade() {
       <Secao numero={1} titulo="Quem trata seus dados">
         <P>
           O Vjez é operado por <Negrito>{RESPONSAVEL.razaoSocial}</Negrito>,
-          inscrita no CNPJ {RESPONSAVEL.cnpj}, com sede em{' '}
-          {RESPONSAVEL.endereco}. Somos o controlador dos dados pessoais
-          tratados no app, nos termos da Lei nº 13.709/2018 (LGPD).
+          inscrita no CNPJ {RESPONSAVEL.cnpj}
+          {SEDE}. Somos o controlador dos dados pessoais tratados no app, nos
+          termos da Lei nº 13.709/2018 (LGPD).
         </P>
         <P>
           Para qualquer assunto de privacidade — inclusive exercer os direitos
-          da seção 9 — escreva para{' '}
+          da seção 10 — escreva para{' '}
           <Negrito>{RESPONSAVEL.email}</Negrito>.
         </P>
       </Secao>

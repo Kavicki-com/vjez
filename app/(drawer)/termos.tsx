@@ -6,7 +6,7 @@ import {
   Rodape,
   Secao,
 } from '@/features/legal/Documento';
-import { RESPONSAVEL } from '@/features/legal/responsavel';
+import { RESPONSAVEL, SEDE } from '@/features/legal/responsavel';
 
 /**
  * Termos de Uso.
@@ -26,8 +26,8 @@ export default function Termos() {
         <P>
           O Vjez é um aplicativo para brasileiros aprenderem croata, oferecido
           por <Negrito>{RESPONSAVEL.razaoSocial}</Negrito>, CNPJ{' '}
-          {RESPONSAVEL.cnpj}, com sede em {RESPONSAVEL.endereco}. Contato:{' '}
-          <Negrito>{RESPONSAVEL.email}</Negrito>.
+          {RESPONSAVEL.cnpj}
+          {SEDE}. Contato: <Negrito>{RESPONSAVEL.email}</Negrito>.
         </P>
       </Secao>
 
