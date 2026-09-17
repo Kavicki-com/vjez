@@ -109,6 +109,40 @@ frase que mistura as duas línguas. Voz croata lendo português é pior do que
 silêncio. Onde as quatro opções são croatas, marque — ver seed
 `015_opcoes_que_falam.sql`.
 
+## A voz não diz texto curtíssimo
+
+Letra solta e palavra de duas letras saem **com a duração certa e silêncio
+dentro**: `a`, `e`, `o`, `u`, `od` e `do` tinham pico abaixo de 0,022 e ZERO
+janelas audíveis, contra 0,27 e 31% das faixas boas.
+
+**Baixar a velocidade não resolve.** Medido de 0,9 a 0,25, três sorteios
+cada: a 0,25 o `a` dura 1,03s e continua mudo. O arquivo cresce e o silêncio
+cresce junto — não é que ela corra demais, é que não gera fonação para
+entrada curtíssima.
+
+**E não é monossílabo.** `krv`, `trg`, `prst` e `sin` saem bem em qualquer
+velocidade. `dan` é a fronteira: funciona a 0,9, colapsa a 0,7 e 0,5, volta a
+funcionar a 0,35 — sorteio, não curva.
+
+O que resolve é mais **texto**, não mais tempo. Daí o `cortar_portador` em
+`audio_ajustes`: o gerador sintetiza `Slovo a.` ("a letra a"), acha o vale de
+energia entre o portador e a vogal, e descarta os quadros de MP3 anteriores a
+ele. O que sobe tem só a vogal, com os mesmos bytes que o sintetizador
+produziu — `supabase/audio/mp3.mjs` recorta por quadro, sem recodificar.
+
+Reprova e sorteia de novo quando não há vale: aí o portador e o alvo saíram
+grudados, e cortar seria chutar no meio da palavra.
+
+## Duração não vê silêncio
+
+O MP3 é de bitrate constante: 0,31s de nada pesa o mesmo que 0,31s de fala.
+Foi assim que as quatro mudas passaram pela régua e foram para o ar.
+
+`supabase/audio/som.mjs` decodifica com o `afconvert` do macOS ou com o
+`ffmpeg` e mede pico e fração audível. Sem nenhum dos dois na máquina o
+script **avisa alto** e segue só com a duração — o que não pode é ficar
+quieto e a gente descobrir pelo aluno.
+
 ## Alternativas à voz sintética
 
 Se a qualidade do TTS não convencer, o caminho é gravar com um nativo. O
