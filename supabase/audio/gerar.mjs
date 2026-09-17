@@ -342,6 +342,9 @@ function faixaEsperada(texto) {
  */
 const PRE_ATAQUE = 0.04;
 
+/** Pico mínimo que um recorte precisa ter para subir. */
+const PICO_MINIMO_DO_RECORTE = 0.27;
+
 /**
  * Sintetiza a frase-portadora e sobe só o alvo.
  *
@@ -380,8 +383,28 @@ async function comPortador(texto, falado) {
 
     const mp3 = recortar(inteiro, Math.max(0, corte - PRE_ATAQUE), Infinity);
     const som = medir(mp3);
-    if (!temSom(som)) {
+    // Barra mais alta que a do `temSom`: aqui sortear de novo é barato, e as
+    // faixas boas da biblioteca vivem entre 0,27 e 1,00 de pico. Aceitar
+    // 0,21 deixaria a vogal recortada mais baixa que as palavras ao lado
+    // dela na mesma lição, e o aluno ouviria o remendo.
+    if (som.pico < PICO_MINIMO_DO_RECORTE || !temSom(som)) {
       falhas.push(`recorte saiu fraco (pico ${som.pico.toFixed(3)})`);
+      continue;
+    }
+
+    // O que sobrou tem que ter a cara do ALVO, não do alvo mais um pedaço de
+    // portador — nem de um pedaço do alvo.
+    //
+    // Contar blocos de voz não serve: "pet" tem a oclusiva do /t/ no meio e
+    // sai legitimamente em dois blocos. Quem separa é a duração contra a
+    // janela da palavra exibida — com piso folgado, porque recorte não tem o
+    // embalo nem a cauda que a síntese inteira tem.
+    const { min, max } = faixaEsperada(texto);
+    if (som.segundos < min * 0.6 || som.segundos > max) {
+      falhas.push(
+        `recorte de ${som.segundos.toFixed(2)}s, fora de ` +
+          `${(min * 0.6).toFixed(2)}–${max.toFixed(2)}s`,
+      );
       continue;
     }
 

@@ -143,13 +143,21 @@ export function fronteira(mp3) {
     }
   }
 
-  const bons = vales.filter((t) => t.ate - t.de >= 0.03);
-  if (!bons.length) return null;
+  // O vale MAIS LONGO, não o último: a oclusiva dentro de uma palavra também
+  // é um vale. "Riječ pet." tem o buraco do /t/ no fim de "pet", e cortar
+  // nele entregava 0,19s de "t" solto. A pausa entre palavras é sempre a
+  // maior — 80 ms ou mais, contra 30–60 ms de uma oclusiva.
+  //
+  // E o que sobra depois do corte tem que ser som de verdade: candidatos que
+  // deixam menos de 0,2s são descartados, e a busca cai para o vale seguinte.
+  const bons = vales
+    .filter((t) => t.ate - t.de >= 0.04)
+    .sort((a, b) => b.ate - b.de - (a.ate - a.de));
 
-  const ultimo = bons[bons.length - 1];
-  // Sobrou fala suficiente depois do vale para o corte valer a pena?
-  if (duracao - ultimo.ate < 0.12) return null;
-  return ultimo.ate;
+  for (const vale of bons) {
+    if (duracao - vale.ate >= 0.2) return vale.ate;
+  }
+  return null;
 }
 
 /** Quantos blocos de voz há no arquivo. Um corte limpo tem exatamente um. */

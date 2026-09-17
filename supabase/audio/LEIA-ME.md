@@ -111,9 +111,11 @@ silêncio. Onde as quatro opções são croatas, marque — ver seed
 
 ## A voz não diz texto curtíssimo
 
-Letra solta e palavra de duas letras saem **com a duração certa e silêncio
-dentro**: `a`, `e`, `o`, `u`, `od` e `do` tinham pico abaixo de 0,022 e ZERO
-janelas audíveis, contra 0,27 e 31% das faixas boas.
+Letra solta e palavra curta saem **com a duração certa e silêncio dentro**.
+Varrendo as 521 faixas da biblioteca, doze estavam assim: `a`, `e`, `o`, `u`,
+`od`, `do`, `pas`, `pet`, `je`, `ja`, `ti` e `Đ` — pico abaixo de 0,05 contra
+0,27 a 1,00 das boas. Cinco eram anteriores à conferência de som existir e
+nunca tinham sido ouvidas.
 
 **Baixar a velocidade não resolve.** Medido de 0,9 a 0,25, três sorteios
 cada: a 0,25 o `a` dura 1,03s e continua mudo. O arquivo cresce e o silêncio
@@ -130,8 +132,21 @@ energia entre o portador e a vogal, e descarta os quadros de MP3 anteriores a
 ele. O que sobe tem só a vogal, com os mesmos bytes que o sintetizador
 produziu — `supabase/audio/mp3.mjs` recorta por quadro, sem recodificar.
 
-Reprova e sorteia de novo quando não há vale: aí o portador e o alvo saíram
-grudados, e cortar seria chutar no meio da palavra.
+**Escolher o portador** é tentativa e erro, e o seed `016` guarda o resultado:
+
+- `Slovo x.` para letra — é o que um croata diz, "a letra x".
+- `Riječ x.` para palavra — "a palavra x".
+- `x, x.` quando o `Riječ` gruda no alvo e não sobra vale, caso de `do` e `pet`.
+- Só pontuação (`pas.`) **não** serve: sai num bloco só, sem onde cortar.
+
+**O vale é o mais LONGO, não o último.** A oclusiva dentro de uma palavra
+também é um vale — em `Riječ pet.` o buraco do /t/ fazia o corte entregar
+0,19s de "t" solto. A pausa entre palavras passa de 80 ms; uma oclusiva fica
+em 30–60.
+
+O gerador reprova e sorteia de novo quando não há vale, quando o recorte sai
+abaixo de 0,27 de pico, ou quando a duração não cabe na janela da palavra
+exibida — esta última é o que pega "trouxe metade do portador junto".
 
 ## Duração não vê silêncio
 
