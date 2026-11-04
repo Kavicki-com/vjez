@@ -2,12 +2,63 @@
 
 App para **falantes de PT-BR aprenderem croata** (iniciantes). Este arquivo é o contrato. Construa o app como **renderizador sobre o schema**; conteúdo entra como **dados curados** no backend — não faça hardcode de conteúdo.
 
+## Situação do projeto
+
+Fatos conferidos nos arquivos e no git em 2026-11-04. Repositório público: nunca versionar segredos. A spec original continua abaixo desta seção.
+
+### 1. O que é
+
+Vjez: curso de croata para falantes de português do Brasil, iniciantes, com trilha de lições, dicionário, tabelas de consulta (Padezi e Konjugacija), ofensiva e correção de produção livre por IA. Web, iOS e Android no mesmo código; o personagem das telas é o Zef.
+
+### 2. Stack
+
+- Expo `~57.0.10`, React Native `0.86.2`, React `19.2.3`, Expo Router `~57.0.10` (`baseUrl` `/app`), TypeScript `~6.0.3`, `react-native-web` `^0.21.2`.
+- `@supabase/supabase-js` `^2.112.0`, TanStack Query `^5.101.4`, `expo-audio` `~57.0.3`.
+- Edge Function versionada: `corrigir-producao-livre`.
+- Web: PWA (`public/sw.js`) e landing estática sem build (`web/`).
+- Versão em `app.json`: `1.0.0`.
+- Comandos: `npm start`, `npm run typecheck`, `npm run preview:web`, `npm run publicar`. Publicação web: `PUBLICAR.md`.
+
+### 3. Situação real
+
+**Em desenvolvimento** para as lojas; publicação web atual não determinada pelos arquivos.
+
+| Afirmação | Evidência |
+| --- | --- |
+| Sem preparo de build de loja: não há `eas.json` e `extra.eas` está vazio | `app.json`, conferido em 2026-11-04 |
+| Login no celular ainda não configurado | `src/features/conta/api.ts` |
+| Login com Apple depende de conta de desenvolvedor ativa | `src/features/conta/PortaoDeLogin.tsx` |
+| Destino web definido: landing e app em `vjez.kavicki.com` | `PUBLICAR.md`, conferido nele em 2026-08-13 |
+| Pacote web montado localmente, com 107 arquivos e `sw` v4, ainda não commitada | `publicar/` (ignorada pelo git), arquivos de 2026-09-17 |
+
+Não determinado pelos arquivos: se `publicar/` subiu e qual versão está no ar em `vjez.kavicki.com`. Falta registro do deploy ou conferência recente.
+
+### 4. Em andamento
+
+- Branch `main`, igual a `origin/main`, em `9a9362b` (2026-09-17). Sem commits há 48 dias.
+- **Não commitado:** 9 arquivos modificados (190 inserções, 118 remoções), com o Zef nas telas de feedback, fim de lição, checkpoint e erro; novos estados `espanta` e `resmunga`; `sw` v4; atualização de `assets/personagem/LEIA-ME.md`.
+- Últimas entregas: Konjugacija (`dcb478b`), varredura de áudio (`7afb7ad`, `38070e3`), 5 lições por unidade (`51975ec`), Zef (`a45b79e`).
+- `acumulado-ate-2026-08-22`: sem commits à frente de `main`.
+
+### 5. Pendências
+
+- Commitar os 9 arquivos modificados.
+- Web (`PUBLICAR.md`, estado de 2026-08-13; estado atual não determinado): certificado do domínio, `try_files` no Nginx e URLs de redirect no Supabase.
+- Lojas: login móvel, login com Apple, `eas.json`, assets de loja e itens de "Compliance" abaixo.
+- `excluirConta` chama a função `excluir-conta`, que não está em `supabase/functions/`. Se está implantada: não determinado pelos arquivos.
+- `src/features/conta/travessia.ts` usa `sessionStorage` de propósito; é exceção à regra 5, a confirmar com o dono.
+- `web/LEIA-ME.md`: fontes em WOFF2 e consentimento do Clarity, quando o analytics entrar.
+- `assets/personagem/LEIA-ME.md`: piscar, boné e poses próprias para `errou`, `espanta`, `resmunga` e `pensa`.
+- Sem TODO/FIXME/HACK/XXX no código.
+
+---
+
 ## Stack (fixa)
 
 - **React Native + React Native Web via Expo** — um código para web + iOS + Android.
 - **Supabase**: Auth (Google/Apple), Postgres, Storage (áudio), Edge Functions.
 - **TypeScript** em tudo. O schema abaixo é a fonte da verdade.
-- **Microsoft Clarity** (analytics) desde o início.
+- **Microsoft Clarity** (analytics) desde o início. *(Obsoleto em 2026-11-04: não integrado; não há Clarity em `src/`, `app/` ou `package.json`, e `app/(drawer)/privacidade.tsx` declara que o app não usa.)*
 - Áudio: **MP3 pré-gerado** (Cloud TTS), servido do Storage.
 
 ## Regras invioláveis
