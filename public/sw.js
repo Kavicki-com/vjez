@@ -35,7 +35,12 @@
 // v3: 14 faixas mudas reescritas nas mesmas URLs (vogais soltas, `pas`,
 // `pet`, `je`, `ja`, `ti`, `Đ`). Quem já tinha o PWA instalado carregava a
 // versão silenciosa do cache.
-const VERSAO = 'vjez-v3';
+//
+// v4: o Zef entrou nas telas (feedback, fim de lição, checkpoint, erro de
+// carregamento). Áudio não mudou; o bump é pelo deploy em si — são 107
+// arquivos por SFTP, e quem estiver com o site aberto no meio da subida
+// fica com casca velha e bundle novo.
+const VERSAO = 'vjez-v4';
 const CASCA = `${VERSAO}-casca`;
 const ESTATICOS = `${VERSAO}-estaticos`;
 const AUDIO = `${VERSAO}-audio`;

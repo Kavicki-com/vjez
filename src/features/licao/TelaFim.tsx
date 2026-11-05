@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Botao } from '@/components/Botao';
 import { Confete } from '@/components/Confete';
+import { Kuna } from '@/components/kuna';
 import { Sahovnica } from '@/components/Sahovnica';
 import { useEntrarComGoogle } from '@/features/conta/entrar';
 import {
@@ -61,15 +62,16 @@ export function TelaFim({
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.coluna}>
-          <View style={styles.medalhaCaixa}>
-            <View style={[styles.medalha, !foiBem && styles.medalhaNeutra]}>
-              <Ionicons
-                name={foiBem ? 'trophy' : 'flag'}
-                size={64}
-                color={cores.superficie}
-              />
-            </View>
-          </View>
+          {/*
+            Quem comemora é o boneco, não um troféu. No portão de login ele
+            acena em vez de comemorar: ali a tela não está fechando a lição,
+            está convidando para a conta. Decorativo — o título abaixo já diz
+            tudo que o leitor de tela precisa.
+          */}
+          <Kuna
+            estado={ofereceConta ? 'acena' : foiBem ? 'comemora' : 'parado'}
+            altura={190}
+          />
 
           <Text style={styles.titulo}>
             {foiBem ? 'Lição concluída!' : 'Lição encerrada'}
@@ -171,17 +173,6 @@ const styles = StyleSheet.create({
     gap: espaco.md,
     alignItems: 'center',
   },
-
-  medalhaCaixa: { padding: espaco.sm },
-  medalha: {
-    width: 128,
-    height: 128,
-    borderRadius: raio.pill,
-    backgroundColor: cores.primaria,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  medalhaNeutra: { backgroundColor: cores.contorno },
 
   titulo: {
     fontSize: fonte.gigante,

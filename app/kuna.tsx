@@ -8,7 +8,15 @@ import { estado as estadoDe } from '@/components/kuna/estados';
 import { ordemDe, palco, pivoDe, rostos, troncoDoRosto } from '@/components/kuna/pose';
 import { cores, espaco, familia, raio } from '@/theme/tokens';
 
-const ESTADOS: NomeDoEstado[] = ['parado', 'acena', 'comemora', 'errou', 'pensa'];
+const ESTADOS: NomeDoEstado[] = [
+  'parado',
+  'acena',
+  'comemora',
+  'errou',
+  'espanta',
+  'resmunga',
+  'pensa',
+];
 
 const ALTURA = 340;
 

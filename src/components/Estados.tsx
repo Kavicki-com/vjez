@@ -1,6 +1,7 @@
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { Botao } from '@/components/Botao';
+import { Kuna } from '@/components/kuna';
 import {
   cores,
   espaco,
@@ -32,6 +33,12 @@ export function Erro({
 }) {
   return (
     <View style={styles.centro}>
+      {/*
+        A cara fechada aqui é com a conexão, não com quem está estudando —
+        é a única tela em que o `bravo` entra. Decorativo: o texto abaixo
+        diz a mesma coisa em palavras.
+      */}
+      <Kuna estado="resmunga" altura={170} />
       <Text style={styles.titulo}>Não deu para carregar</Text>
       <Text style={styles.texto}>
         {mensagem ?? 'Verifique sua conexão e tente de novo.'}

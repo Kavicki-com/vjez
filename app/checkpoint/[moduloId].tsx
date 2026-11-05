@@ -15,6 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Botao } from '@/components/Botao';
 import { Confete } from '@/components/Confete';
+import { Kuna } from '@/components/kuna';
 import { Carregando, Erro } from '@/components/Estados';
 import { Sahovnica } from '@/components/Sahovnica';
 import { useSomDeResposta } from '@/features/audio/sons';
@@ -299,13 +300,11 @@ function Resultado({
     <View style={styles.fim}>
       {passou && <Confete />}
       <View style={styles.colunaFim}>
-        <View style={[styles.medalha, !passou && styles.medalhaNeutra]}>
-          <Ionicons
-            name={passou ? 'ribbon' : 'refresh'}
-            size={60}
-            color={cores.superficie}
-          />
-        </View>
+        {/*
+          Não passar é notícia, não bronca: o `espanta` é um sobressalto de
+          susto, e a explicação logo abaixo diz que só a prova se refaz.
+        */}
+        <Kuna estado={passou ? 'comemora' : 'espanta'} altura={180} />
 
         <Text style={styles.fimTitulo}>
           {passou ? 'Checkpoint concluído!' : 'Quase lá'}
@@ -413,15 +412,6 @@ const styles = StyleSheet.create({
     gap: espaco.md,
     alignItems: 'center',
   },
-  medalha: {
-    width: 120,
-    height: 120,
-    borderRadius: raio.pill,
-    backgroundColor: cores.secundaria,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  medalhaNeutra: { backgroundColor: cores.contorno },
   fimTitulo: {
     fontSize: fonte.gigante,
     lineHeight: linha.gigante,

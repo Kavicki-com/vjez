@@ -166,18 +166,32 @@ Ombro fora do lugar abre buraco na junta quando o braço sobe, então confira
 ## Os estados
 
 `src/components/kuna/estados.ts`, como tabela de quadros — `parado`,
-`acena`, `comemora`, `errou`, `pensa`. Cada estado escolhe uma montagem e
-um rosto — e o tronco segue —, e descreve o movimento por cima. O motor (`Kuna.tsx`) suaviza a
-passagem entre quadros, então dois quadros já dão um vaivém com peso.
+`acena`, `comemora`, `errou`, `espanta`, `resmunga`, `pensa`. Cada estado
+escolhe uma montagem e um rosto — e o tronco segue —, e descreve o movimento
+por cima. O motor (`Kuna.tsx`) suaviza a passagem entre quadros, então dois
+quadros já dão um vaivém com peso.
 
-Nenhum estado usa as cinco expressões ainda — qual cara vai com qual estado
-é decisão de produto, e o CLAUDE.md tem regra sobre ela: no `errou`, "o
-boneco não repreende". Enquanto não se decide, quem quiser uma expressão
-passa a prop `rosto` na chamada.
+**Que cara vai com que estado** (decidido em 17/09/2026, e é por isso que
+`espanta` e `resmunga` existem):
 
-`errou` e `pensa` ainda não têm montagem própria: usam a do `parado` com
-rotações pequenas. Quando o artista desenhá-las, é só acrescentar o node à
-linha de comando do gerador e trocar o `montagem:` do estado.
+| onde | estado | rosto |
+|---|---|---|
+| acerto no exercício | `comemora` | `front` |
+| erro no exercício | `errou` | `triste` |
+| lição concluída | `comemora` | `front` |
+| lição 1 concluída, sem conta | `acena` | `front` |
+| checkpoint não passou | `espanta` | `surpreso` |
+| não deu para carregar | `resmunga` | `bravo` |
+
+A regra que sobrevive à decisão: no erro **o boneco não repreende**. `triste`
+é dó, e a cara fechada (`bravo`) só aparece onde o alvo é a conexão, nunca
+quem respondeu. `sonolento` e `piscando` continuam sem estado — a piscadela
+depende do motor que falta (veja o fim deste arquivo).
+
+`errou`, `espanta`, `resmunga` e `pensa` ainda não têm montagem própria:
+usam a do `parado` com rotações pequenas. Quando o artista desenhá-las, é só
+acrescentar o node à linha de comando do gerador e trocar o `montagem:` do
+estado.
 
 ## O que ainda não dá para fazer
 

@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { Botao } from '@/components/Botao';
 import { Imagem } from '@/components/Imagem';
+import { Kuna } from '@/components/kuna';
 import { Sahovnica } from '@/components/Sahovnica';
 import { etiquetaDoCaso } from '@/lib/padez';
 import {
@@ -42,11 +43,10 @@ export function AberturaLicao({
   quantidadeDeExercicios,
   aoComecar,
 }: Props) {
-  // O campo aceita URL de ilustração ou nome de glifo: a curadoria troca de
-  // um para o outro sem mexer no código.
+  // O campo aceita URL de ilustração: a curadoria põe a arte da lição
+  // quando tem uma. Sem ela, quem abre a lição é o Zef.
   const eUrl = Boolean(ilustracao?.startsWith('http'));
   const [ilustracaoFalhou, setIlustracaoFalhou] = useState(false);
-  const icone = (eUrl ? 'book' : (ilustracao ?? 'book')) as keyof typeof Ionicons.glyphMap;
 
   return (
     <View style={styles.tela}>
@@ -66,9 +66,12 @@ export function AberturaLicao({
               aoFalhar={() => setIlustracaoFalhou(true)}
             />
           ) : (
-            <View style={styles.ilustracao}>
-              <Ionicons name={icone} size={72} color={cores.primaria} />
-            </View>
+            // O aceno é a entrada: o personagem recebe quem abriu a lição.
+            <Kuna
+              estado="acena"
+              altura={200}
+              rotuloAcessivel="Zef, o personagem do Vjez, acenando"
+            />
           )}
 
           {padez && (
@@ -116,15 +119,6 @@ const styles = StyleSheet.create({
     maxWidth: larguraMaximaConteudo,
     gap: espaco.md,
     alignItems: 'center',
-  },
-  ilustracao: {
-    width: 140,
-    height: 140,
-    borderRadius: raio.pill,
-    backgroundColor: cores.primariaSuave,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: espaco.sm,
   },
   selo: {
     paddingHorizontal: espaco.md,

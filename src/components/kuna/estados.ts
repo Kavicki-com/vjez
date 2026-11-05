@@ -36,7 +36,14 @@ export type Movimento = {
   quadros?: Partial<Record<Propriedade, readonly Quadro[]>>;
 };
 
-export type NomeDoEstado = 'parado' | 'acena' | 'comemora' | 'errou' | 'pensa';
+export type NomeDoEstado =
+  | 'parado'
+  | 'acena'
+  | 'comemora'
+  | 'errou'
+  | 'espanta'
+  | 'resmunga'
+  | 'pensa';
 
 type Estado = {
   montagem: NomeDaMontagem;
@@ -121,9 +128,13 @@ const ESTADOS: Record<NomeDoEstado, Estado> = {
   // respiro fica mais lento. O erro não bloqueia, e o boneco não repreende.
   // Os braços já nascem abertos no montado, então recolher é girar cada um
   // para dentro — sinais opostos.
+  //
+  // O rosto `triste` é DÓ, não bronca: quem está de cara fechada aqui seria
+  // o `bravo`, e ele mora no `resmunga`, que é sobre a conexão e não sobre
+  // quem respondeu.
   errou: {
     montagem: 'parado',
-    rosto: 'front',
+    rosto: 'triste',
     juntas: {
       cabeca: {
         duracao: 2800,
@@ -134,6 +145,45 @@ const ESTADOS: Record<NomeDoEstado, Estado> = {
       'braco-dir': { pose: { rot: 12 } },
       calda: { pose: { rot: 12 } },
       tronco: { duracao: 5000, quadros: { escalaY: [[0, 1], [0.5, 1.022], [1, 1]] } },
+    },
+  },
+
+  /**
+   * O sobressalto de quem não passou por pouco: o corpo dá um pulinho curto
+   * no começo do ciclo e volta, os braços abrem um tanto. Não passar é
+   * notícia, não bronca — por isso `surpreso` e não `triste`.
+   *
+   * O pulo é de 10 contra os 44 do `comemora`: ali é festa, aqui é susto.
+   */
+  espanta: {
+    montagem: 'parado',
+    rosto: 'surpreso',
+    juntas: {
+      corpo: {
+        duracao: 1600,
+        quadros: { dy: [[0, 0], [0.1, -10], [0.26, 0], [1, 0]] },
+      },
+      'braco-esq': { pose: { rot: 8 } },
+      'braco-dir': { pose: { rot: -8 } },
+      calda: { duracao: 1000, quadros: { rot: [[0, -3], [0.5, 5], [1, -3]] } },
+    },
+  },
+
+  /**
+   * A cara fechada tem um alvo só: a tela que não carregou. Os braços
+   * cruzam para dentro e a cauda bate rápido — é impaciência, e ela é com a
+   * conexão, não com quem está estudando.
+   */
+  resmunga: {
+    montagem: 'parado',
+    rosto: 'bravo',
+    juntas: {
+      'braco-esq': { pose: { rot: -16 } },
+      'braco-dir': { pose: { rot: 16 } },
+      // Metade da duração do vaivém de base: a mesma amplitude, o dobro da
+      // impaciência.
+      calda: { duracao: 1500, quadros: { rot: [[0, -3], [0.5, 5], [1, -3]] } },
+      cabeca: { duracao: 2600, quadros: { rot: [[0, -1.2], [0.5, 1.2], [1, -1.2]] } },
     },
   },
 
